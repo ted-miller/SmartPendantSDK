@@ -52,6 +52,23 @@ namespace Yaskawa.Ext
 
         public void unsubscribeItemEventTypes(HashSet<String> itemIDs, HashSet<PendantEventType> types)
         {
+            foreach(PendantEventType type in types)
+            {
+                var a = new Dictionary<string, List<Action<PendantEvent>>>();
+                var b = new List<Action<PendantEvent>>();
+                if (itemEventConsumers.TryGetValue(type, out a))
+                {
+                    foreach(string item in itemIDs)
+                    {
+                        if (a.TryGetValue(item, out b))
+                        {
+                            itemEventConsumers[type].Remove(item);
+                        }
+
+                    }
+                }
+            }
+
             lock (extension.SyncRoot)
                 client.unsubscribeItemEventTypes(id, itemIDs, types).Wait();
         }
