@@ -37,6 +37,7 @@ namespace Yaskawa.Ext.API
     Canceled = 18,
     JoggingPanelVisibilityChanged = 19,
     VisibleChanged = 20,
+    IntegrationPointSwitchStateChanged = 21,
     Other = 16384,
   }
 }

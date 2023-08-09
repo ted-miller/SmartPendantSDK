@@ -29,5 +29,10 @@ namespace Yaskawa.Ext.API
     SmartFrameJogPanelBottomAny = 49,
     JogPanelTopCenter = 50,
     HomeScreen = 60,
+    JobTestPanelCenter = 70,
+    JobTestPanelBottomLeft = 71,
+    JobTestPanelBottomRight = 72,
+    JobTestPanelTopLeft = 73,
+    JobTestPanelTopRight = 74,
   }
 }
