@@ -281,7 +281,7 @@ namespace Yaskawa.Ext
         public void registerSwitch(String identifier, IntegrationPoint integrationPoint, String switchLabel, String offPositionLabel, String onPositionLabel, bool defaultState)
         {
             lock (extension.SyncRoot)
-                client.registerSwitch(id, identifier, integrationPoint, switchLabel, offPositionLabel, onPositionLabel, defaultState);
+                client.registerSwitch(id, identifier, integrationPoint, switchLabel, offPositionLabel, onPositionLabel, defaultState).Wait();
         }
 
         public Any property(string itemID, string name)
