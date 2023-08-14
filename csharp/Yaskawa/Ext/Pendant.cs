@@ -229,14 +229,29 @@ namespace Yaskawa.Ext
             lock (extension.SyncRoot)
                 client.registerTranslationData(id, locale, translationData, translationName).Wait();
         }
+        
+        public void registerUtilityMenu(string menuName, string menuText, string menuIcon)
+        {
+            client.registerUtilityMenu(id, menuName, menuText, menuIcon);
+        }
 
-		public void registerUtilityWindow(string identifier, string itemtype, string menuitemname, string windowtitle) 
+        public void unregisterUtilityMenu(string menuName)
+        {
+            client.unregisterUtilityMenu(id, menuName);
+        }
+
+        public void registerUtilityWindow(string identifier, string itemtype, string menuitemname, string windowtitle) 
 		{
             lock (extension.SyncRoot)
                 client.registerUtilityWindow(id, identifier, itemtype, menuitemname, windowtitle).Wait();
 		}
 
-		public void unregisterUtilityWindow(String identifier)
+        public void registerUtilityWindowWithMenu(string identifier, string itemtype, string menuitemname, string windowtitle, string menuName)
+        {
+            client.registerUtilityWindowWithMenu(id, identifier, itemtype, menuitemname, windowtitle, menuName);
+        }
+
+        public void unregisterUtilityWindow(String identifier)
 		{
             lock (extension.SyncRoot)
                 client.unregisterUtilityWindow(id, identifier).Wait();

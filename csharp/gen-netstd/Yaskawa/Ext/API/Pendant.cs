@@ -161,10 +161,27 @@ namespace Yaskawa.Ext.API
       global::System.Threading.Tasks.Task registerTranslationData(long p, string locale, byte[] translationData, string translationName, CancellationToken cancellationToken = default);
 
       /// <summary>
+      /// Register a menu that utilities can be registered under *
+      /// </summary>
+      /// <param name="p"></param>
+      /// <param name="menuName"></param>
+      /// <param name="menuText"></param>
+      /// <param name="menuIcon"></param>
+      global::System.Threading.Tasks.Task registerUtilityMenu(long p, string menuName, string menuText, string menuIcon, CancellationToken cancellationToken = default);
+
+      /// <summary>
+      /// Unregisters a user added menu - All Utilities within the menu must be unregistered with 'unregisterUtilityWindow' first
+      /// </summary>
+      /// <param name="p"></param>
+      /// <param name="menuName"></param>
+      global::System.Threading.Tasks.Task unregisterUtilityMenu(long p, string menuName, CancellationToken cancellationToken = default);
+
+      /// <summary>
       /// Register a Utility window with the UI.
       /// The itemType references a previously registered YML item instantiated for the window
       /// UI content.
-      /// A main menu entry will automatically be added to the pendant UI, for opening the utility window.
+      /// The menuName refers to a previously registered menu that the utility will apear under on the
+      /// main menu or if none is specified it will be under 'Utility'
       /// </summary>
       /// <param name="p"></param>
       /// <param name="identifier"></param>
@@ -172,6 +189,8 @@ namespace Yaskawa.Ext.API
       /// <param name="menuItemName"></param>
       /// <param name="windowTitle"></param>
       global::System.Threading.Tasks.Task registerUtilityWindow(long p, string identifier, string itemType, string menuItemName, string windowTitle, CancellationToken cancellationToken = default);
+
+      global::System.Threading.Tasks.Task registerUtilityWindowWithMenu(long p, string identifier, string itemType, string menuItemName, string windowTitle, string menuName, CancellationToken cancellationToken = default);
 
       global::System.Threading.Tasks.Task unregisterUtilityWindow(long p, string identifier, CancellationToken cancellationToken = default);
 
@@ -1116,22 +1135,21 @@ namespace Yaskawa.Ext.API
         }
       }
 
-      public async global::System.Threading.Tasks.Task registerUtilityWindow(long p, string identifier, string itemType, string menuItemName, string windowTitle, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task registerUtilityMenu(long p, string menuName, string menuText, string menuIcon, CancellationToken cancellationToken = default)
       {
-        await send_registerUtilityWindow(p, identifier, itemType, menuItemName, windowTitle, cancellationToken);
-        await recv_registerUtilityWindow(cancellationToken);
+        await send_registerUtilityMenu(p, menuName, menuText, menuIcon, cancellationToken);
+        await recv_registerUtilityMenu(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task send_registerUtilityWindow(long p, string identifier, string itemType, string menuItemName, string windowTitle, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task send_registerUtilityMenu(long p, string menuName, string menuText, string menuIcon, CancellationToken cancellationToken = default)
       {
-        await OutputProtocol.WriteMessageBeginAsync(new TMessage("registerUtilityWindow", TMessageType.Call, SeqId), cancellationToken);
+        await OutputProtocol.WriteMessageBeginAsync(new TMessage("registerUtilityMenu", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp731 = new InternalStructs.registerUtilityWindow_args() {
+        var tmp731 = new InternalStructs.registerUtilityMenu_args() {
           P = p,
-          Identifier = identifier,
-          ItemType = itemType,
-          MenuItemName = menuItemName,
-          WindowTitle = windowTitle,
+          MenuName = menuName,
+          MenuText = menuText,
+          MenuIcon = menuIcon,
         };
         
         await tmp731.WriteAsync(OutputProtocol, cancellationToken);
@@ -1139,7 +1157,7 @@ namespace Yaskawa.Ext.API
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task recv_registerUtilityWindow(CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task recv_registerUtilityMenu(CancellationToken cancellationToken = default)
       {
         
         var tmp732 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
@@ -1150,12 +1168,139 @@ namespace Yaskawa.Ext.API
           throw tmp733;
         }
 
-        var tmp734 = new InternalStructs.registerUtilityWindow_result();
+        var tmp734 = new InternalStructs.registerUtilityMenu_result();
         await tmp734.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
         if (tmp734.__isset.e)
         {
           throw tmp734.E;
+        }
+      }
+
+      public async global::System.Threading.Tasks.Task unregisterUtilityMenu(long p, string menuName, CancellationToken cancellationToken = default)
+      {
+        await send_unregisterUtilityMenu(p, menuName, cancellationToken);
+        await recv_unregisterUtilityMenu(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task send_unregisterUtilityMenu(long p, string menuName, CancellationToken cancellationToken = default)
+      {
+        await OutputProtocol.WriteMessageBeginAsync(new TMessage("unregisterUtilityMenu", TMessageType.Call, SeqId), cancellationToken);
+        
+        var tmp735 = new InternalStructs.unregisterUtilityMenu_args() {
+          P = p,
+          MenuName = menuName,
+        };
+        
+        await tmp735.WriteAsync(OutputProtocol, cancellationToken);
+        await OutputProtocol.WriteMessageEndAsync(cancellationToken);
+        await OutputProtocol.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task recv_unregisterUtilityMenu(CancellationToken cancellationToken = default)
+      {
+        
+        var tmp736 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp736.Type == TMessageType.Exception)
+        {
+          var tmp737 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          await InputProtocol.ReadMessageEndAsync(cancellationToken);
+          throw tmp737;
+        }
+
+        var tmp738 = new InternalStructs.unregisterUtilityMenu_result();
+        await tmp738.ReadAsync(InputProtocol, cancellationToken);
+        await InputProtocol.ReadMessageEndAsync(cancellationToken);
+        if (tmp738.__isset.e)
+        {
+          throw tmp738.E;
+        }
+      }
+
+      public async global::System.Threading.Tasks.Task registerUtilityWindow(long p, string identifier, string itemType, string menuItemName, string windowTitle, CancellationToken cancellationToken = default)
+      {
+        await send_registerUtilityWindow(p, identifier, itemType, menuItemName, windowTitle, cancellationToken);
+        await recv_registerUtilityWindow(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task send_registerUtilityWindow(long p, string identifier, string itemType, string menuItemName, string windowTitle, CancellationToken cancellationToken = default)
+      {
+        await OutputProtocol.WriteMessageBeginAsync(new TMessage("registerUtilityWindow", TMessageType.Call, SeqId), cancellationToken);
+        
+        var tmp739 = new InternalStructs.registerUtilityWindow_args() {
+          P = p,
+          Identifier = identifier,
+          ItemType = itemType,
+          MenuItemName = menuItemName,
+          WindowTitle = windowTitle,
+        };
+        
+        await tmp739.WriteAsync(OutputProtocol, cancellationToken);
+        await OutputProtocol.WriteMessageEndAsync(cancellationToken);
+        await OutputProtocol.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task recv_registerUtilityWindow(CancellationToken cancellationToken = default)
+      {
+        
+        var tmp740 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp740.Type == TMessageType.Exception)
+        {
+          var tmp741 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          await InputProtocol.ReadMessageEndAsync(cancellationToken);
+          throw tmp741;
+        }
+
+        var tmp742 = new InternalStructs.registerUtilityWindow_result();
+        await tmp742.ReadAsync(InputProtocol, cancellationToken);
+        await InputProtocol.ReadMessageEndAsync(cancellationToken);
+        if (tmp742.__isset.e)
+        {
+          throw tmp742.E;
+        }
+      }
+
+      public async global::System.Threading.Tasks.Task registerUtilityWindowWithMenu(long p, string identifier, string itemType, string menuItemName, string windowTitle, string menuName, CancellationToken cancellationToken = default)
+      {
+        await send_registerUtilityWindowWithMenu(p, identifier, itemType, menuItemName, windowTitle, menuName, cancellationToken);
+        await recv_registerUtilityWindowWithMenu(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task send_registerUtilityWindowWithMenu(long p, string identifier, string itemType, string menuItemName, string windowTitle, string menuName, CancellationToken cancellationToken = default)
+      {
+        await OutputProtocol.WriteMessageBeginAsync(new TMessage("registerUtilityWindowWithMenu", TMessageType.Call, SeqId), cancellationToken);
+        
+        var tmp743 = new InternalStructs.registerUtilityWindowWithMenu_args() {
+          P = p,
+          Identifier = identifier,
+          ItemType = itemType,
+          MenuItemName = menuItemName,
+          WindowTitle = windowTitle,
+          MenuName = menuName,
+        };
+        
+        await tmp743.WriteAsync(OutputProtocol, cancellationToken);
+        await OutputProtocol.WriteMessageEndAsync(cancellationToken);
+        await OutputProtocol.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task recv_registerUtilityWindowWithMenu(CancellationToken cancellationToken = default)
+      {
+        
+        var tmp744 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp744.Type == TMessageType.Exception)
+        {
+          var tmp745 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          await InputProtocol.ReadMessageEndAsync(cancellationToken);
+          throw tmp745;
+        }
+
+        var tmp746 = new InternalStructs.registerUtilityWindowWithMenu_result();
+        await tmp746.ReadAsync(InputProtocol, cancellationToken);
+        await InputProtocol.ReadMessageEndAsync(cancellationToken);
+        if (tmp746.__isset.e)
+        {
+          throw tmp746.E;
         }
       }
 
@@ -1169,12 +1314,12 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("unregisterUtilityWindow", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp735 = new InternalStructs.unregisterUtilityWindow_args() {
+        var tmp747 = new InternalStructs.unregisterUtilityWindow_args() {
           P = p,
           Identifier = identifier,
         };
         
-        await tmp735.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp747.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1182,20 +1327,20 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_unregisterUtilityWindow(CancellationToken cancellationToken = default)
       {
         
-        var tmp736 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp736.Type == TMessageType.Exception)
+        var tmp748 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp748.Type == TMessageType.Exception)
         {
-          var tmp737 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp749 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp737;
+          throw tmp749;
         }
 
-        var tmp738 = new InternalStructs.unregisterUtilityWindow_result();
-        await tmp738.ReadAsync(InputProtocol, cancellationToken);
+        var tmp750 = new InternalStructs.unregisterUtilityWindow_result();
+        await tmp750.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp738.__isset.e)
+        if (tmp750.__isset.e)
         {
-          throw tmp738.E;
+          throw tmp750.E;
         }
       }
 
@@ -1209,12 +1354,12 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("openUtilityWindow", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp739 = new InternalStructs.openUtilityWindow_args() {
+        var tmp751 = new InternalStructs.openUtilityWindow_args() {
           P = p,
           Identifier = identifier,
         };
         
-        await tmp739.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp751.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1222,16 +1367,16 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_openUtilityWindow(CancellationToken cancellationToken = default)
       {
         
-        var tmp740 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp740.Type == TMessageType.Exception)
+        var tmp752 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp752.Type == TMessageType.Exception)
         {
-          var tmp741 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp753 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp741;
+          throw tmp753;
         }
 
-        var tmp742 = new InternalStructs.openUtilityWindow_result();
-        await tmp742.ReadAsync(InputProtocol, cancellationToken);
+        var tmp754 = new InternalStructs.openUtilityWindow_result();
+        await tmp754.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
       }
 
@@ -1245,12 +1390,12 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("closeUtilityWindow", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp743 = new InternalStructs.closeUtilityWindow_args() {
+        var tmp755 = new InternalStructs.closeUtilityWindow_args() {
           P = p,
           Identifier = identifier,
         };
         
-        await tmp743.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp755.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1258,16 +1403,16 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_closeUtilityWindow(CancellationToken cancellationToken = default)
       {
         
-        var tmp744 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp744.Type == TMessageType.Exception)
+        var tmp756 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp756.Type == TMessageType.Exception)
         {
-          var tmp745 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp757 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp745;
+          throw tmp757;
         }
 
-        var tmp746 = new InternalStructs.closeUtilityWindow_result();
-        await tmp746.ReadAsync(InputProtocol, cancellationToken);
+        var tmp758 = new InternalStructs.closeUtilityWindow_result();
+        await tmp758.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
       }
 
@@ -1281,12 +1426,12 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("collapseUtilityWindow", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp747 = new InternalStructs.collapseUtilityWindow_args() {
+        var tmp759 = new InternalStructs.collapseUtilityWindow_args() {
           P = p,
           Identifier = identifier,
         };
         
-        await tmp747.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp759.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1294,16 +1439,16 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_collapseUtilityWindow(CancellationToken cancellationToken = default)
       {
         
-        var tmp748 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp748.Type == TMessageType.Exception)
+        var tmp760 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp760.Type == TMessageType.Exception)
         {
-          var tmp749 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp761 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp749;
+          throw tmp761;
         }
 
-        var tmp750 = new InternalStructs.collapseUtilityWindow_result();
-        await tmp750.ReadAsync(InputProtocol, cancellationToken);
+        var tmp762 = new InternalStructs.collapseUtilityWindow_result();
+        await tmp762.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
       }
 
@@ -1317,12 +1462,12 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("expandUtilityWindow", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp751 = new InternalStructs.expandUtilityWindow_args() {
+        var tmp763 = new InternalStructs.expandUtilityWindow_args() {
           P = p,
           Identifier = identifier,
         };
         
-        await tmp751.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp763.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1330,16 +1475,16 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_expandUtilityWindow(CancellationToken cancellationToken = default)
       {
         
-        var tmp752 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp752.Type == TMessageType.Exception)
+        var tmp764 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp764.Type == TMessageType.Exception)
         {
-          var tmp753 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp765 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp753;
+          throw tmp765;
         }
 
-        var tmp754 = new InternalStructs.expandUtilityWindow_result();
-        await tmp754.ReadAsync(InputProtocol, cancellationToken);
+        var tmp766 = new InternalStructs.expandUtilityWindow_result();
+        await tmp766.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
       }
 
@@ -1353,7 +1498,7 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("registerIntegration", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp755 = new InternalStructs.registerIntegration_args() {
+        var tmp767 = new InternalStructs.registerIntegration_args() {
           P = p,
           Identifier = identifier,
           IntegrationPoint = integrationPoint,
@@ -1362,7 +1507,7 @@ namespace Yaskawa.Ext.API
           ButtonImage = buttonImage,
         };
         
-        await tmp755.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp767.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1370,20 +1515,20 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_registerIntegration(CancellationToken cancellationToken = default)
       {
         
-        var tmp756 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp756.Type == TMessageType.Exception)
+        var tmp768 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp768.Type == TMessageType.Exception)
         {
-          var tmp757 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp769 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp757;
+          throw tmp769;
         }
 
-        var tmp758 = new InternalStructs.registerIntegration_result();
-        await tmp758.ReadAsync(InputProtocol, cancellationToken);
+        var tmp770 = new InternalStructs.registerIntegration_result();
+        await tmp770.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp758.__isset.e)
+        if (tmp770.__isset.e)
         {
-          throw tmp758.E;
+          throw tmp770.E;
         }
       }
 
@@ -1397,12 +1542,12 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("unregisterIntegration", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp759 = new InternalStructs.unregisterIntegration_args() {
+        var tmp771 = new InternalStructs.unregisterIntegration_args() {
           P = p,
           Identifier = identifier,
         };
         
-        await tmp759.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp771.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1410,20 +1555,20 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_unregisterIntegration(CancellationToken cancellationToken = default)
       {
         
-        var tmp760 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp760.Type == TMessageType.Exception)
+        var tmp772 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp772.Type == TMessageType.Exception)
         {
-          var tmp761 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp773 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp761;
+          throw tmp773;
         }
 
-        var tmp762 = new InternalStructs.unregisterIntegration_result();
-        await tmp762.ReadAsync(InputProtocol, cancellationToken);
+        var tmp774 = new InternalStructs.unregisterIntegration_result();
+        await tmp774.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp762.__isset.e)
+        if (tmp774.__isset.e)
         {
-          throw tmp762.E;
+          throw tmp774.E;
         }
       }
 
@@ -1437,7 +1582,7 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("registerSwitch", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp763 = new InternalStructs.registerSwitch_args() {
+        var tmp775 = new InternalStructs.registerSwitch_args() {
           P = p,
           Identifier = identifier,
           IntegrationPoint = integrationPoint,
@@ -1447,7 +1592,7 @@ namespace Yaskawa.Ext.API
           DefaultState = defaultState,
         };
         
-        await tmp763.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp775.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1455,20 +1600,20 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_registerSwitch(CancellationToken cancellationToken = default)
       {
         
-        var tmp764 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp764.Type == TMessageType.Exception)
+        var tmp776 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp776.Type == TMessageType.Exception)
         {
-          var tmp765 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp777 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp765;
+          throw tmp777;
         }
 
-        var tmp766 = new InternalStructs.registerSwitch_result();
-        await tmp766.ReadAsync(InputProtocol, cancellationToken);
+        var tmp778 = new InternalStructs.registerSwitch_result();
+        await tmp778.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp766.__isset.e)
+        if (tmp778.__isset.e)
         {
-          throw tmp766.E;
+          throw tmp778.E;
         }
       }
 
@@ -1482,13 +1627,13 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("property", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp767 = new InternalStructs.property_args() {
+        var tmp779 = new InternalStructs.property_args() {
           P = p,
           ItemID = itemID,
           Name = name,
         };
         
-        await tmp767.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp779.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1496,24 +1641,24 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task<global::Yaskawa.Ext.API.Any> recv_property(CancellationToken cancellationToken = default)
       {
         
-        var tmp768 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp768.Type == TMessageType.Exception)
+        var tmp780 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp780.Type == TMessageType.Exception)
         {
-          var tmp769 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp781 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp769;
+          throw tmp781;
         }
 
-        var tmp770 = new InternalStructs.property_result();
-        await tmp770.ReadAsync(InputProtocol, cancellationToken);
+        var tmp782 = new InternalStructs.property_result();
+        await tmp782.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp770.__isset.success)
+        if (tmp782.__isset.success)
         {
-          return tmp770.Success;
+          return tmp782.Success;
         }
-        if (tmp770.__isset.e)
+        if (tmp782.__isset.e)
         {
-          throw tmp770.E;
+          throw tmp782.E;
         }
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "property failed: unknown result");
       }
@@ -1528,14 +1673,14 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("setProperty", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp771 = new InternalStructs.setProperty_args() {
+        var tmp783 = new InternalStructs.setProperty_args() {
           P = p,
           ItemID = itemID,
           Name = name,
           Value = @value,
         };
         
-        await tmp771.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp783.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1543,20 +1688,20 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_setProperty(CancellationToken cancellationToken = default)
       {
         
-        var tmp772 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp772.Type == TMessageType.Exception)
+        var tmp784 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp784.Type == TMessageType.Exception)
         {
-          var tmp773 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp785 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp773;
+          throw tmp785;
         }
 
-        var tmp774 = new InternalStructs.setProperty_result();
-        await tmp774.ReadAsync(InputProtocol, cancellationToken);
+        var tmp786 = new InternalStructs.setProperty_result();
+        await tmp786.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp774.__isset.e)
+        if (tmp786.__isset.e)
         {
-          throw tmp774.E;
+          throw tmp786.E;
         }
       }
 
@@ -1569,12 +1714,12 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("setProperties", TMessageType.Oneway, SeqId), cancellationToken);
         
-        var tmp775 = new InternalStructs.setProperties_args() {
+        var tmp787 = new InternalStructs.setProperties_args() {
           P = p,
           PropValuesList = propValuesList,
         };
         
-        await tmp775.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp787.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1589,13 +1734,13 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("setChartConfig", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp776 = new InternalStructs.setChartConfig_args() {
+        var tmp788 = new InternalStructs.setChartConfig_args() {
           P = p,
           ChartID = chartID,
           Config = config,
         };
         
-        await tmp776.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp788.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1603,20 +1748,20 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_setChartConfig(CancellationToken cancellationToken = default)
       {
         
-        var tmp777 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp777.Type == TMessageType.Exception)
+        var tmp789 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp789.Type == TMessageType.Exception)
         {
-          var tmp778 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp790 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp778;
+          throw tmp790;
         }
 
-        var tmp779 = new InternalStructs.setChartConfig_result();
-        await tmp779.ReadAsync(InputProtocol, cancellationToken);
+        var tmp791 = new InternalStructs.setChartConfig_result();
+        await tmp791.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp779.__isset.e)
+        if (tmp791.__isset.e)
         {
-          throw tmp779.E;
+          throw tmp791.E;
         }
       }
 
@@ -1630,12 +1775,12 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("getChartConfig", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp780 = new InternalStructs.getChartConfig_args() {
+        var tmp792 = new InternalStructs.getChartConfig_args() {
           P = p,
           ChartID = chartID,
         };
         
-        await tmp780.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp792.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1643,24 +1788,24 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task<global::Yaskawa.Ext.API.Any> recv_getChartConfig(CancellationToken cancellationToken = default)
       {
         
-        var tmp781 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp781.Type == TMessageType.Exception)
+        var tmp793 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp793.Type == TMessageType.Exception)
         {
-          var tmp782 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp794 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp782;
+          throw tmp794;
         }
 
-        var tmp783 = new InternalStructs.getChartConfig_result();
-        await tmp783.ReadAsync(InputProtocol, cancellationToken);
+        var tmp795 = new InternalStructs.getChartConfig_result();
+        await tmp795.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp783.__isset.success)
+        if (tmp795.__isset.success)
         {
-          return tmp783.Success;
+          return tmp795.Success;
         }
-        if (tmp783.__isset.e)
+        if (tmp795.__isset.e)
         {
-          throw tmp783.E;
+          throw tmp795.E;
         }
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "getChartConfig failed: unknown result");
       }
@@ -1675,14 +1820,14 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("setChartData", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp784 = new InternalStructs.setChartData_args() {
+        var tmp796 = new InternalStructs.setChartData_args() {
           P = p,
           ChartID = chartID,
           Dataset = dataset,
           Right = right,
         };
         
-        await tmp784.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp796.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1690,20 +1835,20 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_setChartData(CancellationToken cancellationToken = default)
       {
         
-        var tmp785 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp785.Type == TMessageType.Exception)
+        var tmp797 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp797.Type == TMessageType.Exception)
         {
-          var tmp786 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp798 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp786;
+          throw tmp798;
         }
 
-        var tmp787 = new InternalStructs.setChartData_result();
-        await tmp787.ReadAsync(InputProtocol, cancellationToken);
+        var tmp799 = new InternalStructs.setChartData_result();
+        await tmp799.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp787.__isset.e)
+        if (tmp799.__isset.e)
         {
-          throw tmp787.E;
+          throw tmp799.E;
         }
       }
 
@@ -1717,13 +1862,13 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("getChartData", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp788 = new InternalStructs.getChartData_args() {
+        var tmp800 = new InternalStructs.getChartData_args() {
           P = p,
           ChartID = chartID,
           Right = right,
         };
         
-        await tmp788.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp800.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1731,24 +1876,24 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task<Dictionary<string, global::Yaskawa.Ext.API.Data>> recv_getChartData(CancellationToken cancellationToken = default)
       {
         
-        var tmp789 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp789.Type == TMessageType.Exception)
+        var tmp801 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp801.Type == TMessageType.Exception)
         {
-          var tmp790 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp802 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp790;
+          throw tmp802;
         }
 
-        var tmp791 = new InternalStructs.getChartData_result();
-        await tmp791.ReadAsync(InputProtocol, cancellationToken);
+        var tmp803 = new InternalStructs.getChartData_result();
+        await tmp803.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp791.__isset.success)
+        if (tmp803.__isset.success)
         {
-          return tmp791.Success;
+          return tmp803.Success;
         }
-        if (tmp791.__isset.e)
+        if (tmp803.__isset.e)
         {
-          throw tmp791.E;
+          throw tmp803.E;
         }
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "getChartData failed: unknown result");
       }
@@ -1763,7 +1908,7 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("addChartKey", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp792 = new InternalStructs.addChartKey_args() {
+        var tmp804 = new InternalStructs.addChartKey_args() {
           P = p,
           ChartID = chartID,
           Key = key,
@@ -1771,7 +1916,7 @@ namespace Yaskawa.Ext.API
           Right = right,
         };
         
-        await tmp792.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp804.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1779,20 +1924,20 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_addChartKey(CancellationToken cancellationToken = default)
       {
         
-        var tmp793 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp793.Type == TMessageType.Exception)
+        var tmp805 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp805.Type == TMessageType.Exception)
         {
-          var tmp794 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp806 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp794;
+          throw tmp806;
         }
 
-        var tmp795 = new InternalStructs.addChartKey_result();
-        await tmp795.ReadAsync(InputProtocol, cancellationToken);
+        var tmp807 = new InternalStructs.addChartKey_result();
+        await tmp807.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp795.__isset.e)
+        if (tmp807.__isset.e)
         {
-          throw tmp795.E;
+          throw tmp807.E;
         }
       }
 
@@ -1806,14 +1951,14 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("removeChartKey", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp796 = new InternalStructs.removeChartKey_args() {
+        var tmp808 = new InternalStructs.removeChartKey_args() {
           P = p,
           ChartID = chartID,
           Key = key,
           Right = right,
         };
         
-        await tmp796.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp808.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1821,20 +1966,20 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_removeChartKey(CancellationToken cancellationToken = default)
       {
         
-        var tmp797 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp797.Type == TMessageType.Exception)
+        var tmp809 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp809.Type == TMessageType.Exception)
         {
-          var tmp798 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp810 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp798;
+          throw tmp810;
         }
 
-        var tmp799 = new InternalStructs.removeChartKey_result();
-        await tmp799.ReadAsync(InputProtocol, cancellationToken);
+        var tmp811 = new InternalStructs.removeChartKey_result();
+        await tmp811.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp799.__isset.e)
+        if (tmp811.__isset.e)
         {
-          throw tmp799.E;
+          throw tmp811.E;
         }
       }
 
@@ -1848,7 +1993,7 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("hideChartKey", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp800 = new InternalStructs.hideChartKey_args() {
+        var tmp812 = new InternalStructs.hideChartKey_args() {
           P = p,
           ChartID = chartID,
           Key = key,
@@ -1856,7 +2001,7 @@ namespace Yaskawa.Ext.API
           Right = right,
         };
         
-        await tmp800.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp812.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1864,20 +2009,20 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_hideChartKey(CancellationToken cancellationToken = default)
       {
         
-        var tmp801 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp801.Type == TMessageType.Exception)
+        var tmp813 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp813.Type == TMessageType.Exception)
         {
-          var tmp802 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp814 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp802;
+          throw tmp814;
         }
 
-        var tmp803 = new InternalStructs.hideChartKey_result();
-        await tmp803.ReadAsync(InputProtocol, cancellationToken);
+        var tmp815 = new InternalStructs.hideChartKey_result();
+        await tmp815.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp803.__isset.e)
+        if (tmp815.__isset.e)
         {
-          throw tmp803.E;
+          throw tmp815.E;
         }
       }
 
@@ -1890,7 +2035,7 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("appendChartPoints", TMessageType.Oneway, SeqId), cancellationToken);
         
-        var tmp804 = new InternalStructs.appendChartPoints_args() {
+        var tmp816 = new InternalStructs.appendChartPoints_args() {
           P = p,
           ChartID = chartID,
           Key = key,
@@ -1898,7 +2043,7 @@ namespace Yaskawa.Ext.API
           Right = right,
         };
         
-        await tmp804.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp816.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1913,14 +2058,14 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("incrementChartKey", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp805 = new InternalStructs.incrementChartKey_args() {
+        var tmp817 = new InternalStructs.incrementChartKey_args() {
           P = p,
           ChartID = chartID,
           Key = key,
           Val = val,
         };
         
-        await tmp805.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp817.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1928,20 +2073,20 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_incrementChartKey(CancellationToken cancellationToken = default)
       {
         
-        var tmp806 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp806.Type == TMessageType.Exception)
+        var tmp818 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp818.Type == TMessageType.Exception)
         {
-          var tmp807 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp819 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp807;
+          throw tmp819;
         }
 
-        var tmp808 = new InternalStructs.incrementChartKey_result();
-        await tmp808.ReadAsync(InputProtocol, cancellationToken);
+        var tmp820 = new InternalStructs.incrementChartKey_result();
+        await tmp820.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp808.__isset.e)
+        if (tmp820.__isset.e)
         {
-          throw tmp808.E;
+          throw tmp820.E;
         }
       }
 
@@ -1955,13 +2100,13 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("exportChartImage", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp809 = new InternalStructs.exportChartImage_args() {
+        var tmp821 = new InternalStructs.exportChartImage_args() {
           P = p,
           ChartID = chartID,
           ImageFileName = imageFileName,
         };
         
-        await tmp809.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp821.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -1969,24 +2114,24 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task<string> recv_exportChartImage(CancellationToken cancellationToken = default)
       {
         
-        var tmp810 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp810.Type == TMessageType.Exception)
+        var tmp822 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp822.Type == TMessageType.Exception)
         {
-          var tmp811 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp823 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp811;
+          throw tmp823;
         }
 
-        var tmp812 = new InternalStructs.exportChartImage_result();
-        await tmp812.ReadAsync(InputProtocol, cancellationToken);
+        var tmp824 = new InternalStructs.exportChartImage_result();
+        await tmp824.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp812.__isset.success)
+        if (tmp824.__isset.success)
         {
-          return tmp812.Success;
+          return tmp824.Success;
         }
-        if (tmp812.__isset.e)
+        if (tmp824.__isset.e)
         {
-          throw tmp812.E;
+          throw tmp824.E;
         }
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "exportChartImage failed: unknown result");
       }
@@ -2001,13 +2146,13 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("exportChartImageData", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp813 = new InternalStructs.exportChartImageData_args() {
+        var tmp825 = new InternalStructs.exportChartImageData_args() {
           P = p,
           ChartID = chartID,
           ImageFileName = imageFileName,
         };
         
-        await tmp813.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp825.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -2015,24 +2160,24 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task<byte[]> recv_exportChartImageData(CancellationToken cancellationToken = default)
       {
         
-        var tmp814 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp814.Type == TMessageType.Exception)
+        var tmp826 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp826.Type == TMessageType.Exception)
         {
-          var tmp815 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp827 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp815;
+          throw tmp827;
         }
 
-        var tmp816 = new InternalStructs.exportChartImageData_result();
-        await tmp816.ReadAsync(InputProtocol, cancellationToken);
+        var tmp828 = new InternalStructs.exportChartImageData_result();
+        await tmp828.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp816.__isset.success)
+        if (tmp828.__isset.success)
         {
-          return tmp816.Success;
+          return tmp828.Success;
         }
-        if (tmp816.__isset.e)
+        if (tmp828.__isset.e)
         {
-          throw tmp816.E;
+          throw tmp828.E;
         }
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "exportChartImageData failed: unknown result");
       }
@@ -2046,14 +2191,14 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("notice", TMessageType.Oneway, SeqId), cancellationToken);
         
-        var tmp817 = new InternalStructs.notice_args() {
+        var tmp829 = new InternalStructs.notice_args() {
           P = p,
           Title = title,
           Message = message,
           Log = log,
         };
         
-        await tmp817.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp829.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -2067,7 +2212,7 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("dispNotice", TMessageType.Oneway, SeqId), cancellationToken);
         
-        var tmp818 = new InternalStructs.dispNotice_args() {
+        var tmp830 = new InternalStructs.dispNotice_args() {
           P = p,
           Disposition = disposition,
           Title = title,
@@ -2075,7 +2220,7 @@ namespace Yaskawa.Ext.API
           Log = log,
         };
         
-        await tmp818.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp830.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -2089,14 +2234,14 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("error", TMessageType.Oneway, SeqId), cancellationToken);
         
-        var tmp819 = new InternalStructs.error_args() {
+        var tmp831 = new InternalStructs.error_args() {
           P = p,
           Title = title,
           Message = message,
           Log = log,
         };
         
-        await tmp819.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp831.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -2111,7 +2256,7 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("popupDialog", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp820 = new InternalStructs.popupDialog_args() {
+        var tmp832 = new InternalStructs.popupDialog_args() {
           P = p,
           Identifier = identifier,
           Title = title,
@@ -2120,7 +2265,7 @@ namespace Yaskawa.Ext.API
           NegativeOption = negativeOption,
         };
         
-        await tmp820.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp832.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -2128,20 +2273,20 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_popupDialog(CancellationToken cancellationToken = default)
       {
         
-        var tmp821 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp821.Type == TMessageType.Exception)
+        var tmp833 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp833.Type == TMessageType.Exception)
         {
-          var tmp822 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp834 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp822;
+          throw tmp834;
         }
 
-        var tmp823 = new InternalStructs.popupDialog_result();
-        await tmp823.ReadAsync(InputProtocol, cancellationToken);
+        var tmp835 = new InternalStructs.popupDialog_result();
+        await tmp835.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp823.__isset.e)
+        if (tmp835.__isset.e)
         {
-          throw tmp823.E;
+          throw tmp835.E;
         }
       }
 
@@ -2155,12 +2300,12 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("cancelPopupDialog", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp824 = new InternalStructs.cancelPopupDialog_args() {
+        var tmp836 = new InternalStructs.cancelPopupDialog_args() {
           P = p,
           Identifier = identifier,
         };
         
-        await tmp824.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp836.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -2168,16 +2313,16 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_cancelPopupDialog(CancellationToken cancellationToken = default)
       {
         
-        var tmp825 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp825.Type == TMessageType.Exception)
+        var tmp837 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp837.Type == TMessageType.Exception)
         {
-          var tmp826 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp838 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp826;
+          throw tmp838;
         }
 
-        var tmp827 = new InternalStructs.cancelPopupDialog_result();
-        await tmp827.ReadAsync(InputProtocol, cancellationToken);
+        var tmp839 = new InternalStructs.cancelPopupDialog_result();
+        await tmp839.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
       }
 
@@ -2191,12 +2336,12 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("insertInstructionAtSelectedLine", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp828 = new InternalStructs.insertInstructionAtSelectedLine_args() {
+        var tmp840 = new InternalStructs.insertInstructionAtSelectedLine_args() {
           P = p,
           Instruction = instruction,
         };
         
-        await tmp828.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp840.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -2204,20 +2349,20 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task<string> recv_insertInstructionAtSelectedLine(CancellationToken cancellationToken = default)
       {
         
-        var tmp829 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp829.Type == TMessageType.Exception)
+        var tmp841 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp841.Type == TMessageType.Exception)
         {
-          var tmp830 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp842 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp830;
+          throw tmp842;
         }
 
-        var tmp831 = new InternalStructs.insertInstructionAtSelectedLine_result();
-        await tmp831.ReadAsync(InputProtocol, cancellationToken);
+        var tmp843 = new InternalStructs.insertInstructionAtSelectedLine_result();
+        await tmp843.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
-        if (tmp831.__isset.success)
+        if (tmp843.__isset.success)
         {
-          return tmp831.Success;
+          return tmp843.Success;
         }
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "insertInstructionAtSelectedLine failed: unknown result");
       }
@@ -2232,12 +2377,12 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("displayScreen", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp832 = new InternalStructs.displayScreen_args() {
+        var tmp844 = new InternalStructs.displayScreen_args() {
           P = p,
           Identifier = identifier,
         };
         
-        await tmp832.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp844.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -2245,16 +2390,16 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_displayScreen(CancellationToken cancellationToken = default)
       {
         
-        var tmp833 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp833.Type == TMessageType.Exception)
+        var tmp845 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp845.Type == TMessageType.Exception)
         {
-          var tmp834 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp846 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp834;
+          throw tmp846;
         }
 
-        var tmp835 = new InternalStructs.displayScreen_result();
-        await tmp835.ReadAsync(InputProtocol, cancellationToken);
+        var tmp847 = new InternalStructs.displayScreen_result();
+        await tmp847.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
       }
 
@@ -2268,13 +2413,13 @@ namespace Yaskawa.Ext.API
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("displayHelp", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp836 = new InternalStructs.displayHelp_args() {
+        var tmp848 = new InternalStructs.displayHelp_args() {
           P = p,
           Title = title,
           HtmlContentFile = htmlContentFile,
         };
         
-        await tmp836.WriteAsync(OutputProtocol, cancellationToken);
+        await tmp848.WriteAsync(OutputProtocol, cancellationToken);
         await OutputProtocol.WriteMessageEndAsync(cancellationToken);
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
@@ -2282,16 +2427,16 @@ namespace Yaskawa.Ext.API
       public async global::System.Threading.Tasks.Task recv_displayHelp(CancellationToken cancellationToken = default)
       {
         
-        var tmp837 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
-        if (tmp837.Type == TMessageType.Exception)
+        var tmp849 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
+        if (tmp849.Type == TMessageType.Exception)
         {
-          var tmp838 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
+          var tmp850 = await TApplicationException.ReadAsync(InputProtocol, cancellationToken);
           await InputProtocol.ReadMessageEndAsync(cancellationToken);
-          throw tmp838;
+          throw tmp850;
         }
 
-        var tmp839 = new InternalStructs.displayHelp_result();
-        await tmp839.ReadAsync(InputProtocol, cancellationToken);
+        var tmp851 = new InternalStructs.displayHelp_result();
+        await tmp851.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
       }
 
@@ -2322,7 +2467,10 @@ namespace Yaskawa.Ext.API
         processMap_["registerHTMLData"] = registerHTMLData_ProcessAsync;
         processMap_["registerTranslationFile"] = registerTranslationFile_ProcessAsync;
         processMap_["registerTranslationData"] = registerTranslationData_ProcessAsync;
+        processMap_["registerUtilityMenu"] = registerUtilityMenu_ProcessAsync;
+        processMap_["unregisterUtilityMenu"] = unregisterUtilityMenu_ProcessAsync;
         processMap_["registerUtilityWindow"] = registerUtilityWindow_ProcessAsync;
+        processMap_["registerUtilityWindowWithMenu"] = registerUtilityWindowWithMenu_ProcessAsync;
         processMap_["unregisterUtilityWindow"] = unregisterUtilityWindow_ProcessAsync;
         processMap_["openUtilityWindow"] = openUtilityWindow_ProcessAsync;
         processMap_["closeUtilityWindow"] = closeUtilityWindow_ProcessAsync;
@@ -2396,30 +2544,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task pendantVersion_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp840 = new InternalStructs.pendantVersion_args();
-        await tmp840.ReadAsync(iprot, cancellationToken);
+        var tmp852 = new InternalStructs.pendantVersion_args();
+        await tmp852.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp841 = new InternalStructs.pendantVersion_result();
+        var tmp853 = new InternalStructs.pendantVersion_result();
         try
         {
-          tmp841.Success = await _iAsync.pendantVersion(tmp840.P, cancellationToken);
+          tmp853.Success = await _iAsync.pendantVersion(tmp852.P, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("pendantVersion", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp841.WriteAsync(oprot, cancellationToken);
+          await tmp853.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp842)
+        catch (Exception tmp854)
         {
-          var tmp843 = $"Error occurred in {GetType().FullName}: {tmp842.Message}";
+          var tmp855 = $"Error occurred in {GetType().FullName}: {tmp854.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp842, tmp843);
+            _logger.LogError("{Exception}, {Message}", tmp854, tmp855);
           else
-            Console.Error.WriteLine(tmp843);
-          var tmp844 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp855);
+          var tmp856 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("pendantVersion", TMessageType.Exception, seqid), cancellationToken);
-          await tmp844.WriteAsync(oprot, cancellationToken);
+          await tmp856.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -2427,30 +2575,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task subscribeEventTypes_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp845 = new InternalStructs.subscribeEventTypes_args();
-        await tmp845.ReadAsync(iprot, cancellationToken);
+        var tmp857 = new InternalStructs.subscribeEventTypes_args();
+        await tmp857.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp846 = new InternalStructs.subscribeEventTypes_result();
+        var tmp858 = new InternalStructs.subscribeEventTypes_result();
         try
         {
-          await _iAsync.subscribeEventTypes(tmp845.P, tmp845.Types, cancellationToken);
+          await _iAsync.subscribeEventTypes(tmp857.P, tmp857.Types, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("subscribeEventTypes", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp846.WriteAsync(oprot, cancellationToken);
+          await tmp858.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp847)
+        catch (Exception tmp859)
         {
-          var tmp848 = $"Error occurred in {GetType().FullName}: {tmp847.Message}";
+          var tmp860 = $"Error occurred in {GetType().FullName}: {tmp859.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp847, tmp848);
+            _logger.LogError("{Exception}, {Message}", tmp859, tmp860);
           else
-            Console.Error.WriteLine(tmp848);
-          var tmp849 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp860);
+          var tmp861 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("subscribeEventTypes", TMessageType.Exception, seqid), cancellationToken);
-          await tmp849.WriteAsync(oprot, cancellationToken);
+          await tmp861.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -2458,30 +2606,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task unsubscribeEventTypes_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp850 = new InternalStructs.unsubscribeEventTypes_args();
-        await tmp850.ReadAsync(iprot, cancellationToken);
+        var tmp862 = new InternalStructs.unsubscribeEventTypes_args();
+        await tmp862.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp851 = new InternalStructs.unsubscribeEventTypes_result();
+        var tmp863 = new InternalStructs.unsubscribeEventTypes_result();
         try
         {
-          await _iAsync.unsubscribeEventTypes(tmp850.P, tmp850.Types, cancellationToken);
+          await _iAsync.unsubscribeEventTypes(tmp862.P, tmp862.Types, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("unsubscribeEventTypes", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp851.WriteAsync(oprot, cancellationToken);
+          await tmp863.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp852)
+        catch (Exception tmp864)
         {
-          var tmp853 = $"Error occurred in {GetType().FullName}: {tmp852.Message}";
+          var tmp865 = $"Error occurred in {GetType().FullName}: {tmp864.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp852, tmp853);
+            _logger.LogError("{Exception}, {Message}", tmp864, tmp865);
           else
-            Console.Error.WriteLine(tmp853);
-          var tmp854 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp865);
+          var tmp866 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("unsubscribeEventTypes", TMessageType.Exception, seqid), cancellationToken);
-          await tmp854.WriteAsync(oprot, cancellationToken);
+          await tmp866.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -2489,30 +2637,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task subscribeItemEventTypes_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp855 = new InternalStructs.subscribeItemEventTypes_args();
-        await tmp855.ReadAsync(iprot, cancellationToken);
+        var tmp867 = new InternalStructs.subscribeItemEventTypes_args();
+        await tmp867.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp856 = new InternalStructs.subscribeItemEventTypes_result();
+        var tmp868 = new InternalStructs.subscribeItemEventTypes_result();
         try
         {
-          await _iAsync.subscribeItemEventTypes(tmp855.P, tmp855.ItemIDs, tmp855.Types, cancellationToken);
+          await _iAsync.subscribeItemEventTypes(tmp867.P, tmp867.ItemIDs, tmp867.Types, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("subscribeItemEventTypes", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp856.WriteAsync(oprot, cancellationToken);
+          await tmp868.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp857)
+        catch (Exception tmp869)
         {
-          var tmp858 = $"Error occurred in {GetType().FullName}: {tmp857.Message}";
+          var tmp870 = $"Error occurred in {GetType().FullName}: {tmp869.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp857, tmp858);
+            _logger.LogError("{Exception}, {Message}", tmp869, tmp870);
           else
-            Console.Error.WriteLine(tmp858);
-          var tmp859 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp870);
+          var tmp871 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("subscribeItemEventTypes", TMessageType.Exception, seqid), cancellationToken);
-          await tmp859.WriteAsync(oprot, cancellationToken);
+          await tmp871.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -2520,30 +2668,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task unsubscribeItemEventTypes_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp860 = new InternalStructs.unsubscribeItemEventTypes_args();
-        await tmp860.ReadAsync(iprot, cancellationToken);
+        var tmp872 = new InternalStructs.unsubscribeItemEventTypes_args();
+        await tmp872.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp861 = new InternalStructs.unsubscribeItemEventTypes_result();
+        var tmp873 = new InternalStructs.unsubscribeItemEventTypes_result();
         try
         {
-          await _iAsync.unsubscribeItemEventTypes(tmp860.P, tmp860.ItemIDs, tmp860.Types, cancellationToken);
+          await _iAsync.unsubscribeItemEventTypes(tmp872.P, tmp872.ItemIDs, tmp872.Types, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("unsubscribeItemEventTypes", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp861.WriteAsync(oprot, cancellationToken);
+          await tmp873.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp862)
+        catch (Exception tmp874)
         {
-          var tmp863 = $"Error occurred in {GetType().FullName}: {tmp862.Message}";
+          var tmp875 = $"Error occurred in {GetType().FullName}: {tmp874.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp862, tmp863);
+            _logger.LogError("{Exception}, {Message}", tmp874, tmp875);
           else
-            Console.Error.WriteLine(tmp863);
-          var tmp864 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp875);
+          var tmp876 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("unsubscribeItemEventTypes", TMessageType.Exception, seqid), cancellationToken);
-          await tmp864.WriteAsync(oprot, cancellationToken);
+          await tmp876.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -2551,30 +2699,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task events_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp865 = new InternalStructs.events_args();
-        await tmp865.ReadAsync(iprot, cancellationToken);
+        var tmp877 = new InternalStructs.events_args();
+        await tmp877.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp866 = new InternalStructs.events_result();
+        var tmp878 = new InternalStructs.events_result();
         try
         {
-          tmp866.Success = await _iAsync.events(tmp865.P, cancellationToken);
+          tmp878.Success = await _iAsync.events(tmp877.P, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("events", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp866.WriteAsync(oprot, cancellationToken);
+          await tmp878.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp867)
+        catch (Exception tmp879)
         {
-          var tmp868 = $"Error occurred in {GetType().FullName}: {tmp867.Message}";
+          var tmp880 = $"Error occurred in {GetType().FullName}: {tmp879.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp867, tmp868);
+            _logger.LogError("{Exception}, {Message}", tmp879, tmp880);
           else
-            Console.Error.WriteLine(tmp868);
-          var tmp869 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp880);
+          var tmp881 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("events", TMessageType.Exception, seqid), cancellationToken);
-          await tmp869.WriteAsync(oprot, cancellationToken);
+          await tmp881.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -2582,30 +2730,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task currentLanguage_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp870 = new InternalStructs.currentLanguage_args();
-        await tmp870.ReadAsync(iprot, cancellationToken);
+        var tmp882 = new InternalStructs.currentLanguage_args();
+        await tmp882.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp871 = new InternalStructs.currentLanguage_result();
+        var tmp883 = new InternalStructs.currentLanguage_result();
         try
         {
-          tmp871.Success = await _iAsync.currentLanguage(tmp870.P, cancellationToken);
+          tmp883.Success = await _iAsync.currentLanguage(tmp882.P, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("currentLanguage", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp871.WriteAsync(oprot, cancellationToken);
+          await tmp883.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp872)
+        catch (Exception tmp884)
         {
-          var tmp873 = $"Error occurred in {GetType().FullName}: {tmp872.Message}";
+          var tmp885 = $"Error occurred in {GetType().FullName}: {tmp884.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp872, tmp873);
+            _logger.LogError("{Exception}, {Message}", tmp884, tmp885);
           else
-            Console.Error.WriteLine(tmp873);
-          var tmp874 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp885);
+          var tmp886 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("currentLanguage", TMessageType.Exception, seqid), cancellationToken);
-          await tmp874.WriteAsync(oprot, cancellationToken);
+          await tmp886.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -2613,30 +2761,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task currentLocale_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp875 = new InternalStructs.currentLocale_args();
-        await tmp875.ReadAsync(iprot, cancellationToken);
+        var tmp887 = new InternalStructs.currentLocale_args();
+        await tmp887.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp876 = new InternalStructs.currentLocale_result();
+        var tmp888 = new InternalStructs.currentLocale_result();
         try
         {
-          tmp876.Success = await _iAsync.currentLocale(tmp875.P, cancellationToken);
+          tmp888.Success = await _iAsync.currentLocale(tmp887.P, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("currentLocale", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp876.WriteAsync(oprot, cancellationToken);
+          await tmp888.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp877)
+        catch (Exception tmp889)
         {
-          var tmp878 = $"Error occurred in {GetType().FullName}: {tmp877.Message}";
+          var tmp890 = $"Error occurred in {GetType().FullName}: {tmp889.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp877, tmp878);
+            _logger.LogError("{Exception}, {Message}", tmp889, tmp890);
           else
-            Console.Error.WriteLine(tmp878);
-          var tmp879 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp890);
+          var tmp891 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("currentLocale", TMessageType.Exception, seqid), cancellationToken);
-          await tmp879.WriteAsync(oprot, cancellationToken);
+          await tmp891.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -2644,30 +2792,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task currentScreenName_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp880 = new InternalStructs.currentScreenName_args();
-        await tmp880.ReadAsync(iprot, cancellationToken);
+        var tmp892 = new InternalStructs.currentScreenName_args();
+        await tmp892.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp881 = new InternalStructs.currentScreenName_result();
+        var tmp893 = new InternalStructs.currentScreenName_result();
         try
         {
-          tmp881.Success = await _iAsync.currentScreenName(tmp880.P, cancellationToken);
+          tmp893.Success = await _iAsync.currentScreenName(tmp892.P, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("currentScreenName", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp881.WriteAsync(oprot, cancellationToken);
+          await tmp893.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp882)
+        catch (Exception tmp894)
         {
-          var tmp883 = $"Error occurred in {GetType().FullName}: {tmp882.Message}";
+          var tmp895 = $"Error occurred in {GetType().FullName}: {tmp894.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp882, tmp883);
+            _logger.LogError("{Exception}, {Message}", tmp894, tmp895);
           else
-            Console.Error.WriteLine(tmp883);
-          var tmp884 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp895);
+          var tmp896 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("currentScreenName", TMessageType.Exception, seqid), cancellationToken);
-          await tmp884.WriteAsync(oprot, cancellationToken);
+          await tmp896.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -2675,91 +2823,15 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task registerYML_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp885 = new InternalStructs.registerYML_args();
-        await tmp885.ReadAsync(iprot, cancellationToken);
+        var tmp897 = new InternalStructs.registerYML_args();
+        await tmp897.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp886 = new InternalStructs.registerYML_result();
+        var tmp898 = new InternalStructs.registerYML_result();
         try
         {
-          tmp886.Success = await _iAsync.registerYML(tmp885.P, tmp885.YmlSource, cancellationToken);
+          tmp898.Success = await _iAsync.registerYML(tmp897.P, tmp897.YmlSource, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("registerYML", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp886.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp887)
-        {
-          var tmp888 = $"Error occurred in {GetType().FullName}: {tmp887.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp887, tmp888);
-          else
-            Console.Error.WriteLine(tmp888);
-          var tmp889 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("registerYML", TMessageType.Exception, seqid), cancellationToken);
-          await tmp889.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task registerImageFile_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp890 = new InternalStructs.registerImageFile_args();
-        await tmp890.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp891 = new InternalStructs.registerImageFile_result();
-        try
-        {
-          try
-          {
-            await _iAsync.registerImageFile(tmp890.P, tmp890.ImageFileName, cancellationToken);
-          }
-          catch (global::Yaskawa.Ext.API.IllegalArgument tmp892)
-          {
-            tmp891.E = tmp892;
-          }
-          await oprot.WriteMessageBeginAsync(new TMessage("registerImageFile", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp891.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp893)
-        {
-          var tmp894 = $"Error occurred in {GetType().FullName}: {tmp893.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp893, tmp894);
-          else
-            Console.Error.WriteLine(tmp894);
-          var tmp895 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("registerImageFile", TMessageType.Exception, seqid), cancellationToken);
-          await tmp895.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task registerImageData_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp896 = new InternalStructs.registerImageData_args();
-        await tmp896.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp897 = new InternalStructs.registerImageData_result();
-        try
-        {
-          try
-          {
-            await _iAsync.registerImageData(tmp896.P, tmp896.ImageData, tmp896.ImageName, cancellationToken);
-          }
-          catch (global::Yaskawa.Ext.API.IllegalArgument tmp898)
-          {
-            tmp897.E = tmp898;
-          }
-          await oprot.WriteMessageBeginAsync(new TMessage("registerImageData", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp897.WriteAsync(oprot, cancellationToken);
+          await tmp898.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
@@ -2773,30 +2845,30 @@ namespace Yaskawa.Ext.API
           else
             Console.Error.WriteLine(tmp900);
           var tmp901 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("registerImageData", TMessageType.Exception, seqid), cancellationToken);
+          await oprot.WriteMessageBeginAsync(new TMessage("registerYML", TMessageType.Exception, seqid), cancellationToken);
           await tmp901.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task registerHTMLFile_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      public async global::System.Threading.Tasks.Task registerImageFile_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp902 = new InternalStructs.registerHTMLFile_args();
+        var tmp902 = new InternalStructs.registerImageFile_args();
         await tmp902.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp903 = new InternalStructs.registerHTMLFile_result();
+        var tmp903 = new InternalStructs.registerImageFile_result();
         try
         {
           try
           {
-            await _iAsync.registerHTMLFile(tmp902.P, tmp902.HtmlFileName, cancellationToken);
+            await _iAsync.registerImageFile(tmp902.P, tmp902.ImageFileName, cancellationToken);
           }
           catch (global::Yaskawa.Ext.API.IllegalArgument tmp904)
           {
             tmp903.E = tmp904;
           }
-          await oprot.WriteMessageBeginAsync(new TMessage("registerHTMLFile", TMessageType.Reply, seqid), cancellationToken); 
+          await oprot.WriteMessageBeginAsync(new TMessage("registerImageFile", TMessageType.Reply, seqid), cancellationToken); 
           await tmp903.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
@@ -2811,30 +2883,30 @@ namespace Yaskawa.Ext.API
           else
             Console.Error.WriteLine(tmp906);
           var tmp907 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("registerHTMLFile", TMessageType.Exception, seqid), cancellationToken);
+          await oprot.WriteMessageBeginAsync(new TMessage("registerImageFile", TMessageType.Exception, seqid), cancellationToken);
           await tmp907.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task registerHTMLData_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      public async global::System.Threading.Tasks.Task registerImageData_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp908 = new InternalStructs.registerHTMLData_args();
+        var tmp908 = new InternalStructs.registerImageData_args();
         await tmp908.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp909 = new InternalStructs.registerHTMLData_result();
+        var tmp909 = new InternalStructs.registerImageData_result();
         try
         {
           try
           {
-            await _iAsync.registerHTMLData(tmp908.P, tmp908.HtmlData, tmp908.HtmlName, cancellationToken);
+            await _iAsync.registerImageData(tmp908.P, tmp908.ImageData, tmp908.ImageName, cancellationToken);
           }
           catch (global::Yaskawa.Ext.API.IllegalArgument tmp910)
           {
             tmp909.E = tmp910;
           }
-          await oprot.WriteMessageBeginAsync(new TMessage("registerHTMLData", TMessageType.Reply, seqid), cancellationToken); 
+          await oprot.WriteMessageBeginAsync(new TMessage("registerImageData", TMessageType.Reply, seqid), cancellationToken); 
           await tmp909.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
@@ -2849,30 +2921,30 @@ namespace Yaskawa.Ext.API
           else
             Console.Error.WriteLine(tmp912);
           var tmp913 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("registerHTMLData", TMessageType.Exception, seqid), cancellationToken);
+          await oprot.WriteMessageBeginAsync(new TMessage("registerImageData", TMessageType.Exception, seqid), cancellationToken);
           await tmp913.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task registerTranslationFile_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      public async global::System.Threading.Tasks.Task registerHTMLFile_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp914 = new InternalStructs.registerTranslationFile_args();
+        var tmp914 = new InternalStructs.registerHTMLFile_args();
         await tmp914.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp915 = new InternalStructs.registerTranslationFile_result();
+        var tmp915 = new InternalStructs.registerHTMLFile_result();
         try
         {
           try
           {
-            await _iAsync.registerTranslationFile(tmp914.P, tmp914.Locale, tmp914.TranslationFileName, cancellationToken);
+            await _iAsync.registerHTMLFile(tmp914.P, tmp914.HtmlFileName, cancellationToken);
           }
           catch (global::Yaskawa.Ext.API.IllegalArgument tmp916)
           {
             tmp915.E = tmp916;
           }
-          await oprot.WriteMessageBeginAsync(new TMessage("registerTranslationFile", TMessageType.Reply, seqid), cancellationToken); 
+          await oprot.WriteMessageBeginAsync(new TMessage("registerHTMLFile", TMessageType.Reply, seqid), cancellationToken); 
           await tmp915.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
@@ -2887,30 +2959,30 @@ namespace Yaskawa.Ext.API
           else
             Console.Error.WriteLine(tmp918);
           var tmp919 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("registerTranslationFile", TMessageType.Exception, seqid), cancellationToken);
+          await oprot.WriteMessageBeginAsync(new TMessage("registerHTMLFile", TMessageType.Exception, seqid), cancellationToken);
           await tmp919.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task registerTranslationData_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      public async global::System.Threading.Tasks.Task registerHTMLData_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp920 = new InternalStructs.registerTranslationData_args();
+        var tmp920 = new InternalStructs.registerHTMLData_args();
         await tmp920.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp921 = new InternalStructs.registerTranslationData_result();
+        var tmp921 = new InternalStructs.registerHTMLData_result();
         try
         {
           try
           {
-            await _iAsync.registerTranslationData(tmp920.P, tmp920.Locale, tmp920.TranslationData, tmp920.TranslationName, cancellationToken);
+            await _iAsync.registerHTMLData(tmp920.P, tmp920.HtmlData, tmp920.HtmlName, cancellationToken);
           }
           catch (global::Yaskawa.Ext.API.IllegalArgument tmp922)
           {
             tmp921.E = tmp922;
           }
-          await oprot.WriteMessageBeginAsync(new TMessage("registerTranslationData", TMessageType.Reply, seqid), cancellationToken); 
+          await oprot.WriteMessageBeginAsync(new TMessage("registerHTMLData", TMessageType.Reply, seqid), cancellationToken); 
           await tmp921.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
@@ -2925,30 +2997,30 @@ namespace Yaskawa.Ext.API
           else
             Console.Error.WriteLine(tmp924);
           var tmp925 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("registerTranslationData", TMessageType.Exception, seqid), cancellationToken);
+          await oprot.WriteMessageBeginAsync(new TMessage("registerHTMLData", TMessageType.Exception, seqid), cancellationToken);
           await tmp925.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task registerUtilityWindow_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      public async global::System.Threading.Tasks.Task registerTranslationFile_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp926 = new InternalStructs.registerUtilityWindow_args();
+        var tmp926 = new InternalStructs.registerTranslationFile_args();
         await tmp926.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp927 = new InternalStructs.registerUtilityWindow_result();
+        var tmp927 = new InternalStructs.registerTranslationFile_result();
         try
         {
           try
           {
-            await _iAsync.registerUtilityWindow(tmp926.P, tmp926.Identifier, tmp926.ItemType, tmp926.MenuItemName, tmp926.WindowTitle, cancellationToken);
+            await _iAsync.registerTranslationFile(tmp926.P, tmp926.Locale, tmp926.TranslationFileName, cancellationToken);
           }
           catch (global::Yaskawa.Ext.API.IllegalArgument tmp928)
           {
             tmp927.E = tmp928;
           }
-          await oprot.WriteMessageBeginAsync(new TMessage("registerUtilityWindow", TMessageType.Reply, seqid), cancellationToken); 
+          await oprot.WriteMessageBeginAsync(new TMessage("registerTranslationFile", TMessageType.Reply, seqid), cancellationToken); 
           await tmp927.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
@@ -2963,30 +3035,30 @@ namespace Yaskawa.Ext.API
           else
             Console.Error.WriteLine(tmp930);
           var tmp931 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("registerUtilityWindow", TMessageType.Exception, seqid), cancellationToken);
+          await oprot.WriteMessageBeginAsync(new TMessage("registerTranslationFile", TMessageType.Exception, seqid), cancellationToken);
           await tmp931.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task unregisterUtilityWindow_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      public async global::System.Threading.Tasks.Task registerTranslationData_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp932 = new InternalStructs.unregisterUtilityWindow_args();
+        var tmp932 = new InternalStructs.registerTranslationData_args();
         await tmp932.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp933 = new InternalStructs.unregisterUtilityWindow_result();
+        var tmp933 = new InternalStructs.registerTranslationData_result();
         try
         {
           try
           {
-            await _iAsync.unregisterUtilityWindow(tmp932.P, tmp932.Identifier, cancellationToken);
+            await _iAsync.registerTranslationData(tmp932.P, tmp932.Locale, tmp932.TranslationData, tmp932.TranslationName, cancellationToken);
           }
           catch (global::Yaskawa.Ext.API.IllegalArgument tmp934)
           {
             tmp933.E = tmp934;
           }
-          await oprot.WriteMessageBeginAsync(new TMessage("unregisterUtilityWindow", TMessageType.Reply, seqid), cancellationToken); 
+          await oprot.WriteMessageBeginAsync(new TMessage("registerTranslationData", TMessageType.Reply, seqid), cancellationToken); 
           await tmp933.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
@@ -3001,8 +3073,198 @@ namespace Yaskawa.Ext.API
           else
             Console.Error.WriteLine(tmp936);
           var tmp937 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("unregisterUtilityWindow", TMessageType.Exception, seqid), cancellationToken);
+          await oprot.WriteMessageBeginAsync(new TMessage("registerTranslationData", TMessageType.Exception, seqid), cancellationToken);
           await tmp937.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task registerUtilityMenu_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp938 = new InternalStructs.registerUtilityMenu_args();
+        await tmp938.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp939 = new InternalStructs.registerUtilityMenu_result();
+        try
+        {
+          try
+          {
+            await _iAsync.registerUtilityMenu(tmp938.P, tmp938.MenuName, tmp938.MenuText, tmp938.MenuIcon, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp940)
+          {
+            tmp939.E = tmp940;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("registerUtilityMenu", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp939.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp941)
+        {
+          var tmp942 = $"Error occurred in {GetType().FullName}: {tmp941.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp941, tmp942);
+          else
+            Console.Error.WriteLine(tmp942);
+          var tmp943 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("registerUtilityMenu", TMessageType.Exception, seqid), cancellationToken);
+          await tmp943.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task unregisterUtilityMenu_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp944 = new InternalStructs.unregisterUtilityMenu_args();
+        await tmp944.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp945 = new InternalStructs.unregisterUtilityMenu_result();
+        try
+        {
+          try
+          {
+            await _iAsync.unregisterUtilityMenu(tmp944.P, tmp944.MenuName, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp946)
+          {
+            tmp945.E = tmp946;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("unregisterUtilityMenu", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp945.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp947)
+        {
+          var tmp948 = $"Error occurred in {GetType().FullName}: {tmp947.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp947, tmp948);
+          else
+            Console.Error.WriteLine(tmp948);
+          var tmp949 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("unregisterUtilityMenu", TMessageType.Exception, seqid), cancellationToken);
+          await tmp949.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task registerUtilityWindow_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp950 = new InternalStructs.registerUtilityWindow_args();
+        await tmp950.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp951 = new InternalStructs.registerUtilityWindow_result();
+        try
+        {
+          try
+          {
+            await _iAsync.registerUtilityWindow(tmp950.P, tmp950.Identifier, tmp950.ItemType, tmp950.MenuItemName, tmp950.WindowTitle, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp952)
+          {
+            tmp951.E = tmp952;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("registerUtilityWindow", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp951.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp953)
+        {
+          var tmp954 = $"Error occurred in {GetType().FullName}: {tmp953.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp953, tmp954);
+          else
+            Console.Error.WriteLine(tmp954);
+          var tmp955 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("registerUtilityWindow", TMessageType.Exception, seqid), cancellationToken);
+          await tmp955.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task registerUtilityWindowWithMenu_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp956 = new InternalStructs.registerUtilityWindowWithMenu_args();
+        await tmp956.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp957 = new InternalStructs.registerUtilityWindowWithMenu_result();
+        try
+        {
+          try
+          {
+            await _iAsync.registerUtilityWindowWithMenu(tmp956.P, tmp956.Identifier, tmp956.ItemType, tmp956.MenuItemName, tmp956.WindowTitle, tmp956.MenuName, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp958)
+          {
+            tmp957.E = tmp958;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("registerUtilityWindowWithMenu", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp957.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp959)
+        {
+          var tmp960 = $"Error occurred in {GetType().FullName}: {tmp959.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp959, tmp960);
+          else
+            Console.Error.WriteLine(tmp960);
+          var tmp961 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("registerUtilityWindowWithMenu", TMessageType.Exception, seqid), cancellationToken);
+          await tmp961.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task unregisterUtilityWindow_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp962 = new InternalStructs.unregisterUtilityWindow_args();
+        await tmp962.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp963 = new InternalStructs.unregisterUtilityWindow_result();
+        try
+        {
+          try
+          {
+            await _iAsync.unregisterUtilityWindow(tmp962.P, tmp962.Identifier, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp964)
+          {
+            tmp963.E = tmp964;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("unregisterUtilityWindow", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp963.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp965)
+        {
+          var tmp966 = $"Error occurred in {GetType().FullName}: {tmp965.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp965, tmp966);
+          else
+            Console.Error.WriteLine(tmp966);
+          var tmp967 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("unregisterUtilityWindow", TMessageType.Exception, seqid), cancellationToken);
+          await tmp967.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -3010,30 +3272,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task openUtilityWindow_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp938 = new InternalStructs.openUtilityWindow_args();
-        await tmp938.ReadAsync(iprot, cancellationToken);
+        var tmp968 = new InternalStructs.openUtilityWindow_args();
+        await tmp968.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp939 = new InternalStructs.openUtilityWindow_result();
+        var tmp969 = new InternalStructs.openUtilityWindow_result();
         try
         {
-          await _iAsync.openUtilityWindow(tmp938.P, tmp938.Identifier, cancellationToken);
+          await _iAsync.openUtilityWindow(tmp968.P, tmp968.Identifier, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("openUtilityWindow", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp939.WriteAsync(oprot, cancellationToken);
+          await tmp969.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp940)
+        catch (Exception tmp970)
         {
-          var tmp941 = $"Error occurred in {GetType().FullName}: {tmp940.Message}";
+          var tmp971 = $"Error occurred in {GetType().FullName}: {tmp970.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp940, tmp941);
+            _logger.LogError("{Exception}, {Message}", tmp970, tmp971);
           else
-            Console.Error.WriteLine(tmp941);
-          var tmp942 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp971);
+          var tmp972 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("openUtilityWindow", TMessageType.Exception, seqid), cancellationToken);
-          await tmp942.WriteAsync(oprot, cancellationToken);
+          await tmp972.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -3041,30 +3303,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task closeUtilityWindow_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp943 = new InternalStructs.closeUtilityWindow_args();
-        await tmp943.ReadAsync(iprot, cancellationToken);
+        var tmp973 = new InternalStructs.closeUtilityWindow_args();
+        await tmp973.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp944 = new InternalStructs.closeUtilityWindow_result();
+        var tmp974 = new InternalStructs.closeUtilityWindow_result();
         try
         {
-          await _iAsync.closeUtilityWindow(tmp943.P, tmp943.Identifier, cancellationToken);
+          await _iAsync.closeUtilityWindow(tmp973.P, tmp973.Identifier, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("closeUtilityWindow", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp944.WriteAsync(oprot, cancellationToken);
+          await tmp974.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp945)
+        catch (Exception tmp975)
         {
-          var tmp946 = $"Error occurred in {GetType().FullName}: {tmp945.Message}";
+          var tmp976 = $"Error occurred in {GetType().FullName}: {tmp975.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp945, tmp946);
+            _logger.LogError("{Exception}, {Message}", tmp975, tmp976);
           else
-            Console.Error.WriteLine(tmp946);
-          var tmp947 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp976);
+          var tmp977 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("closeUtilityWindow", TMessageType.Exception, seqid), cancellationToken);
-          await tmp947.WriteAsync(oprot, cancellationToken);
+          await tmp977.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -3072,30 +3334,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task collapseUtilityWindow_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp948 = new InternalStructs.collapseUtilityWindow_args();
-        await tmp948.ReadAsync(iprot, cancellationToken);
+        var tmp978 = new InternalStructs.collapseUtilityWindow_args();
+        await tmp978.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp949 = new InternalStructs.collapseUtilityWindow_result();
+        var tmp979 = new InternalStructs.collapseUtilityWindow_result();
         try
         {
-          await _iAsync.collapseUtilityWindow(tmp948.P, tmp948.Identifier, cancellationToken);
+          await _iAsync.collapseUtilityWindow(tmp978.P, tmp978.Identifier, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("collapseUtilityWindow", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp949.WriteAsync(oprot, cancellationToken);
+          await tmp979.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp950)
+        catch (Exception tmp980)
         {
-          var tmp951 = $"Error occurred in {GetType().FullName}: {tmp950.Message}";
+          var tmp981 = $"Error occurred in {GetType().FullName}: {tmp980.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp950, tmp951);
+            _logger.LogError("{Exception}, {Message}", tmp980, tmp981);
           else
-            Console.Error.WriteLine(tmp951);
-          var tmp952 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp981);
+          var tmp982 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("collapseUtilityWindow", TMessageType.Exception, seqid), cancellationToken);
-          await tmp952.WriteAsync(oprot, cancellationToken);
+          await tmp982.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -3103,205 +3365,15 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task expandUtilityWindow_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp953 = new InternalStructs.expandUtilityWindow_args();
-        await tmp953.ReadAsync(iprot, cancellationToken);
+        var tmp983 = new InternalStructs.expandUtilityWindow_args();
+        await tmp983.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp954 = new InternalStructs.expandUtilityWindow_result();
+        var tmp984 = new InternalStructs.expandUtilityWindow_result();
         try
         {
-          await _iAsync.expandUtilityWindow(tmp953.P, tmp953.Identifier, cancellationToken);
+          await _iAsync.expandUtilityWindow(tmp983.P, tmp983.Identifier, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("expandUtilityWindow", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp954.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp955)
-        {
-          var tmp956 = $"Error occurred in {GetType().FullName}: {tmp955.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp955, tmp956);
-          else
-            Console.Error.WriteLine(tmp956);
-          var tmp957 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("expandUtilityWindow", TMessageType.Exception, seqid), cancellationToken);
-          await tmp957.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task registerIntegration_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp958 = new InternalStructs.registerIntegration_args();
-        await tmp958.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp959 = new InternalStructs.registerIntegration_result();
-        try
-        {
-          try
-          {
-            await _iAsync.registerIntegration(tmp958.P, tmp958.Identifier, tmp958.IntegrationPoint, tmp958.ItemType, tmp958.ButtonLabel, tmp958.ButtonImage, cancellationToken);
-          }
-          catch (global::Yaskawa.Ext.API.IllegalArgument tmp960)
-          {
-            tmp959.E = tmp960;
-          }
-          await oprot.WriteMessageBeginAsync(new TMessage("registerIntegration", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp959.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp961)
-        {
-          var tmp962 = $"Error occurred in {GetType().FullName}: {tmp961.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp961, tmp962);
-          else
-            Console.Error.WriteLine(tmp962);
-          var tmp963 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("registerIntegration", TMessageType.Exception, seqid), cancellationToken);
-          await tmp963.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task unregisterIntegration_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp964 = new InternalStructs.unregisterIntegration_args();
-        await tmp964.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp965 = new InternalStructs.unregisterIntegration_result();
-        try
-        {
-          try
-          {
-            await _iAsync.unregisterIntegration(tmp964.P, tmp964.Identifier, cancellationToken);
-          }
-          catch (global::Yaskawa.Ext.API.IllegalArgument tmp966)
-          {
-            tmp965.E = tmp966;
-          }
-          await oprot.WriteMessageBeginAsync(new TMessage("unregisterIntegration", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp965.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp967)
-        {
-          var tmp968 = $"Error occurred in {GetType().FullName}: {tmp967.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp967, tmp968);
-          else
-            Console.Error.WriteLine(tmp968);
-          var tmp969 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("unregisterIntegration", TMessageType.Exception, seqid), cancellationToken);
-          await tmp969.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task registerSwitch_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp970 = new InternalStructs.registerSwitch_args();
-        await tmp970.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp971 = new InternalStructs.registerSwitch_result();
-        try
-        {
-          try
-          {
-            await _iAsync.registerSwitch(tmp970.P, tmp970.Identifier, tmp970.IntegrationPoint, tmp970.SwitchLabel, tmp970.OffPositionLabel, tmp970.OnPositionLabel, tmp970.DefaultState, cancellationToken);
-          }
-          catch (global::Yaskawa.Ext.API.IllegalArgument tmp972)
-          {
-            tmp971.E = tmp972;
-          }
-          await oprot.WriteMessageBeginAsync(new TMessage("registerSwitch", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp971.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp973)
-        {
-          var tmp974 = $"Error occurred in {GetType().FullName}: {tmp973.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp973, tmp974);
-          else
-            Console.Error.WriteLine(tmp974);
-          var tmp975 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("registerSwitch", TMessageType.Exception, seqid), cancellationToken);
-          await tmp975.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task property_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp976 = new InternalStructs.property_args();
-        await tmp976.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp977 = new InternalStructs.property_result();
-        try
-        {
-          try
-          {
-            tmp977.Success = await _iAsync.property(tmp976.P, tmp976.ItemID, tmp976.Name, cancellationToken);
-          }
-          catch (global::Yaskawa.Ext.API.IllegalArgument tmp978)
-          {
-            tmp977.E = tmp978;
-          }
-          await oprot.WriteMessageBeginAsync(new TMessage("property", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp977.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp979)
-        {
-          var tmp980 = $"Error occurred in {GetType().FullName}: {tmp979.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp979, tmp980);
-          else
-            Console.Error.WriteLine(tmp980);
-          var tmp981 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("property", TMessageType.Exception, seqid), cancellationToken);
-          await tmp981.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task setProperty_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp982 = new InternalStructs.setProperty_args();
-        await tmp982.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp983 = new InternalStructs.setProperty_result();
-        try
-        {
-          try
-          {
-            await _iAsync.setProperty(tmp982.P, tmp982.ItemID, tmp982.Name, tmp982.Value, cancellationToken);
-          }
-          catch (global::Yaskawa.Ext.API.IllegalArgument tmp984)
-          {
-            tmp983.E = tmp984;
-          }
-          await oprot.WriteMessageBeginAsync(new TMessage("setProperty", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp983.WriteAsync(oprot, cancellationToken);
+          await tmp984.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
@@ -3315,8 +3387,198 @@ namespace Yaskawa.Ext.API
           else
             Console.Error.WriteLine(tmp986);
           var tmp987 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("setProperty", TMessageType.Exception, seqid), cancellationToken);
+          await oprot.WriteMessageBeginAsync(new TMessage("expandUtilityWindow", TMessageType.Exception, seqid), cancellationToken);
           await tmp987.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task registerIntegration_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp988 = new InternalStructs.registerIntegration_args();
+        await tmp988.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp989 = new InternalStructs.registerIntegration_result();
+        try
+        {
+          try
+          {
+            await _iAsync.registerIntegration(tmp988.P, tmp988.Identifier, tmp988.IntegrationPoint, tmp988.ItemType, tmp988.ButtonLabel, tmp988.ButtonImage, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp990)
+          {
+            tmp989.E = tmp990;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("registerIntegration", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp989.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp991)
+        {
+          var tmp992 = $"Error occurred in {GetType().FullName}: {tmp991.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp991, tmp992);
+          else
+            Console.Error.WriteLine(tmp992);
+          var tmp993 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("registerIntegration", TMessageType.Exception, seqid), cancellationToken);
+          await tmp993.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task unregisterIntegration_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp994 = new InternalStructs.unregisterIntegration_args();
+        await tmp994.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp995 = new InternalStructs.unregisterIntegration_result();
+        try
+        {
+          try
+          {
+            await _iAsync.unregisterIntegration(tmp994.P, tmp994.Identifier, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp996)
+          {
+            tmp995.E = tmp996;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("unregisterIntegration", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp995.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp997)
+        {
+          var tmp998 = $"Error occurred in {GetType().FullName}: {tmp997.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp997, tmp998);
+          else
+            Console.Error.WriteLine(tmp998);
+          var tmp999 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("unregisterIntegration", TMessageType.Exception, seqid), cancellationToken);
+          await tmp999.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task registerSwitch_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp1000 = new InternalStructs.registerSwitch_args();
+        await tmp1000.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp1001 = new InternalStructs.registerSwitch_result();
+        try
+        {
+          try
+          {
+            await _iAsync.registerSwitch(tmp1000.P, tmp1000.Identifier, tmp1000.IntegrationPoint, tmp1000.SwitchLabel, tmp1000.OffPositionLabel, tmp1000.OnPositionLabel, tmp1000.DefaultState, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1002)
+          {
+            tmp1001.E = tmp1002;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("registerSwitch", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp1001.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp1003)
+        {
+          var tmp1004 = $"Error occurred in {GetType().FullName}: {tmp1003.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp1003, tmp1004);
+          else
+            Console.Error.WriteLine(tmp1004);
+          var tmp1005 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("registerSwitch", TMessageType.Exception, seqid), cancellationToken);
+          await tmp1005.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task property_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp1006 = new InternalStructs.property_args();
+        await tmp1006.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp1007 = new InternalStructs.property_result();
+        try
+        {
+          try
+          {
+            tmp1007.Success = await _iAsync.property(tmp1006.P, tmp1006.ItemID, tmp1006.Name, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1008)
+          {
+            tmp1007.E = tmp1008;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("property", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp1007.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp1009)
+        {
+          var tmp1010 = $"Error occurred in {GetType().FullName}: {tmp1009.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp1009, tmp1010);
+          else
+            Console.Error.WriteLine(tmp1010);
+          var tmp1011 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("property", TMessageType.Exception, seqid), cancellationToken);
+          await tmp1011.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task setProperty_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp1012 = new InternalStructs.setProperty_args();
+        await tmp1012.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp1013 = new InternalStructs.setProperty_result();
+        try
+        {
+          try
+          {
+            await _iAsync.setProperty(tmp1012.P, tmp1012.ItemID, tmp1012.Name, tmp1012.Value, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1014)
+          {
+            tmp1013.E = tmp1014;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("setProperty", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp1013.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp1015)
+        {
+          var tmp1016 = $"Error occurred in {GetType().FullName}: {tmp1015.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp1015, tmp1016);
+          else
+            Console.Error.WriteLine(tmp1016);
+          var tmp1017 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("setProperty", TMessageType.Exception, seqid), cancellationToken);
+          await tmp1017.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -3324,234 +3586,44 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task setProperties_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp988 = new InternalStructs.setProperties_args();
-        await tmp988.ReadAsync(iprot, cancellationToken);
+        var tmp1018 = new InternalStructs.setProperties_args();
+        await tmp1018.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
         try
         {
-          await _iAsync.setProperties(tmp988.P, tmp988.PropValuesList, cancellationToken);
+          await _iAsync.setProperties(tmp1018.P, tmp1018.PropValuesList, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp990)
+        catch (Exception tmp1020)
         {
-          var tmp991 = $"Error occurred in {GetType().FullName}: {tmp990.Message}";
+          var tmp1021 = $"Error occurred in {GetType().FullName}: {tmp1020.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp990, tmp991);
+            _logger.LogError("{Exception}, {Message}", tmp1020, tmp1021);
           else
-            Console.Error.WriteLine(tmp991);
+            Console.Error.WriteLine(tmp1021);
         }
       }
 
       public async global::System.Threading.Tasks.Task setChartConfig_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp992 = new InternalStructs.setChartConfig_args();
-        await tmp992.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp993 = new InternalStructs.setChartConfig_result();
-        try
-        {
-          try
-          {
-            await _iAsync.setChartConfig(tmp992.P, tmp992.ChartID, tmp992.Config, cancellationToken);
-          }
-          catch (global::Yaskawa.Ext.API.IllegalArgument tmp994)
-          {
-            tmp993.E = tmp994;
-          }
-          await oprot.WriteMessageBeginAsync(new TMessage("setChartConfig", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp993.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp995)
-        {
-          var tmp996 = $"Error occurred in {GetType().FullName}: {tmp995.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp995, tmp996);
-          else
-            Console.Error.WriteLine(tmp996);
-          var tmp997 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("setChartConfig", TMessageType.Exception, seqid), cancellationToken);
-          await tmp997.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task getChartConfig_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp998 = new InternalStructs.getChartConfig_args();
-        await tmp998.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp999 = new InternalStructs.getChartConfig_result();
-        try
-        {
-          try
-          {
-            tmp999.Success = await _iAsync.getChartConfig(tmp998.P, tmp998.ChartID, cancellationToken);
-          }
-          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1000)
-          {
-            tmp999.E = tmp1000;
-          }
-          await oprot.WriteMessageBeginAsync(new TMessage("getChartConfig", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp999.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp1001)
-        {
-          var tmp1002 = $"Error occurred in {GetType().FullName}: {tmp1001.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp1001, tmp1002);
-          else
-            Console.Error.WriteLine(tmp1002);
-          var tmp1003 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("getChartConfig", TMessageType.Exception, seqid), cancellationToken);
-          await tmp1003.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task setChartData_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp1004 = new InternalStructs.setChartData_args();
-        await tmp1004.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp1005 = new InternalStructs.setChartData_result();
-        try
-        {
-          try
-          {
-            await _iAsync.setChartData(tmp1004.P, tmp1004.ChartID, tmp1004.Dataset, tmp1004.Right, cancellationToken);
-          }
-          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1006)
-          {
-            tmp1005.E = tmp1006;
-          }
-          await oprot.WriteMessageBeginAsync(new TMessage("setChartData", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp1005.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp1007)
-        {
-          var tmp1008 = $"Error occurred in {GetType().FullName}: {tmp1007.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp1007, tmp1008);
-          else
-            Console.Error.WriteLine(tmp1008);
-          var tmp1009 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("setChartData", TMessageType.Exception, seqid), cancellationToken);
-          await tmp1009.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task getChartData_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp1010 = new InternalStructs.getChartData_args();
-        await tmp1010.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp1011 = new InternalStructs.getChartData_result();
-        try
-        {
-          try
-          {
-            tmp1011.Success = await _iAsync.getChartData(tmp1010.P, tmp1010.ChartID, tmp1010.Right, cancellationToken);
-          }
-          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1012)
-          {
-            tmp1011.E = tmp1012;
-          }
-          await oprot.WriteMessageBeginAsync(new TMessage("getChartData", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp1011.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp1013)
-        {
-          var tmp1014 = $"Error occurred in {GetType().FullName}: {tmp1013.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp1013, tmp1014);
-          else
-            Console.Error.WriteLine(tmp1014);
-          var tmp1015 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("getChartData", TMessageType.Exception, seqid), cancellationToken);
-          await tmp1015.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task addChartKey_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp1016 = new InternalStructs.addChartKey_args();
-        await tmp1016.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp1017 = new InternalStructs.addChartKey_result();
-        try
-        {
-          try
-          {
-            await _iAsync.addChartKey(tmp1016.P, tmp1016.ChartID, tmp1016.Key, tmp1016.Data, tmp1016.Right, cancellationToken);
-          }
-          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1018)
-          {
-            tmp1017.E = tmp1018;
-          }
-          await oprot.WriteMessageBeginAsync(new TMessage("addChartKey", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp1017.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp1019)
-        {
-          var tmp1020 = $"Error occurred in {GetType().FullName}: {tmp1019.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp1019, tmp1020);
-          else
-            Console.Error.WriteLine(tmp1020);
-          var tmp1021 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("addChartKey", TMessageType.Exception, seqid), cancellationToken);
-          await tmp1021.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task removeChartKey_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp1022 = new InternalStructs.removeChartKey_args();
+        var tmp1022 = new InternalStructs.setChartConfig_args();
         await tmp1022.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp1023 = new InternalStructs.removeChartKey_result();
+        var tmp1023 = new InternalStructs.setChartConfig_result();
         try
         {
           try
           {
-            await _iAsync.removeChartKey(tmp1022.P, tmp1022.ChartID, tmp1022.Key, tmp1022.Right, cancellationToken);
+            await _iAsync.setChartConfig(tmp1022.P, tmp1022.ChartID, tmp1022.Config, cancellationToken);
           }
           catch (global::Yaskawa.Ext.API.IllegalArgument tmp1024)
           {
             tmp1023.E = tmp1024;
           }
-          await oprot.WriteMessageBeginAsync(new TMessage("removeChartKey", TMessageType.Reply, seqid), cancellationToken); 
+          await oprot.WriteMessageBeginAsync(new TMessage("setChartConfig", TMessageType.Reply, seqid), cancellationToken); 
           await tmp1023.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
@@ -3566,30 +3638,30 @@ namespace Yaskawa.Ext.API
           else
             Console.Error.WriteLine(tmp1026);
           var tmp1027 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("removeChartKey", TMessageType.Exception, seqid), cancellationToken);
+          await oprot.WriteMessageBeginAsync(new TMessage("setChartConfig", TMessageType.Exception, seqid), cancellationToken);
           await tmp1027.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task hideChartKey_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      public async global::System.Threading.Tasks.Task getChartConfig_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp1028 = new InternalStructs.hideChartKey_args();
+        var tmp1028 = new InternalStructs.getChartConfig_args();
         await tmp1028.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp1029 = new InternalStructs.hideChartKey_result();
+        var tmp1029 = new InternalStructs.getChartConfig_result();
         try
         {
           try
           {
-            await _iAsync.hideChartKey(tmp1028.P, tmp1028.ChartID, tmp1028.Key, tmp1028.Hidden, tmp1028.Right, cancellationToken);
+            tmp1029.Success = await _iAsync.getChartConfig(tmp1028.P, tmp1028.ChartID, cancellationToken);
           }
           catch (global::Yaskawa.Ext.API.IllegalArgument tmp1030)
           {
             tmp1029.E = tmp1030;
           }
-          await oprot.WriteMessageBeginAsync(new TMessage("hideChartKey", TMessageType.Reply, seqid), cancellationToken); 
+          await oprot.WriteMessageBeginAsync(new TMessage("getChartConfig", TMessageType.Reply, seqid), cancellationToken); 
           await tmp1029.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
@@ -3604,8 +3676,198 @@ namespace Yaskawa.Ext.API
           else
             Console.Error.WriteLine(tmp1032);
           var tmp1033 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("hideChartKey", TMessageType.Exception, seqid), cancellationToken);
+          await oprot.WriteMessageBeginAsync(new TMessage("getChartConfig", TMessageType.Exception, seqid), cancellationToken);
           await tmp1033.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task setChartData_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp1034 = new InternalStructs.setChartData_args();
+        await tmp1034.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp1035 = new InternalStructs.setChartData_result();
+        try
+        {
+          try
+          {
+            await _iAsync.setChartData(tmp1034.P, tmp1034.ChartID, tmp1034.Dataset, tmp1034.Right, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1036)
+          {
+            tmp1035.E = tmp1036;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("setChartData", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp1035.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp1037)
+        {
+          var tmp1038 = $"Error occurred in {GetType().FullName}: {tmp1037.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp1037, tmp1038);
+          else
+            Console.Error.WriteLine(tmp1038);
+          var tmp1039 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("setChartData", TMessageType.Exception, seqid), cancellationToken);
+          await tmp1039.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task getChartData_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp1040 = new InternalStructs.getChartData_args();
+        await tmp1040.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp1041 = new InternalStructs.getChartData_result();
+        try
+        {
+          try
+          {
+            tmp1041.Success = await _iAsync.getChartData(tmp1040.P, tmp1040.ChartID, tmp1040.Right, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1042)
+          {
+            tmp1041.E = tmp1042;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("getChartData", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp1041.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp1043)
+        {
+          var tmp1044 = $"Error occurred in {GetType().FullName}: {tmp1043.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp1043, tmp1044);
+          else
+            Console.Error.WriteLine(tmp1044);
+          var tmp1045 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("getChartData", TMessageType.Exception, seqid), cancellationToken);
+          await tmp1045.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task addChartKey_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp1046 = new InternalStructs.addChartKey_args();
+        await tmp1046.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp1047 = new InternalStructs.addChartKey_result();
+        try
+        {
+          try
+          {
+            await _iAsync.addChartKey(tmp1046.P, tmp1046.ChartID, tmp1046.Key, tmp1046.Data, tmp1046.Right, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1048)
+          {
+            tmp1047.E = tmp1048;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("addChartKey", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp1047.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp1049)
+        {
+          var tmp1050 = $"Error occurred in {GetType().FullName}: {tmp1049.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp1049, tmp1050);
+          else
+            Console.Error.WriteLine(tmp1050);
+          var tmp1051 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("addChartKey", TMessageType.Exception, seqid), cancellationToken);
+          await tmp1051.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task removeChartKey_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp1052 = new InternalStructs.removeChartKey_args();
+        await tmp1052.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp1053 = new InternalStructs.removeChartKey_result();
+        try
+        {
+          try
+          {
+            await _iAsync.removeChartKey(tmp1052.P, tmp1052.ChartID, tmp1052.Key, tmp1052.Right, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1054)
+          {
+            tmp1053.E = tmp1054;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("removeChartKey", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp1053.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp1055)
+        {
+          var tmp1056 = $"Error occurred in {GetType().FullName}: {tmp1055.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp1055, tmp1056);
+          else
+            Console.Error.WriteLine(tmp1056);
+          var tmp1057 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("removeChartKey", TMessageType.Exception, seqid), cancellationToken);
+          await tmp1057.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task hideChartKey_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp1058 = new InternalStructs.hideChartKey_args();
+        await tmp1058.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp1059 = new InternalStructs.hideChartKey_result();
+        try
+        {
+          try
+          {
+            await _iAsync.hideChartKey(tmp1058.P, tmp1058.ChartID, tmp1058.Key, tmp1058.Hidden, tmp1058.Right, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1060)
+          {
+            tmp1059.E = tmp1060;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("hideChartKey", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp1059.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp1061)
+        {
+          var tmp1062 = $"Error occurred in {GetType().FullName}: {tmp1061.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp1061, tmp1062);
+          else
+            Console.Error.WriteLine(tmp1062);
+          var tmp1063 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("hideChartKey", TMessageType.Exception, seqid), cancellationToken);
+          await tmp1063.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -3613,195 +3875,12 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task appendChartPoints_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp1034 = new InternalStructs.appendChartPoints_args();
-        await tmp1034.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        try
-        {
-          await _iAsync.appendChartPoints(tmp1034.P, tmp1034.ChartID, tmp1034.Key, tmp1034.Points, tmp1034.Right, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp1036)
-        {
-          var tmp1037 = $"Error occurred in {GetType().FullName}: {tmp1036.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp1036, tmp1037);
-          else
-            Console.Error.WriteLine(tmp1037);
-        }
-      }
-
-      public async global::System.Threading.Tasks.Task incrementChartKey_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp1038 = new InternalStructs.incrementChartKey_args();
-        await tmp1038.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp1039 = new InternalStructs.incrementChartKey_result();
-        try
-        {
-          try
-          {
-            await _iAsync.incrementChartKey(tmp1038.P, tmp1038.ChartID, tmp1038.Key, tmp1038.Val, cancellationToken);
-          }
-          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1040)
-          {
-            tmp1039.E = tmp1040;
-          }
-          await oprot.WriteMessageBeginAsync(new TMessage("incrementChartKey", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp1039.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp1041)
-        {
-          var tmp1042 = $"Error occurred in {GetType().FullName}: {tmp1041.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp1041, tmp1042);
-          else
-            Console.Error.WriteLine(tmp1042);
-          var tmp1043 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("incrementChartKey", TMessageType.Exception, seqid), cancellationToken);
-          await tmp1043.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task exportChartImage_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp1044 = new InternalStructs.exportChartImage_args();
-        await tmp1044.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp1045 = new InternalStructs.exportChartImage_result();
-        try
-        {
-          try
-          {
-            tmp1045.Success = await _iAsync.exportChartImage(tmp1044.P, tmp1044.ChartID, tmp1044.ImageFileName, cancellationToken);
-          }
-          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1046)
-          {
-            tmp1045.E = tmp1046;
-          }
-          await oprot.WriteMessageBeginAsync(new TMessage("exportChartImage", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp1045.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp1047)
-        {
-          var tmp1048 = $"Error occurred in {GetType().FullName}: {tmp1047.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp1047, tmp1048);
-          else
-            Console.Error.WriteLine(tmp1048);
-          var tmp1049 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("exportChartImage", TMessageType.Exception, seqid), cancellationToken);
-          await tmp1049.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task exportChartImageData_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp1050 = new InternalStructs.exportChartImageData_args();
-        await tmp1050.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp1051 = new InternalStructs.exportChartImageData_result();
-        try
-        {
-          try
-          {
-            tmp1051.Success = await _iAsync.exportChartImageData(tmp1050.P, tmp1050.ChartID, tmp1050.ImageFileName, cancellationToken);
-          }
-          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1052)
-          {
-            tmp1051.E = tmp1052;
-          }
-          await oprot.WriteMessageBeginAsync(new TMessage("exportChartImageData", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp1051.WriteAsync(oprot, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp1053)
-        {
-          var tmp1054 = $"Error occurred in {GetType().FullName}: {tmp1053.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp1053, tmp1054);
-          else
-            Console.Error.WriteLine(tmp1054);
-          var tmp1055 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("exportChartImageData", TMessageType.Exception, seqid), cancellationToken);
-          await tmp1055.WriteAsync(oprot, cancellationToken);
-        }
-        await oprot.WriteMessageEndAsync(cancellationToken);
-        await oprot.Transport.FlushAsync(cancellationToken);
-      }
-
-      public async global::System.Threading.Tasks.Task notice_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp1056 = new InternalStructs.notice_args();
-        await tmp1056.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        try
-        {
-          await _iAsync.notice(tmp1056.P, tmp1056.Title, tmp1056.Message, tmp1056.Log, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp1058)
-        {
-          var tmp1059 = $"Error occurred in {GetType().FullName}: {tmp1058.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp1058, tmp1059);
-          else
-            Console.Error.WriteLine(tmp1059);
-        }
-      }
-
-      public async global::System.Threading.Tasks.Task dispNotice_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp1060 = new InternalStructs.dispNotice_args();
-        await tmp1060.ReadAsync(iprot, cancellationToken);
-        await iprot.ReadMessageEndAsync(cancellationToken);
-        try
-        {
-          await _iAsync.dispNotice(tmp1060.P, tmp1060.Disposition, tmp1060.Title, tmp1060.Message, tmp1060.Log, cancellationToken);
-        }
-        catch (TTransportException)
-        {
-          throw;
-        }
-        catch (Exception tmp1062)
-        {
-          var tmp1063 = $"Error occurred in {GetType().FullName}: {tmp1062.Message}";
-          if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp1062, tmp1063);
-          else
-            Console.Error.WriteLine(tmp1063);
-        }
-      }
-
-      public async global::System.Threading.Tasks.Task error_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
-      {
-        var tmp1064 = new InternalStructs.error_args();
+        var tmp1064 = new InternalStructs.appendChartPoints_args();
         await tmp1064.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
         try
         {
-          await _iAsync.error(tmp1064.P, tmp1064.Title, tmp1064.Message, tmp1064.Log, cancellationToken);
+          await _iAsync.appendChartPoints(tmp1064.P, tmp1064.ChartID, tmp1064.Key, tmp1064.Points, tmp1064.Right, cancellationToken);
         }
         catch (TTransportException)
         {
@@ -3817,23 +3896,23 @@ namespace Yaskawa.Ext.API
         }
       }
 
-      public async global::System.Threading.Tasks.Task popupDialog_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      public async global::System.Threading.Tasks.Task incrementChartKey_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp1068 = new InternalStructs.popupDialog_args();
+        var tmp1068 = new InternalStructs.incrementChartKey_args();
         await tmp1068.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp1069 = new InternalStructs.popupDialog_result();
+        var tmp1069 = new InternalStructs.incrementChartKey_result();
         try
         {
           try
           {
-            await _iAsync.popupDialog(tmp1068.P, tmp1068.Identifier, tmp1068.Title, tmp1068.Message, tmp1068.PositiveOption, tmp1068.NegativeOption, cancellationToken);
+            await _iAsync.incrementChartKey(tmp1068.P, tmp1068.ChartID, tmp1068.Key, tmp1068.Val, cancellationToken);
           }
           catch (global::Yaskawa.Ext.API.IllegalArgument tmp1070)
           {
             tmp1069.E = tmp1070;
           }
-          await oprot.WriteMessageBeginAsync(new TMessage("popupDialog", TMessageType.Reply, seqid), cancellationToken); 
+          await oprot.WriteMessageBeginAsync(new TMessage("incrementChartKey", TMessageType.Reply, seqid), cancellationToken); 
           await tmp1069.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
@@ -3848,8 +3927,191 @@ namespace Yaskawa.Ext.API
           else
             Console.Error.WriteLine(tmp1072);
           var tmp1073 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("popupDialog", TMessageType.Exception, seqid), cancellationToken);
+          await oprot.WriteMessageBeginAsync(new TMessage("incrementChartKey", TMessageType.Exception, seqid), cancellationToken);
           await tmp1073.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task exportChartImage_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp1074 = new InternalStructs.exportChartImage_args();
+        await tmp1074.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp1075 = new InternalStructs.exportChartImage_result();
+        try
+        {
+          try
+          {
+            tmp1075.Success = await _iAsync.exportChartImage(tmp1074.P, tmp1074.ChartID, tmp1074.ImageFileName, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1076)
+          {
+            tmp1075.E = tmp1076;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("exportChartImage", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp1075.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp1077)
+        {
+          var tmp1078 = $"Error occurred in {GetType().FullName}: {tmp1077.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp1077, tmp1078);
+          else
+            Console.Error.WriteLine(tmp1078);
+          var tmp1079 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("exportChartImage", TMessageType.Exception, seqid), cancellationToken);
+          await tmp1079.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task exportChartImageData_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp1080 = new InternalStructs.exportChartImageData_args();
+        await tmp1080.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp1081 = new InternalStructs.exportChartImageData_result();
+        try
+        {
+          try
+          {
+            tmp1081.Success = await _iAsync.exportChartImageData(tmp1080.P, tmp1080.ChartID, tmp1080.ImageFileName, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1082)
+          {
+            tmp1081.E = tmp1082;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("exportChartImageData", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp1081.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp1083)
+        {
+          var tmp1084 = $"Error occurred in {GetType().FullName}: {tmp1083.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp1083, tmp1084);
+          else
+            Console.Error.WriteLine(tmp1084);
+          var tmp1085 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("exportChartImageData", TMessageType.Exception, seqid), cancellationToken);
+          await tmp1085.WriteAsync(oprot, cancellationToken);
+        }
+        await oprot.WriteMessageEndAsync(cancellationToken);
+        await oprot.Transport.FlushAsync(cancellationToken);
+      }
+
+      public async global::System.Threading.Tasks.Task notice_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp1086 = new InternalStructs.notice_args();
+        await tmp1086.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        try
+        {
+          await _iAsync.notice(tmp1086.P, tmp1086.Title, tmp1086.Message, tmp1086.Log, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp1088)
+        {
+          var tmp1089 = $"Error occurred in {GetType().FullName}: {tmp1088.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp1088, tmp1089);
+          else
+            Console.Error.WriteLine(tmp1089);
+        }
+      }
+
+      public async global::System.Threading.Tasks.Task dispNotice_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp1090 = new InternalStructs.dispNotice_args();
+        await tmp1090.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        try
+        {
+          await _iAsync.dispNotice(tmp1090.P, tmp1090.Disposition, tmp1090.Title, tmp1090.Message, tmp1090.Log, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp1092)
+        {
+          var tmp1093 = $"Error occurred in {GetType().FullName}: {tmp1092.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp1092, tmp1093);
+          else
+            Console.Error.WriteLine(tmp1093);
+        }
+      }
+
+      public async global::System.Threading.Tasks.Task error_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp1094 = new InternalStructs.error_args();
+        await tmp1094.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        try
+        {
+          await _iAsync.error(tmp1094.P, tmp1094.Title, tmp1094.Message, tmp1094.Log, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp1096)
+        {
+          var tmp1097 = $"Error occurred in {GetType().FullName}: {tmp1096.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp1096, tmp1097);
+          else
+            Console.Error.WriteLine(tmp1097);
+        }
+      }
+
+      public async global::System.Threading.Tasks.Task popupDialog_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      {
+        var tmp1098 = new InternalStructs.popupDialog_args();
+        await tmp1098.ReadAsync(iprot, cancellationToken);
+        await iprot.ReadMessageEndAsync(cancellationToken);
+        var tmp1099 = new InternalStructs.popupDialog_result();
+        try
+        {
+          try
+          {
+            await _iAsync.popupDialog(tmp1098.P, tmp1098.Identifier, tmp1098.Title, tmp1098.Message, tmp1098.PositiveOption, tmp1098.NegativeOption, cancellationToken);
+          }
+          catch (global::Yaskawa.Ext.API.IllegalArgument tmp1100)
+          {
+            tmp1099.E = tmp1100;
+          }
+          await oprot.WriteMessageBeginAsync(new TMessage("popupDialog", TMessageType.Reply, seqid), cancellationToken); 
+          await tmp1099.WriteAsync(oprot, cancellationToken);
+        }
+        catch (TTransportException)
+        {
+          throw;
+        }
+        catch (Exception tmp1101)
+        {
+          var tmp1102 = $"Error occurred in {GetType().FullName}: {tmp1101.Message}";
+          if(_logger != null)
+            _logger.LogError("{Exception}, {Message}", tmp1101, tmp1102);
+          else
+            Console.Error.WriteLine(tmp1102);
+          var tmp1103 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+          await oprot.WriteMessageBeginAsync(new TMessage("popupDialog", TMessageType.Exception, seqid), cancellationToken);
+          await tmp1103.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -3857,30 +4119,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task cancelPopupDialog_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp1074 = new InternalStructs.cancelPopupDialog_args();
-        await tmp1074.ReadAsync(iprot, cancellationToken);
+        var tmp1104 = new InternalStructs.cancelPopupDialog_args();
+        await tmp1104.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp1075 = new InternalStructs.cancelPopupDialog_result();
+        var tmp1105 = new InternalStructs.cancelPopupDialog_result();
         try
         {
-          await _iAsync.cancelPopupDialog(tmp1074.P, tmp1074.Identifier, cancellationToken);
+          await _iAsync.cancelPopupDialog(tmp1104.P, tmp1104.Identifier, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("cancelPopupDialog", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp1075.WriteAsync(oprot, cancellationToken);
+          await tmp1105.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp1076)
+        catch (Exception tmp1106)
         {
-          var tmp1077 = $"Error occurred in {GetType().FullName}: {tmp1076.Message}";
+          var tmp1107 = $"Error occurred in {GetType().FullName}: {tmp1106.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp1076, tmp1077);
+            _logger.LogError("{Exception}, {Message}", tmp1106, tmp1107);
           else
-            Console.Error.WriteLine(tmp1077);
-          var tmp1078 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp1107);
+          var tmp1108 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("cancelPopupDialog", TMessageType.Exception, seqid), cancellationToken);
-          await tmp1078.WriteAsync(oprot, cancellationToken);
+          await tmp1108.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -3888,30 +4150,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task insertInstructionAtSelectedLine_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp1079 = new InternalStructs.insertInstructionAtSelectedLine_args();
-        await tmp1079.ReadAsync(iprot, cancellationToken);
+        var tmp1109 = new InternalStructs.insertInstructionAtSelectedLine_args();
+        await tmp1109.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp1080 = new InternalStructs.insertInstructionAtSelectedLine_result();
+        var tmp1110 = new InternalStructs.insertInstructionAtSelectedLine_result();
         try
         {
-          tmp1080.Success = await _iAsync.insertInstructionAtSelectedLine(tmp1079.P, tmp1079.Instruction, cancellationToken);
+          tmp1110.Success = await _iAsync.insertInstructionAtSelectedLine(tmp1109.P, tmp1109.Instruction, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("insertInstructionAtSelectedLine", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp1080.WriteAsync(oprot, cancellationToken);
+          await tmp1110.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp1081)
+        catch (Exception tmp1111)
         {
-          var tmp1082 = $"Error occurred in {GetType().FullName}: {tmp1081.Message}";
+          var tmp1112 = $"Error occurred in {GetType().FullName}: {tmp1111.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp1081, tmp1082);
+            _logger.LogError("{Exception}, {Message}", tmp1111, tmp1112);
           else
-            Console.Error.WriteLine(tmp1082);
-          var tmp1083 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp1112);
+          var tmp1113 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("insertInstructionAtSelectedLine", TMessageType.Exception, seqid), cancellationToken);
-          await tmp1083.WriteAsync(oprot, cancellationToken);
+          await tmp1113.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -3919,30 +4181,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task displayScreen_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp1084 = new InternalStructs.displayScreen_args();
-        await tmp1084.ReadAsync(iprot, cancellationToken);
+        var tmp1114 = new InternalStructs.displayScreen_args();
+        await tmp1114.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp1085 = new InternalStructs.displayScreen_result();
+        var tmp1115 = new InternalStructs.displayScreen_result();
         try
         {
-          await _iAsync.displayScreen(tmp1084.P, tmp1084.Identifier, cancellationToken);
+          await _iAsync.displayScreen(tmp1114.P, tmp1114.Identifier, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("displayScreen", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp1085.WriteAsync(oprot, cancellationToken);
+          await tmp1115.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp1086)
+        catch (Exception tmp1116)
         {
-          var tmp1087 = $"Error occurred in {GetType().FullName}: {tmp1086.Message}";
+          var tmp1117 = $"Error occurred in {GetType().FullName}: {tmp1116.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp1086, tmp1087);
+            _logger.LogError("{Exception}, {Message}", tmp1116, tmp1117);
           else
-            Console.Error.WriteLine(tmp1087);
-          var tmp1088 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp1117);
+          var tmp1118 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("displayScreen", TMessageType.Exception, seqid), cancellationToken);
-          await tmp1088.WriteAsync(oprot, cancellationToken);
+          await tmp1118.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -3950,30 +4212,30 @@ namespace Yaskawa.Ext.API
 
       public async global::System.Threading.Tasks.Task displayHelp_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp1089 = new InternalStructs.displayHelp_args();
-        await tmp1089.ReadAsync(iprot, cancellationToken);
+        var tmp1119 = new InternalStructs.displayHelp_args();
+        await tmp1119.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp1090 = new InternalStructs.displayHelp_result();
+        var tmp1120 = new InternalStructs.displayHelp_result();
         try
         {
-          await _iAsync.displayHelp(tmp1089.P, tmp1089.Title, tmp1089.HtmlContentFile, cancellationToken);
+          await _iAsync.displayHelp(tmp1119.P, tmp1119.Title, tmp1119.HtmlContentFile, cancellationToken);
           await oprot.WriteMessageBeginAsync(new TMessage("displayHelp", TMessageType.Reply, seqid), cancellationToken); 
-          await tmp1090.WriteAsync(oprot, cancellationToken);
+          await tmp1120.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
         {
           throw;
         }
-        catch (Exception tmp1091)
+        catch (Exception tmp1121)
         {
-          var tmp1092 = $"Error occurred in {GetType().FullName}: {tmp1091.Message}";
+          var tmp1122 = $"Error occurred in {GetType().FullName}: {tmp1121.Message}";
           if(_logger != null)
-            _logger.LogError("{Exception}, {Message}", tmp1091, tmp1092);
+            _logger.LogError("{Exception}, {Message}", tmp1121, tmp1122);
           else
-            Console.Error.WriteLine(tmp1092);
-          var tmp1093 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
+            Console.Error.WriteLine(tmp1122);
+          var tmp1123 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
           await oprot.WriteMessageBeginAsync(new TMessage("displayHelp", TMessageType.Exception, seqid), cancellationToken);
-          await tmp1093.WriteAsync(oprot, cancellationToken);
+          await tmp1123.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
         await oprot.Transport.FlushAsync(cancellationToken);
@@ -4014,13 +4276,13 @@ namespace Yaskawa.Ext.API
 
         public pendantVersion_args DeepCopy()
         {
-          var tmp1094 = new pendantVersion_args();
+          var tmp1124 = new pendantVersion_args();
           if(__isset.p)
           {
-            tmp1094.P = this.P;
+            tmp1124.P = this.P;
           }
-          tmp1094.__isset.p = this.__isset.p;
-          return tmp1094;
+          tmp1124.__isset.p = this.__isset.p;
+          return tmp1124;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -4071,15 +4333,15 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1095 = new TStruct("pendantVersion_args");
-            await oprot.WriteStructBeginAsync(tmp1095, cancellationToken);
-            var tmp1096 = new TField();
+            var tmp1125 = new TStruct("pendantVersion_args");
+            await oprot.WriteStructBeginAsync(tmp1125, cancellationToken);
+            var tmp1126 = new TField();
             if(__isset.p)
             {
-              tmp1096.Name = "p";
-              tmp1096.Type = TType.I64;
-              tmp1096.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1096, cancellationToken);
+              tmp1126.Name = "p";
+              tmp1126.Type = TType.I64;
+              tmp1126.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1126, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -4112,16 +4374,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1097 = new StringBuilder("pendantVersion_args(");
-          int tmp1098 = 0;
+          var tmp1127 = new StringBuilder("pendantVersion_args(");
+          int tmp1128 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1098++) { tmp1097.Append(", "); }
-            tmp1097.Append("P: ");
-            P.ToString(tmp1097);
+            if(0 < tmp1128++) { tmp1127.Append(", "); }
+            tmp1127.Append("P: ");
+            P.ToString(tmp1127);
           }
-          tmp1097.Append(')');
-          return tmp1097.ToString();
+          tmp1127.Append(')');
+          return tmp1127.ToString();
         }
       }
 
@@ -4156,13 +4418,13 @@ namespace Yaskawa.Ext.API
 
         public pendantVersion_result DeepCopy()
         {
-          var tmp1099 = new pendantVersion_result();
+          var tmp1129 = new pendantVersion_result();
           if((Success != null) && __isset.success)
           {
-            tmp1099.Success = (global::Yaskawa.Ext.API.Version)this.Success.DeepCopy();
+            tmp1129.Success = (global::Yaskawa.Ext.API.Version)this.Success.DeepCopy();
           }
-          tmp1099.__isset.success = this.__isset.success;
-          return tmp1099;
+          tmp1129.__isset.success = this.__isset.success;
+          return tmp1129;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -4214,18 +4476,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1100 = new TStruct("pendantVersion_result");
-            await oprot.WriteStructBeginAsync(tmp1100, cancellationToken);
-            var tmp1101 = new TField();
+            var tmp1130 = new TStruct("pendantVersion_result");
+            await oprot.WriteStructBeginAsync(tmp1130, cancellationToken);
+            var tmp1131 = new TField();
 
             if(this.__isset.success)
             {
               if (Success != null)
               {
-                tmp1101.Name = "Success";
-                tmp1101.Type = TType.Struct;
-                tmp1101.ID = 0;
-                await oprot.WriteFieldBeginAsync(tmp1101, cancellationToken);
+                tmp1131.Name = "Success";
+                tmp1131.Type = TType.Struct;
+                tmp1131.ID = 0;
+                await oprot.WriteFieldBeginAsync(tmp1131, cancellationToken);
                 await Success.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -4259,16 +4521,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1102 = new StringBuilder("pendantVersion_result(");
-          int tmp1103 = 0;
+          var tmp1132 = new StringBuilder("pendantVersion_result(");
+          int tmp1133 = 0;
           if((Success != null) && __isset.success)
           {
-            if(0 < tmp1103++) { tmp1102.Append(", "); }
-            tmp1102.Append("Success: ");
-            Success.ToString(tmp1102);
+            if(0 < tmp1133++) { tmp1132.Append(", "); }
+            tmp1132.Append("Success: ");
+            Success.ToString(tmp1132);
           }
-          tmp1102.Append(')');
-          return tmp1102.ToString();
+          tmp1132.Append(')');
+          return tmp1132.ToString();
         }
       }
 
@@ -4318,18 +4580,18 @@ namespace Yaskawa.Ext.API
 
         public subscribeEventTypes_args DeepCopy()
         {
-          var tmp1104 = new subscribeEventTypes_args();
+          var tmp1134 = new subscribeEventTypes_args();
           if(__isset.p)
           {
-            tmp1104.P = this.P;
+            tmp1134.P = this.P;
           }
-          tmp1104.__isset.p = this.__isset.p;
+          tmp1134.__isset.p = this.__isset.p;
           if((Types != null) && __isset.types)
           {
-            tmp1104.Types = this.Types.DeepCopy();
+            tmp1134.Types = this.Types.DeepCopy();
           }
-          tmp1104.__isset.types = this.__isset.types;
-          return tmp1104;
+          tmp1134.__isset.types = this.__isset.types;
+          return tmp1134;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -4363,13 +4625,13 @@ namespace Yaskawa.Ext.API
                   if (field.Type == TType.Set)
                   {
                     {
-                      var _set1105 = await iprot.ReadSetBeginAsync(cancellationToken);
-                      Types = new HashSet<global::Yaskawa.Ext.API.PendantEventType>(_set1105.Count);
-                      for(int _i1106 = 0; _i1106 < _set1105.Count; ++_i1106)
+                      var _set1135 = await iprot.ReadSetBeginAsync(cancellationToken);
+                      Types = new HashSet<global::Yaskawa.Ext.API.PendantEventType>(_set1135.Count);
+                      for(int _i1136 = 0; _i1136 < _set1135.Count; ++_i1136)
                       {
-                        global::Yaskawa.Ext.API.PendantEventType _elem1107;
-                        _elem1107 = (global::Yaskawa.Ext.API.PendantEventType)await iprot.ReadI32Async(cancellationToken);
-                        Types.Add(_elem1107);
+                        global::Yaskawa.Ext.API.PendantEventType _elem1137;
+                        _elem1137 = (global::Yaskawa.Ext.API.PendantEventType)await iprot.ReadI32Async(cancellationToken);
+                        Types.Add(_elem1137);
                       }
                       await iprot.ReadSetEndAsync(cancellationToken);
                     }
@@ -4400,28 +4662,28 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1108 = new TStruct("subscribeEventTypes_args");
-            await oprot.WriteStructBeginAsync(tmp1108, cancellationToken);
-            var tmp1109 = new TField();
+            var tmp1138 = new TStruct("subscribeEventTypes_args");
+            await oprot.WriteStructBeginAsync(tmp1138, cancellationToken);
+            var tmp1139 = new TField();
             if(__isset.p)
             {
-              tmp1109.Name = "p";
-              tmp1109.Type = TType.I64;
-              tmp1109.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1109, cancellationToken);
+              tmp1139.Name = "p";
+              tmp1139.Type = TType.I64;
+              tmp1139.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1139, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Types != null) && __isset.types)
             {
-              tmp1109.Name = "types";
-              tmp1109.Type = TType.Set;
-              tmp1109.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1109, cancellationToken);
+              tmp1139.Name = "types";
+              tmp1139.Type = TType.Set;
+              tmp1139.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1139, cancellationToken);
               await oprot.WriteSetBeginAsync(new TSet(TType.I32, Types.Count), cancellationToken);
-              foreach (global::Yaskawa.Ext.API.PendantEventType _iter1110 in Types)
+              foreach (global::Yaskawa.Ext.API.PendantEventType _iter1140 in Types)
               {
-                await oprot.WriteI32Async((int)_iter1110, cancellationToken);
+                await oprot.WriteI32Async((int)_iter1140, cancellationToken);
               }
               await oprot.WriteSetEndAsync(cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
@@ -4460,22 +4722,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1111 = new StringBuilder("subscribeEventTypes_args(");
-          int tmp1112 = 0;
+          var tmp1141 = new StringBuilder("subscribeEventTypes_args(");
+          int tmp1142 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1112++) { tmp1111.Append(", "); }
-            tmp1111.Append("P: ");
-            P.ToString(tmp1111);
+            if(0 < tmp1142++) { tmp1141.Append(", "); }
+            tmp1141.Append("P: ");
+            P.ToString(tmp1141);
           }
           if((Types != null) && __isset.types)
           {
-            if(0 < tmp1112++) { tmp1111.Append(", "); }
-            tmp1111.Append("Types: ");
-            Types.ToString(tmp1111);
+            if(0 < tmp1142++) { tmp1141.Append(", "); }
+            tmp1141.Append("Types: ");
+            Types.ToString(tmp1141);
           }
-          tmp1111.Append(')');
-          return tmp1111.ToString();
+          tmp1141.Append(')');
+          return tmp1141.ToString();
         }
       }
 
@@ -4489,8 +4751,8 @@ namespace Yaskawa.Ext.API
 
         public subscribeEventTypes_result DeepCopy()
         {
-          var tmp1113 = new subscribeEventTypes_result();
-          return tmp1113;
+          var tmp1143 = new subscribeEventTypes_result();
+          return tmp1143;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -4531,8 +4793,8 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1114 = new TStruct("subscribeEventTypes_result");
-            await oprot.WriteStructBeginAsync(tmp1114, cancellationToken);
+            var tmp1144 = new TStruct("subscribeEventTypes_result");
+            await oprot.WriteStructBeginAsync(tmp1144, cancellationToken);
             await oprot.WriteFieldStopAsync(cancellationToken);
             await oprot.WriteStructEndAsync(cancellationToken);
           }
@@ -4558,9 +4820,9 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1115 = new StringBuilder("subscribeEventTypes_result(");
-          tmp1115.Append(')');
-          return tmp1115.ToString();
+          var tmp1145 = new StringBuilder("subscribeEventTypes_result(");
+          tmp1145.Append(')');
+          return tmp1145.ToString();
         }
       }
 
@@ -4610,18 +4872,18 @@ namespace Yaskawa.Ext.API
 
         public unsubscribeEventTypes_args DeepCopy()
         {
-          var tmp1117 = new unsubscribeEventTypes_args();
+          var tmp1147 = new unsubscribeEventTypes_args();
           if(__isset.p)
           {
-            tmp1117.P = this.P;
+            tmp1147.P = this.P;
           }
-          tmp1117.__isset.p = this.__isset.p;
+          tmp1147.__isset.p = this.__isset.p;
           if((Types != null) && __isset.types)
           {
-            tmp1117.Types = this.Types.DeepCopy();
+            tmp1147.Types = this.Types.DeepCopy();
           }
-          tmp1117.__isset.types = this.__isset.types;
-          return tmp1117;
+          tmp1147.__isset.types = this.__isset.types;
+          return tmp1147;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -4655,13 +4917,13 @@ namespace Yaskawa.Ext.API
                   if (field.Type == TType.Set)
                   {
                     {
-                      var _set1118 = await iprot.ReadSetBeginAsync(cancellationToken);
-                      Types = new HashSet<global::Yaskawa.Ext.API.PendantEventType>(_set1118.Count);
-                      for(int _i1119 = 0; _i1119 < _set1118.Count; ++_i1119)
+                      var _set1148 = await iprot.ReadSetBeginAsync(cancellationToken);
+                      Types = new HashSet<global::Yaskawa.Ext.API.PendantEventType>(_set1148.Count);
+                      for(int _i1149 = 0; _i1149 < _set1148.Count; ++_i1149)
                       {
-                        global::Yaskawa.Ext.API.PendantEventType _elem1120;
-                        _elem1120 = (global::Yaskawa.Ext.API.PendantEventType)await iprot.ReadI32Async(cancellationToken);
-                        Types.Add(_elem1120);
+                        global::Yaskawa.Ext.API.PendantEventType _elem1150;
+                        _elem1150 = (global::Yaskawa.Ext.API.PendantEventType)await iprot.ReadI32Async(cancellationToken);
+                        Types.Add(_elem1150);
                       }
                       await iprot.ReadSetEndAsync(cancellationToken);
                     }
@@ -4692,28 +4954,28 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1121 = new TStruct("unsubscribeEventTypes_args");
-            await oprot.WriteStructBeginAsync(tmp1121, cancellationToken);
-            var tmp1122 = new TField();
+            var tmp1151 = new TStruct("unsubscribeEventTypes_args");
+            await oprot.WriteStructBeginAsync(tmp1151, cancellationToken);
+            var tmp1152 = new TField();
             if(__isset.p)
             {
-              tmp1122.Name = "p";
-              tmp1122.Type = TType.I64;
-              tmp1122.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1122, cancellationToken);
+              tmp1152.Name = "p";
+              tmp1152.Type = TType.I64;
+              tmp1152.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1152, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Types != null) && __isset.types)
             {
-              tmp1122.Name = "types";
-              tmp1122.Type = TType.Set;
-              tmp1122.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1122, cancellationToken);
+              tmp1152.Name = "types";
+              tmp1152.Type = TType.Set;
+              tmp1152.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1152, cancellationToken);
               await oprot.WriteSetBeginAsync(new TSet(TType.I32, Types.Count), cancellationToken);
-              foreach (global::Yaskawa.Ext.API.PendantEventType _iter1123 in Types)
+              foreach (global::Yaskawa.Ext.API.PendantEventType _iter1153 in Types)
               {
-                await oprot.WriteI32Async((int)_iter1123, cancellationToken);
+                await oprot.WriteI32Async((int)_iter1153, cancellationToken);
               }
               await oprot.WriteSetEndAsync(cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
@@ -4752,22 +5014,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1124 = new StringBuilder("unsubscribeEventTypes_args(");
-          int tmp1125 = 0;
+          var tmp1154 = new StringBuilder("unsubscribeEventTypes_args(");
+          int tmp1155 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1125++) { tmp1124.Append(", "); }
-            tmp1124.Append("P: ");
-            P.ToString(tmp1124);
+            if(0 < tmp1155++) { tmp1154.Append(", "); }
+            tmp1154.Append("P: ");
+            P.ToString(tmp1154);
           }
           if((Types != null) && __isset.types)
           {
-            if(0 < tmp1125++) { tmp1124.Append(", "); }
-            tmp1124.Append("Types: ");
-            Types.ToString(tmp1124);
+            if(0 < tmp1155++) { tmp1154.Append(", "); }
+            tmp1154.Append("Types: ");
+            Types.ToString(tmp1154);
           }
-          tmp1124.Append(')');
-          return tmp1124.ToString();
+          tmp1154.Append(')');
+          return tmp1154.ToString();
         }
       }
 
@@ -4781,8 +5043,8 @@ namespace Yaskawa.Ext.API
 
         public unsubscribeEventTypes_result DeepCopy()
         {
-          var tmp1126 = new unsubscribeEventTypes_result();
-          return tmp1126;
+          var tmp1156 = new unsubscribeEventTypes_result();
+          return tmp1156;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -4823,8 +5085,8 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1127 = new TStruct("unsubscribeEventTypes_result");
-            await oprot.WriteStructBeginAsync(tmp1127, cancellationToken);
+            var tmp1157 = new TStruct("unsubscribeEventTypes_result");
+            await oprot.WriteStructBeginAsync(tmp1157, cancellationToken);
             await oprot.WriteFieldStopAsync(cancellationToken);
             await oprot.WriteStructEndAsync(cancellationToken);
           }
@@ -4850,9 +5112,9 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1128 = new StringBuilder("unsubscribeEventTypes_result(");
-          tmp1128.Append(')');
-          return tmp1128.ToString();
+          var tmp1158 = new StringBuilder("unsubscribeEventTypes_result(");
+          tmp1158.Append(')');
+          return tmp1158.ToString();
         }
       }
 
@@ -4917,23 +5179,23 @@ namespace Yaskawa.Ext.API
 
         public subscribeItemEventTypes_args DeepCopy()
         {
-          var tmp1130 = new subscribeItemEventTypes_args();
+          var tmp1160 = new subscribeItemEventTypes_args();
           if(__isset.p)
           {
-            tmp1130.P = this.P;
+            tmp1160.P = this.P;
           }
-          tmp1130.__isset.p = this.__isset.p;
+          tmp1160.__isset.p = this.__isset.p;
           if((ItemIDs != null) && __isset.itemIDs)
           {
-            tmp1130.ItemIDs = this.ItemIDs.DeepCopy();
+            tmp1160.ItemIDs = this.ItemIDs.DeepCopy();
           }
-          tmp1130.__isset.itemIDs = this.__isset.itemIDs;
+          tmp1160.__isset.itemIDs = this.__isset.itemIDs;
           if((Types != null) && __isset.types)
           {
-            tmp1130.Types = this.Types.DeepCopy();
+            tmp1160.Types = this.Types.DeepCopy();
           }
-          tmp1130.__isset.types = this.__isset.types;
-          return tmp1130;
+          tmp1160.__isset.types = this.__isset.types;
+          return tmp1160;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -4967,13 +5229,13 @@ namespace Yaskawa.Ext.API
                   if (field.Type == TType.Set)
                   {
                     {
-                      var _set1131 = await iprot.ReadSetBeginAsync(cancellationToken);
-                      ItemIDs = new HashSet<string>(_set1131.Count);
-                      for(int _i1132 = 0; _i1132 < _set1131.Count; ++_i1132)
+                      var _set1161 = await iprot.ReadSetBeginAsync(cancellationToken);
+                      ItemIDs = new HashSet<string>(_set1161.Count);
+                      for(int _i1162 = 0; _i1162 < _set1161.Count; ++_i1162)
                       {
-                        string _elem1133;
-                        _elem1133 = await iprot.ReadStringAsync(cancellationToken);
-                        ItemIDs.Add(_elem1133);
+                        string _elem1163;
+                        _elem1163 = await iprot.ReadStringAsync(cancellationToken);
+                        ItemIDs.Add(_elem1163);
                       }
                       await iprot.ReadSetEndAsync(cancellationToken);
                     }
@@ -4987,13 +5249,13 @@ namespace Yaskawa.Ext.API
                   if (field.Type == TType.Set)
                   {
                     {
-                      var _set1134 = await iprot.ReadSetBeginAsync(cancellationToken);
-                      Types = new HashSet<global::Yaskawa.Ext.API.PendantEventType>(_set1134.Count);
-                      for(int _i1135 = 0; _i1135 < _set1134.Count; ++_i1135)
+                      var _set1164 = await iprot.ReadSetBeginAsync(cancellationToken);
+                      Types = new HashSet<global::Yaskawa.Ext.API.PendantEventType>(_set1164.Count);
+                      for(int _i1165 = 0; _i1165 < _set1164.Count; ++_i1165)
                       {
-                        global::Yaskawa.Ext.API.PendantEventType _elem1136;
-                        _elem1136 = (global::Yaskawa.Ext.API.PendantEventType)await iprot.ReadI32Async(cancellationToken);
-                        Types.Add(_elem1136);
+                        global::Yaskawa.Ext.API.PendantEventType _elem1166;
+                        _elem1166 = (global::Yaskawa.Ext.API.PendantEventType)await iprot.ReadI32Async(cancellationToken);
+                        Types.Add(_elem1166);
                       }
                       await iprot.ReadSetEndAsync(cancellationToken);
                     }
@@ -5024,42 +5286,42 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1137 = new TStruct("subscribeItemEventTypes_args");
-            await oprot.WriteStructBeginAsync(tmp1137, cancellationToken);
-            var tmp1138 = new TField();
+            var tmp1167 = new TStruct("subscribeItemEventTypes_args");
+            await oprot.WriteStructBeginAsync(tmp1167, cancellationToken);
+            var tmp1168 = new TField();
             if(__isset.p)
             {
-              tmp1138.Name = "p";
-              tmp1138.Type = TType.I64;
-              tmp1138.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1138, cancellationToken);
+              tmp1168.Name = "p";
+              tmp1168.Type = TType.I64;
+              tmp1168.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1168, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ItemIDs != null) && __isset.itemIDs)
             {
-              tmp1138.Name = "itemIDs";
-              tmp1138.Type = TType.Set;
-              tmp1138.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1138, cancellationToken);
+              tmp1168.Name = "itemIDs";
+              tmp1168.Type = TType.Set;
+              tmp1168.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1168, cancellationToken);
               await oprot.WriteSetBeginAsync(new TSet(TType.String, ItemIDs.Count), cancellationToken);
-              foreach (string _iter1139 in ItemIDs)
+              foreach (string _iter1169 in ItemIDs)
               {
-                await oprot.WriteStringAsync(_iter1139, cancellationToken);
+                await oprot.WriteStringAsync(_iter1169, cancellationToken);
               }
               await oprot.WriteSetEndAsync(cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Types != null) && __isset.types)
             {
-              tmp1138.Name = "types";
-              tmp1138.Type = TType.Set;
-              tmp1138.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1138, cancellationToken);
+              tmp1168.Name = "types";
+              tmp1168.Type = TType.Set;
+              tmp1168.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1168, cancellationToken);
               await oprot.WriteSetBeginAsync(new TSet(TType.I32, Types.Count), cancellationToken);
-              foreach (global::Yaskawa.Ext.API.PendantEventType _iter1140 in Types)
+              foreach (global::Yaskawa.Ext.API.PendantEventType _iter1170 in Types)
               {
-                await oprot.WriteI32Async((int)_iter1140, cancellationToken);
+                await oprot.WriteI32Async((int)_iter1170, cancellationToken);
               }
               await oprot.WriteSetEndAsync(cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
@@ -5103,28 +5365,28 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1141 = new StringBuilder("subscribeItemEventTypes_args(");
-          int tmp1142 = 0;
+          var tmp1171 = new StringBuilder("subscribeItemEventTypes_args(");
+          int tmp1172 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1142++) { tmp1141.Append(", "); }
-            tmp1141.Append("P: ");
-            P.ToString(tmp1141);
+            if(0 < tmp1172++) { tmp1171.Append(", "); }
+            tmp1171.Append("P: ");
+            P.ToString(tmp1171);
           }
           if((ItemIDs != null) && __isset.itemIDs)
           {
-            if(0 < tmp1142++) { tmp1141.Append(", "); }
-            tmp1141.Append("ItemIDs: ");
-            ItemIDs.ToString(tmp1141);
+            if(0 < tmp1172++) { tmp1171.Append(", "); }
+            tmp1171.Append("ItemIDs: ");
+            ItemIDs.ToString(tmp1171);
           }
           if((Types != null) && __isset.types)
           {
-            if(0 < tmp1142++) { tmp1141.Append(", "); }
-            tmp1141.Append("Types: ");
-            Types.ToString(tmp1141);
+            if(0 < tmp1172++) { tmp1171.Append(", "); }
+            tmp1171.Append("Types: ");
+            Types.ToString(tmp1171);
           }
-          tmp1141.Append(')');
-          return tmp1141.ToString();
+          tmp1171.Append(')');
+          return tmp1171.ToString();
         }
       }
 
@@ -5138,8 +5400,8 @@ namespace Yaskawa.Ext.API
 
         public subscribeItemEventTypes_result DeepCopy()
         {
-          var tmp1143 = new subscribeItemEventTypes_result();
-          return tmp1143;
+          var tmp1173 = new subscribeItemEventTypes_result();
+          return tmp1173;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -5180,8 +5442,8 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1144 = new TStruct("subscribeItemEventTypes_result");
-            await oprot.WriteStructBeginAsync(tmp1144, cancellationToken);
+            var tmp1174 = new TStruct("subscribeItemEventTypes_result");
+            await oprot.WriteStructBeginAsync(tmp1174, cancellationToken);
             await oprot.WriteFieldStopAsync(cancellationToken);
             await oprot.WriteStructEndAsync(cancellationToken);
           }
@@ -5207,9 +5469,9 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1145 = new StringBuilder("subscribeItemEventTypes_result(");
-          tmp1145.Append(')');
-          return tmp1145.ToString();
+          var tmp1175 = new StringBuilder("subscribeItemEventTypes_result(");
+          tmp1175.Append(')');
+          return tmp1175.ToString();
         }
       }
 
@@ -5274,23 +5536,23 @@ namespace Yaskawa.Ext.API
 
         public unsubscribeItemEventTypes_args DeepCopy()
         {
-          var tmp1147 = new unsubscribeItemEventTypes_args();
+          var tmp1177 = new unsubscribeItemEventTypes_args();
           if(__isset.p)
           {
-            tmp1147.P = this.P;
+            tmp1177.P = this.P;
           }
-          tmp1147.__isset.p = this.__isset.p;
+          tmp1177.__isset.p = this.__isset.p;
           if((ItemIDs != null) && __isset.itemIDs)
           {
-            tmp1147.ItemIDs = this.ItemIDs.DeepCopy();
+            tmp1177.ItemIDs = this.ItemIDs.DeepCopy();
           }
-          tmp1147.__isset.itemIDs = this.__isset.itemIDs;
+          tmp1177.__isset.itemIDs = this.__isset.itemIDs;
           if((Types != null) && __isset.types)
           {
-            tmp1147.Types = this.Types.DeepCopy();
+            tmp1177.Types = this.Types.DeepCopy();
           }
-          tmp1147.__isset.types = this.__isset.types;
-          return tmp1147;
+          tmp1177.__isset.types = this.__isset.types;
+          return tmp1177;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -5324,13 +5586,13 @@ namespace Yaskawa.Ext.API
                   if (field.Type == TType.Set)
                   {
                     {
-                      var _set1148 = await iprot.ReadSetBeginAsync(cancellationToken);
-                      ItemIDs = new HashSet<string>(_set1148.Count);
-                      for(int _i1149 = 0; _i1149 < _set1148.Count; ++_i1149)
+                      var _set1178 = await iprot.ReadSetBeginAsync(cancellationToken);
+                      ItemIDs = new HashSet<string>(_set1178.Count);
+                      for(int _i1179 = 0; _i1179 < _set1178.Count; ++_i1179)
                       {
-                        string _elem1150;
-                        _elem1150 = await iprot.ReadStringAsync(cancellationToken);
-                        ItemIDs.Add(_elem1150);
+                        string _elem1180;
+                        _elem1180 = await iprot.ReadStringAsync(cancellationToken);
+                        ItemIDs.Add(_elem1180);
                       }
                       await iprot.ReadSetEndAsync(cancellationToken);
                     }
@@ -5344,13 +5606,13 @@ namespace Yaskawa.Ext.API
                   if (field.Type == TType.Set)
                   {
                     {
-                      var _set1151 = await iprot.ReadSetBeginAsync(cancellationToken);
-                      Types = new HashSet<global::Yaskawa.Ext.API.PendantEventType>(_set1151.Count);
-                      for(int _i1152 = 0; _i1152 < _set1151.Count; ++_i1152)
+                      var _set1181 = await iprot.ReadSetBeginAsync(cancellationToken);
+                      Types = new HashSet<global::Yaskawa.Ext.API.PendantEventType>(_set1181.Count);
+                      for(int _i1182 = 0; _i1182 < _set1181.Count; ++_i1182)
                       {
-                        global::Yaskawa.Ext.API.PendantEventType _elem1153;
-                        _elem1153 = (global::Yaskawa.Ext.API.PendantEventType)await iprot.ReadI32Async(cancellationToken);
-                        Types.Add(_elem1153);
+                        global::Yaskawa.Ext.API.PendantEventType _elem1183;
+                        _elem1183 = (global::Yaskawa.Ext.API.PendantEventType)await iprot.ReadI32Async(cancellationToken);
+                        Types.Add(_elem1183);
                       }
                       await iprot.ReadSetEndAsync(cancellationToken);
                     }
@@ -5381,42 +5643,42 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1154 = new TStruct("unsubscribeItemEventTypes_args");
-            await oprot.WriteStructBeginAsync(tmp1154, cancellationToken);
-            var tmp1155 = new TField();
+            var tmp1184 = new TStruct("unsubscribeItemEventTypes_args");
+            await oprot.WriteStructBeginAsync(tmp1184, cancellationToken);
+            var tmp1185 = new TField();
             if(__isset.p)
             {
-              tmp1155.Name = "p";
-              tmp1155.Type = TType.I64;
-              tmp1155.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1155, cancellationToken);
+              tmp1185.Name = "p";
+              tmp1185.Type = TType.I64;
+              tmp1185.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1185, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ItemIDs != null) && __isset.itemIDs)
             {
-              tmp1155.Name = "itemIDs";
-              tmp1155.Type = TType.Set;
-              tmp1155.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1155, cancellationToken);
+              tmp1185.Name = "itemIDs";
+              tmp1185.Type = TType.Set;
+              tmp1185.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1185, cancellationToken);
               await oprot.WriteSetBeginAsync(new TSet(TType.String, ItemIDs.Count), cancellationToken);
-              foreach (string _iter1156 in ItemIDs)
+              foreach (string _iter1186 in ItemIDs)
               {
-                await oprot.WriteStringAsync(_iter1156, cancellationToken);
+                await oprot.WriteStringAsync(_iter1186, cancellationToken);
               }
               await oprot.WriteSetEndAsync(cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Types != null) && __isset.types)
             {
-              tmp1155.Name = "types";
-              tmp1155.Type = TType.Set;
-              tmp1155.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1155, cancellationToken);
+              tmp1185.Name = "types";
+              tmp1185.Type = TType.Set;
+              tmp1185.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1185, cancellationToken);
               await oprot.WriteSetBeginAsync(new TSet(TType.I32, Types.Count), cancellationToken);
-              foreach (global::Yaskawa.Ext.API.PendantEventType _iter1157 in Types)
+              foreach (global::Yaskawa.Ext.API.PendantEventType _iter1187 in Types)
               {
-                await oprot.WriteI32Async((int)_iter1157, cancellationToken);
+                await oprot.WriteI32Async((int)_iter1187, cancellationToken);
               }
               await oprot.WriteSetEndAsync(cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
@@ -5460,28 +5722,28 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1158 = new StringBuilder("unsubscribeItemEventTypes_args(");
-          int tmp1159 = 0;
+          var tmp1188 = new StringBuilder("unsubscribeItemEventTypes_args(");
+          int tmp1189 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1159++) { tmp1158.Append(", "); }
-            tmp1158.Append("P: ");
-            P.ToString(tmp1158);
+            if(0 < tmp1189++) { tmp1188.Append(", "); }
+            tmp1188.Append("P: ");
+            P.ToString(tmp1188);
           }
           if((ItemIDs != null) && __isset.itemIDs)
           {
-            if(0 < tmp1159++) { tmp1158.Append(", "); }
-            tmp1158.Append("ItemIDs: ");
-            ItemIDs.ToString(tmp1158);
+            if(0 < tmp1189++) { tmp1188.Append(", "); }
+            tmp1188.Append("ItemIDs: ");
+            ItemIDs.ToString(tmp1188);
           }
           if((Types != null) && __isset.types)
           {
-            if(0 < tmp1159++) { tmp1158.Append(", "); }
-            tmp1158.Append("Types: ");
-            Types.ToString(tmp1158);
+            if(0 < tmp1189++) { tmp1188.Append(", "); }
+            tmp1188.Append("Types: ");
+            Types.ToString(tmp1188);
           }
-          tmp1158.Append(')');
-          return tmp1158.ToString();
+          tmp1188.Append(')');
+          return tmp1188.ToString();
         }
       }
 
@@ -5495,8 +5757,8 @@ namespace Yaskawa.Ext.API
 
         public unsubscribeItemEventTypes_result DeepCopy()
         {
-          var tmp1160 = new unsubscribeItemEventTypes_result();
-          return tmp1160;
+          var tmp1190 = new unsubscribeItemEventTypes_result();
+          return tmp1190;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -5537,8 +5799,8 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1161 = new TStruct("unsubscribeItemEventTypes_result");
-            await oprot.WriteStructBeginAsync(tmp1161, cancellationToken);
+            var tmp1191 = new TStruct("unsubscribeItemEventTypes_result");
+            await oprot.WriteStructBeginAsync(tmp1191, cancellationToken);
             await oprot.WriteFieldStopAsync(cancellationToken);
             await oprot.WriteStructEndAsync(cancellationToken);
           }
@@ -5564,9 +5826,9 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1162 = new StringBuilder("unsubscribeItemEventTypes_result(");
-          tmp1162.Append(')');
-          return tmp1162.ToString();
+          var tmp1192 = new StringBuilder("unsubscribeItemEventTypes_result(");
+          tmp1192.Append(')');
+          return tmp1192.ToString();
         }
       }
 
@@ -5601,13 +5863,13 @@ namespace Yaskawa.Ext.API
 
         public events_args DeepCopy()
         {
-          var tmp1164 = new events_args();
+          var tmp1194 = new events_args();
           if(__isset.p)
           {
-            tmp1164.P = this.P;
+            tmp1194.P = this.P;
           }
-          tmp1164.__isset.p = this.__isset.p;
-          return tmp1164;
+          tmp1194.__isset.p = this.__isset.p;
+          return tmp1194;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -5658,15 +5920,15 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1165 = new TStruct("events_args");
-            await oprot.WriteStructBeginAsync(tmp1165, cancellationToken);
-            var tmp1166 = new TField();
+            var tmp1195 = new TStruct("events_args");
+            await oprot.WriteStructBeginAsync(tmp1195, cancellationToken);
+            var tmp1196 = new TField();
             if(__isset.p)
             {
-              tmp1166.Name = "p";
-              tmp1166.Type = TType.I64;
-              tmp1166.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1166, cancellationToken);
+              tmp1196.Name = "p";
+              tmp1196.Type = TType.I64;
+              tmp1196.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1196, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -5699,16 +5961,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1167 = new StringBuilder("events_args(");
-          int tmp1168 = 0;
+          var tmp1197 = new StringBuilder("events_args(");
+          int tmp1198 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1168++) { tmp1167.Append(", "); }
-            tmp1167.Append("P: ");
-            P.ToString(tmp1167);
+            if(0 < tmp1198++) { tmp1197.Append(", "); }
+            tmp1197.Append("P: ");
+            P.ToString(tmp1197);
           }
-          tmp1167.Append(')');
-          return tmp1167.ToString();
+          tmp1197.Append(')');
+          return tmp1197.ToString();
         }
       }
 
@@ -5743,13 +6005,13 @@ namespace Yaskawa.Ext.API
 
         public events_result DeepCopy()
         {
-          var tmp1169 = new events_result();
+          var tmp1199 = new events_result();
           if((Success != null) && __isset.success)
           {
-            tmp1169.Success = this.Success.DeepCopy();
+            tmp1199.Success = this.Success.DeepCopy();
           }
-          tmp1169.__isset.success = this.__isset.success;
-          return tmp1169;
+          tmp1199.__isset.success = this.__isset.success;
+          return tmp1199;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -5773,14 +6035,14 @@ namespace Yaskawa.Ext.API
                   if (field.Type == TType.List)
                   {
                     {
-                      var _list1170 = await iprot.ReadListBeginAsync(cancellationToken);
-                      Success = new List<global::Yaskawa.Ext.API.PendantEvent>(_list1170.Count);
-                      for(int _i1171 = 0; _i1171 < _list1170.Count; ++_i1171)
+                      var _list1200 = await iprot.ReadListBeginAsync(cancellationToken);
+                      Success = new List<global::Yaskawa.Ext.API.PendantEvent>(_list1200.Count);
+                      for(int _i1201 = 0; _i1201 < _list1200.Count; ++_i1201)
                       {
-                        global::Yaskawa.Ext.API.PendantEvent _elem1172;
-                        _elem1172 = new global::Yaskawa.Ext.API.PendantEvent();
-                        await _elem1172.ReadAsync(iprot, cancellationToken);
-                        Success.Add(_elem1172);
+                        global::Yaskawa.Ext.API.PendantEvent _elem1202;
+                        _elem1202 = new global::Yaskawa.Ext.API.PendantEvent();
+                        await _elem1202.ReadAsync(iprot, cancellationToken);
+                        Success.Add(_elem1202);
                       }
                       await iprot.ReadListEndAsync(cancellationToken);
                     }
@@ -5811,22 +6073,22 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1173 = new TStruct("events_result");
-            await oprot.WriteStructBeginAsync(tmp1173, cancellationToken);
-            var tmp1174 = new TField();
+            var tmp1203 = new TStruct("events_result");
+            await oprot.WriteStructBeginAsync(tmp1203, cancellationToken);
+            var tmp1204 = new TField();
 
             if(this.__isset.success)
             {
               if (Success != null)
               {
-                tmp1174.Name = "Success";
-                tmp1174.Type = TType.List;
-                tmp1174.ID = 0;
-                await oprot.WriteFieldBeginAsync(tmp1174, cancellationToken);
+                tmp1204.Name = "Success";
+                tmp1204.Type = TType.List;
+                tmp1204.ID = 0;
+                await oprot.WriteFieldBeginAsync(tmp1204, cancellationToken);
                 await oprot.WriteListBeginAsync(new TList(TType.Struct, Success.Count), cancellationToken);
-                foreach (global::Yaskawa.Ext.API.PendantEvent _iter1175 in Success)
+                foreach (global::Yaskawa.Ext.API.PendantEvent _iter1205 in Success)
                 {
-                  await _iter1175.WriteAsync(oprot, cancellationToken);
+                  await _iter1205.WriteAsync(oprot, cancellationToken);
                 }
                 await oprot.WriteListEndAsync(cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
@@ -5861,16 +6123,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1176 = new StringBuilder("events_result(");
-          int tmp1177 = 0;
+          var tmp1206 = new StringBuilder("events_result(");
+          int tmp1207 = 0;
           if((Success != null) && __isset.success)
           {
-            if(0 < tmp1177++) { tmp1176.Append(", "); }
-            tmp1176.Append("Success: ");
-            Success.ToString(tmp1176);
+            if(0 < tmp1207++) { tmp1206.Append(", "); }
+            tmp1206.Append("Success: ");
+            Success.ToString(tmp1206);
           }
-          tmp1176.Append(')');
-          return tmp1176.ToString();
+          tmp1206.Append(')');
+          return tmp1206.ToString();
         }
       }
 
@@ -5905,13 +6167,13 @@ namespace Yaskawa.Ext.API
 
         public currentLanguage_args DeepCopy()
         {
-          var tmp1178 = new currentLanguage_args();
+          var tmp1208 = new currentLanguage_args();
           if(__isset.p)
           {
-            tmp1178.P = this.P;
+            tmp1208.P = this.P;
           }
-          tmp1178.__isset.p = this.__isset.p;
-          return tmp1178;
+          tmp1208.__isset.p = this.__isset.p;
+          return tmp1208;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -5962,15 +6224,15 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1179 = new TStruct("currentLanguage_args");
-            await oprot.WriteStructBeginAsync(tmp1179, cancellationToken);
-            var tmp1180 = new TField();
+            var tmp1209 = new TStruct("currentLanguage_args");
+            await oprot.WriteStructBeginAsync(tmp1209, cancellationToken);
+            var tmp1210 = new TField();
             if(__isset.p)
             {
-              tmp1180.Name = "p";
-              tmp1180.Type = TType.I64;
-              tmp1180.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1180, cancellationToken);
+              tmp1210.Name = "p";
+              tmp1210.Type = TType.I64;
+              tmp1210.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1210, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -6003,16 +6265,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1181 = new StringBuilder("currentLanguage_args(");
-          int tmp1182 = 0;
+          var tmp1211 = new StringBuilder("currentLanguage_args(");
+          int tmp1212 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1182++) { tmp1181.Append(", "); }
-            tmp1181.Append("P: ");
-            P.ToString(tmp1181);
+            if(0 < tmp1212++) { tmp1211.Append(", "); }
+            tmp1211.Append("P: ");
+            P.ToString(tmp1211);
           }
-          tmp1181.Append(')');
-          return tmp1181.ToString();
+          tmp1211.Append(')');
+          return tmp1211.ToString();
         }
       }
 
@@ -6047,13 +6309,13 @@ namespace Yaskawa.Ext.API
 
         public currentLanguage_result DeepCopy()
         {
-          var tmp1183 = new currentLanguage_result();
+          var tmp1213 = new currentLanguage_result();
           if((Success != null) && __isset.success)
           {
-            tmp1183.Success = this.Success;
+            tmp1213.Success = this.Success;
           }
-          tmp1183.__isset.success = this.__isset.success;
-          return tmp1183;
+          tmp1213.__isset.success = this.__isset.success;
+          return tmp1213;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -6104,18 +6366,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1184 = new TStruct("currentLanguage_result");
-            await oprot.WriteStructBeginAsync(tmp1184, cancellationToken);
-            var tmp1185 = new TField();
+            var tmp1214 = new TStruct("currentLanguage_result");
+            await oprot.WriteStructBeginAsync(tmp1214, cancellationToken);
+            var tmp1215 = new TField();
 
             if(this.__isset.success)
             {
               if (Success != null)
               {
-                tmp1185.Name = "Success";
-                tmp1185.Type = TType.String;
-                tmp1185.ID = 0;
-                await oprot.WriteFieldBeginAsync(tmp1185, cancellationToken);
+                tmp1215.Name = "Success";
+                tmp1215.Type = TType.String;
+                tmp1215.ID = 0;
+                await oprot.WriteFieldBeginAsync(tmp1215, cancellationToken);
                 await oprot.WriteStringAsync(Success, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -6149,16 +6411,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1186 = new StringBuilder("currentLanguage_result(");
-          int tmp1187 = 0;
+          var tmp1216 = new StringBuilder("currentLanguage_result(");
+          int tmp1217 = 0;
           if((Success != null) && __isset.success)
           {
-            if(0 < tmp1187++) { tmp1186.Append(", "); }
-            tmp1186.Append("Success: ");
-            Success.ToString(tmp1186);
+            if(0 < tmp1217++) { tmp1216.Append(", "); }
+            tmp1216.Append("Success: ");
+            Success.ToString(tmp1216);
           }
-          tmp1186.Append(')');
-          return tmp1186.ToString();
+          tmp1216.Append(')');
+          return tmp1216.ToString();
         }
       }
 
@@ -6193,13 +6455,13 @@ namespace Yaskawa.Ext.API
 
         public currentLocale_args DeepCopy()
         {
-          var tmp1188 = new currentLocale_args();
+          var tmp1218 = new currentLocale_args();
           if(__isset.p)
           {
-            tmp1188.P = this.P;
+            tmp1218.P = this.P;
           }
-          tmp1188.__isset.p = this.__isset.p;
-          return tmp1188;
+          tmp1218.__isset.p = this.__isset.p;
+          return tmp1218;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -6250,15 +6512,15 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1189 = new TStruct("currentLocale_args");
-            await oprot.WriteStructBeginAsync(tmp1189, cancellationToken);
-            var tmp1190 = new TField();
+            var tmp1219 = new TStruct("currentLocale_args");
+            await oprot.WriteStructBeginAsync(tmp1219, cancellationToken);
+            var tmp1220 = new TField();
             if(__isset.p)
             {
-              tmp1190.Name = "p";
-              tmp1190.Type = TType.I64;
-              tmp1190.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1190, cancellationToken);
+              tmp1220.Name = "p";
+              tmp1220.Type = TType.I64;
+              tmp1220.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1220, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -6291,16 +6553,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1191 = new StringBuilder("currentLocale_args(");
-          int tmp1192 = 0;
+          var tmp1221 = new StringBuilder("currentLocale_args(");
+          int tmp1222 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1192++) { tmp1191.Append(", "); }
-            tmp1191.Append("P: ");
-            P.ToString(tmp1191);
+            if(0 < tmp1222++) { tmp1221.Append(", "); }
+            tmp1221.Append("P: ");
+            P.ToString(tmp1221);
           }
-          tmp1191.Append(')');
-          return tmp1191.ToString();
+          tmp1221.Append(')');
+          return tmp1221.ToString();
         }
       }
 
@@ -6335,13 +6597,13 @@ namespace Yaskawa.Ext.API
 
         public currentLocale_result DeepCopy()
         {
-          var tmp1193 = new currentLocale_result();
+          var tmp1223 = new currentLocale_result();
           if((Success != null) && __isset.success)
           {
-            tmp1193.Success = this.Success;
+            tmp1223.Success = this.Success;
           }
-          tmp1193.__isset.success = this.__isset.success;
-          return tmp1193;
+          tmp1223.__isset.success = this.__isset.success;
+          return tmp1223;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -6392,18 +6654,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1194 = new TStruct("currentLocale_result");
-            await oprot.WriteStructBeginAsync(tmp1194, cancellationToken);
-            var tmp1195 = new TField();
+            var tmp1224 = new TStruct("currentLocale_result");
+            await oprot.WriteStructBeginAsync(tmp1224, cancellationToken);
+            var tmp1225 = new TField();
 
             if(this.__isset.success)
             {
               if (Success != null)
               {
-                tmp1195.Name = "Success";
-                tmp1195.Type = TType.String;
-                tmp1195.ID = 0;
-                await oprot.WriteFieldBeginAsync(tmp1195, cancellationToken);
+                tmp1225.Name = "Success";
+                tmp1225.Type = TType.String;
+                tmp1225.ID = 0;
+                await oprot.WriteFieldBeginAsync(tmp1225, cancellationToken);
                 await oprot.WriteStringAsync(Success, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -6437,16 +6699,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1196 = new StringBuilder("currentLocale_result(");
-          int tmp1197 = 0;
+          var tmp1226 = new StringBuilder("currentLocale_result(");
+          int tmp1227 = 0;
           if((Success != null) && __isset.success)
           {
-            if(0 < tmp1197++) { tmp1196.Append(", "); }
-            tmp1196.Append("Success: ");
-            Success.ToString(tmp1196);
+            if(0 < tmp1227++) { tmp1226.Append(", "); }
+            tmp1226.Append("Success: ");
+            Success.ToString(tmp1226);
           }
-          tmp1196.Append(')');
-          return tmp1196.ToString();
+          tmp1226.Append(')');
+          return tmp1226.ToString();
         }
       }
 
@@ -6481,13 +6743,13 @@ namespace Yaskawa.Ext.API
 
         public currentScreenName_args DeepCopy()
         {
-          var tmp1198 = new currentScreenName_args();
+          var tmp1228 = new currentScreenName_args();
           if(__isset.p)
           {
-            tmp1198.P = this.P;
+            tmp1228.P = this.P;
           }
-          tmp1198.__isset.p = this.__isset.p;
-          return tmp1198;
+          tmp1228.__isset.p = this.__isset.p;
+          return tmp1228;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -6538,15 +6800,15 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1199 = new TStruct("currentScreenName_args");
-            await oprot.WriteStructBeginAsync(tmp1199, cancellationToken);
-            var tmp1200 = new TField();
+            var tmp1229 = new TStruct("currentScreenName_args");
+            await oprot.WriteStructBeginAsync(tmp1229, cancellationToken);
+            var tmp1230 = new TField();
             if(__isset.p)
             {
-              tmp1200.Name = "p";
-              tmp1200.Type = TType.I64;
-              tmp1200.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1200, cancellationToken);
+              tmp1230.Name = "p";
+              tmp1230.Type = TType.I64;
+              tmp1230.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1230, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -6579,16 +6841,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1201 = new StringBuilder("currentScreenName_args(");
-          int tmp1202 = 0;
+          var tmp1231 = new StringBuilder("currentScreenName_args(");
+          int tmp1232 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1202++) { tmp1201.Append(", "); }
-            tmp1201.Append("P: ");
-            P.ToString(tmp1201);
+            if(0 < tmp1232++) { tmp1231.Append(", "); }
+            tmp1231.Append("P: ");
+            P.ToString(tmp1231);
           }
-          tmp1201.Append(')');
-          return tmp1201.ToString();
+          tmp1231.Append(')');
+          return tmp1231.ToString();
         }
       }
 
@@ -6623,13 +6885,13 @@ namespace Yaskawa.Ext.API
 
         public currentScreenName_result DeepCopy()
         {
-          var tmp1203 = new currentScreenName_result();
+          var tmp1233 = new currentScreenName_result();
           if((Success != null) && __isset.success)
           {
-            tmp1203.Success = this.Success;
+            tmp1233.Success = this.Success;
           }
-          tmp1203.__isset.success = this.__isset.success;
-          return tmp1203;
+          tmp1233.__isset.success = this.__isset.success;
+          return tmp1233;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -6680,18 +6942,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1204 = new TStruct("currentScreenName_result");
-            await oprot.WriteStructBeginAsync(tmp1204, cancellationToken);
-            var tmp1205 = new TField();
+            var tmp1234 = new TStruct("currentScreenName_result");
+            await oprot.WriteStructBeginAsync(tmp1234, cancellationToken);
+            var tmp1235 = new TField();
 
             if(this.__isset.success)
             {
               if (Success != null)
               {
-                tmp1205.Name = "Success";
-                tmp1205.Type = TType.String;
-                tmp1205.ID = 0;
-                await oprot.WriteFieldBeginAsync(tmp1205, cancellationToken);
+                tmp1235.Name = "Success";
+                tmp1235.Type = TType.String;
+                tmp1235.ID = 0;
+                await oprot.WriteFieldBeginAsync(tmp1235, cancellationToken);
                 await oprot.WriteStringAsync(Success, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -6725,16 +6987,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1206 = new StringBuilder("currentScreenName_result(");
-          int tmp1207 = 0;
+          var tmp1236 = new StringBuilder("currentScreenName_result(");
+          int tmp1237 = 0;
           if((Success != null) && __isset.success)
           {
-            if(0 < tmp1207++) { tmp1206.Append(", "); }
-            tmp1206.Append("Success: ");
-            Success.ToString(tmp1206);
+            if(0 < tmp1237++) { tmp1236.Append(", "); }
+            tmp1236.Append("Success: ");
+            Success.ToString(tmp1236);
           }
-          tmp1206.Append(')');
-          return tmp1206.ToString();
+          tmp1236.Append(')');
+          return tmp1236.ToString();
         }
       }
 
@@ -6784,18 +7046,18 @@ namespace Yaskawa.Ext.API
 
         public registerYML_args DeepCopy()
         {
-          var tmp1208 = new registerYML_args();
+          var tmp1238 = new registerYML_args();
           if(__isset.p)
           {
-            tmp1208.P = this.P;
+            tmp1238.P = this.P;
           }
-          tmp1208.__isset.p = this.__isset.p;
+          tmp1238.__isset.p = this.__isset.p;
           if((YmlSource != null) && __isset.ymlSource)
           {
-            tmp1208.YmlSource = this.YmlSource;
+            tmp1238.YmlSource = this.YmlSource;
           }
-          tmp1208.__isset.ymlSource = this.__isset.ymlSource;
-          return tmp1208;
+          tmp1238.__isset.ymlSource = this.__isset.ymlSource;
+          return tmp1238;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -6856,24 +7118,24 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1209 = new TStruct("registerYML_args");
-            await oprot.WriteStructBeginAsync(tmp1209, cancellationToken);
-            var tmp1210 = new TField();
+            var tmp1239 = new TStruct("registerYML_args");
+            await oprot.WriteStructBeginAsync(tmp1239, cancellationToken);
+            var tmp1240 = new TField();
             if(__isset.p)
             {
-              tmp1210.Name = "p";
-              tmp1210.Type = TType.I64;
-              tmp1210.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1210, cancellationToken);
+              tmp1240.Name = "p";
+              tmp1240.Type = TType.I64;
+              tmp1240.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1240, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((YmlSource != null) && __isset.ymlSource)
             {
-              tmp1210.Name = "ymlSource";
-              tmp1210.Type = TType.String;
-              tmp1210.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1210, cancellationToken);
+              tmp1240.Name = "ymlSource";
+              tmp1240.Type = TType.String;
+              tmp1240.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1240, cancellationToken);
               await oprot.WriteStringAsync(YmlSource, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -6911,22 +7173,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1211 = new StringBuilder("registerYML_args(");
-          int tmp1212 = 0;
+          var tmp1241 = new StringBuilder("registerYML_args(");
+          int tmp1242 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1212++) { tmp1211.Append(", "); }
-            tmp1211.Append("P: ");
-            P.ToString(tmp1211);
+            if(0 < tmp1242++) { tmp1241.Append(", "); }
+            tmp1241.Append("P: ");
+            P.ToString(tmp1241);
           }
           if((YmlSource != null) && __isset.ymlSource)
           {
-            if(0 < tmp1212++) { tmp1211.Append(", "); }
-            tmp1211.Append("YmlSource: ");
-            YmlSource.ToString(tmp1211);
+            if(0 < tmp1242++) { tmp1241.Append(", "); }
+            tmp1241.Append("YmlSource: ");
+            YmlSource.ToString(tmp1241);
           }
-          tmp1211.Append(')');
-          return tmp1211.ToString();
+          tmp1241.Append(')');
+          return tmp1241.ToString();
         }
       }
 
@@ -6961,13 +7223,13 @@ namespace Yaskawa.Ext.API
 
         public registerYML_result DeepCopy()
         {
-          var tmp1213 = new registerYML_result();
+          var tmp1243 = new registerYML_result();
           if((Success != null) && __isset.success)
           {
-            tmp1213.Success = this.Success.DeepCopy();
+            tmp1243.Success = this.Success.DeepCopy();
           }
-          tmp1213.__isset.success = this.__isset.success;
-          return tmp1213;
+          tmp1243.__isset.success = this.__isset.success;
+          return tmp1243;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -6991,13 +7253,13 @@ namespace Yaskawa.Ext.API
                   if (field.Type == TType.List)
                   {
                     {
-                      var _list1214 = await iprot.ReadListBeginAsync(cancellationToken);
-                      Success = new List<string>(_list1214.Count);
-                      for(int _i1215 = 0; _i1215 < _list1214.Count; ++_i1215)
+                      var _list1244 = await iprot.ReadListBeginAsync(cancellationToken);
+                      Success = new List<string>(_list1244.Count);
+                      for(int _i1245 = 0; _i1245 < _list1244.Count; ++_i1245)
                       {
-                        string _elem1216;
-                        _elem1216 = await iprot.ReadStringAsync(cancellationToken);
-                        Success.Add(_elem1216);
+                        string _elem1246;
+                        _elem1246 = await iprot.ReadStringAsync(cancellationToken);
+                        Success.Add(_elem1246);
                       }
                       await iprot.ReadListEndAsync(cancellationToken);
                     }
@@ -7028,22 +7290,22 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1217 = new TStruct("registerYML_result");
-            await oprot.WriteStructBeginAsync(tmp1217, cancellationToken);
-            var tmp1218 = new TField();
+            var tmp1247 = new TStruct("registerYML_result");
+            await oprot.WriteStructBeginAsync(tmp1247, cancellationToken);
+            var tmp1248 = new TField();
 
             if(this.__isset.success)
             {
               if (Success != null)
               {
-                tmp1218.Name = "Success";
-                tmp1218.Type = TType.List;
-                tmp1218.ID = 0;
-                await oprot.WriteFieldBeginAsync(tmp1218, cancellationToken);
+                tmp1248.Name = "Success";
+                tmp1248.Type = TType.List;
+                tmp1248.ID = 0;
+                await oprot.WriteFieldBeginAsync(tmp1248, cancellationToken);
                 await oprot.WriteListBeginAsync(new TList(TType.String, Success.Count), cancellationToken);
-                foreach (string _iter1219 in Success)
+                foreach (string _iter1249 in Success)
                 {
-                  await oprot.WriteStringAsync(_iter1219, cancellationToken);
+                  await oprot.WriteStringAsync(_iter1249, cancellationToken);
                 }
                 await oprot.WriteListEndAsync(cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
@@ -7078,16 +7340,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1220 = new StringBuilder("registerYML_result(");
-          int tmp1221 = 0;
+          var tmp1250 = new StringBuilder("registerYML_result(");
+          int tmp1251 = 0;
           if((Success != null) && __isset.success)
           {
-            if(0 < tmp1221++) { tmp1220.Append(", "); }
-            tmp1220.Append("Success: ");
-            Success.ToString(tmp1220);
+            if(0 < tmp1251++) { tmp1250.Append(", "); }
+            tmp1250.Append("Success: ");
+            Success.ToString(tmp1250);
           }
-          tmp1220.Append(')');
-          return tmp1220.ToString();
+          tmp1250.Append(')');
+          return tmp1250.ToString();
         }
       }
 
@@ -7137,18 +7399,18 @@ namespace Yaskawa.Ext.API
 
         public registerImageFile_args DeepCopy()
         {
-          var tmp1222 = new registerImageFile_args();
+          var tmp1252 = new registerImageFile_args();
           if(__isset.p)
           {
-            tmp1222.P = this.P;
+            tmp1252.P = this.P;
           }
-          tmp1222.__isset.p = this.__isset.p;
+          tmp1252.__isset.p = this.__isset.p;
           if((ImageFileName != null) && __isset.imageFileName)
           {
-            tmp1222.ImageFileName = this.ImageFileName;
+            tmp1252.ImageFileName = this.ImageFileName;
           }
-          tmp1222.__isset.imageFileName = this.__isset.imageFileName;
-          return tmp1222;
+          tmp1252.__isset.imageFileName = this.__isset.imageFileName;
+          return tmp1252;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -7209,24 +7471,24 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1223 = new TStruct("registerImageFile_args");
-            await oprot.WriteStructBeginAsync(tmp1223, cancellationToken);
-            var tmp1224 = new TField();
+            var tmp1253 = new TStruct("registerImageFile_args");
+            await oprot.WriteStructBeginAsync(tmp1253, cancellationToken);
+            var tmp1254 = new TField();
             if(__isset.p)
             {
-              tmp1224.Name = "p";
-              tmp1224.Type = TType.I64;
-              tmp1224.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1224, cancellationToken);
+              tmp1254.Name = "p";
+              tmp1254.Type = TType.I64;
+              tmp1254.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1254, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ImageFileName != null) && __isset.imageFileName)
             {
-              tmp1224.Name = "imageFileName";
-              tmp1224.Type = TType.String;
-              tmp1224.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1224, cancellationToken);
+              tmp1254.Name = "imageFileName";
+              tmp1254.Type = TType.String;
+              tmp1254.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1254, cancellationToken);
               await oprot.WriteStringAsync(ImageFileName, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -7264,22 +7526,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1225 = new StringBuilder("registerImageFile_args(");
-          int tmp1226 = 0;
+          var tmp1255 = new StringBuilder("registerImageFile_args(");
+          int tmp1256 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1226++) { tmp1225.Append(", "); }
-            tmp1225.Append("P: ");
-            P.ToString(tmp1225);
+            if(0 < tmp1256++) { tmp1255.Append(", "); }
+            tmp1255.Append("P: ");
+            P.ToString(tmp1255);
           }
           if((ImageFileName != null) && __isset.imageFileName)
           {
-            if(0 < tmp1226++) { tmp1225.Append(", "); }
-            tmp1225.Append("ImageFileName: ");
-            ImageFileName.ToString(tmp1225);
+            if(0 < tmp1256++) { tmp1255.Append(", "); }
+            tmp1255.Append("ImageFileName: ");
+            ImageFileName.ToString(tmp1255);
           }
-          tmp1225.Append(')');
-          return tmp1225.ToString();
+          tmp1255.Append(')');
+          return tmp1255.ToString();
         }
       }
 
@@ -7314,13 +7576,13 @@ namespace Yaskawa.Ext.API
 
         public registerImageFile_result DeepCopy()
         {
-          var tmp1227 = new registerImageFile_result();
+          var tmp1257 = new registerImageFile_result();
           if((E != null) && __isset.e)
           {
-            tmp1227.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1257.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1227.__isset.e = this.__isset.e;
-          return tmp1227;
+          tmp1257.__isset.e = this.__isset.e;
+          return tmp1257;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -7372,18 +7634,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1228 = new TStruct("registerImageFile_result");
-            await oprot.WriteStructBeginAsync(tmp1228, cancellationToken);
-            var tmp1229 = new TField();
+            var tmp1258 = new TStruct("registerImageFile_result");
+            await oprot.WriteStructBeginAsync(tmp1258, cancellationToken);
+            var tmp1259 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1229.Name = "E";
-                tmp1229.Type = TType.Struct;
-                tmp1229.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1229, cancellationToken);
+                tmp1259.Name = "E";
+                tmp1259.Type = TType.Struct;
+                tmp1259.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1259, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -7417,16 +7679,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1230 = new StringBuilder("registerImageFile_result(");
-          int tmp1231 = 0;
+          var tmp1260 = new StringBuilder("registerImageFile_result(");
+          int tmp1261 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1231++) { tmp1230.Append(", "); }
-            tmp1230.Append("E: ");
-            E.ToString(tmp1230);
+            if(0 < tmp1261++) { tmp1260.Append(", "); }
+            tmp1260.Append("E: ");
+            E.ToString(tmp1260);
           }
-          tmp1230.Append(')');
-          return tmp1230.ToString();
+          tmp1260.Append(')');
+          return tmp1260.ToString();
         }
       }
 
@@ -7491,23 +7753,23 @@ namespace Yaskawa.Ext.API
 
         public registerImageData_args DeepCopy()
         {
-          var tmp1232 = new registerImageData_args();
+          var tmp1262 = new registerImageData_args();
           if(__isset.p)
           {
-            tmp1232.P = this.P;
+            tmp1262.P = this.P;
           }
-          tmp1232.__isset.p = this.__isset.p;
+          tmp1262.__isset.p = this.__isset.p;
           if((ImageData != null) && __isset.imageData)
           {
-            tmp1232.ImageData = this.ImageData.ToArray();
+            tmp1262.ImageData = this.ImageData.ToArray();
           }
-          tmp1232.__isset.imageData = this.__isset.imageData;
+          tmp1262.__isset.imageData = this.__isset.imageData;
           if((ImageName != null) && __isset.imageName)
           {
-            tmp1232.ImageName = this.ImageName;
+            tmp1262.ImageName = this.ImageName;
           }
-          tmp1232.__isset.imageName = this.__isset.imageName;
-          return tmp1232;
+          tmp1262.__isset.imageName = this.__isset.imageName;
+          return tmp1262;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -7578,33 +7840,33 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1233 = new TStruct("registerImageData_args");
-            await oprot.WriteStructBeginAsync(tmp1233, cancellationToken);
-            var tmp1234 = new TField();
+            var tmp1263 = new TStruct("registerImageData_args");
+            await oprot.WriteStructBeginAsync(tmp1263, cancellationToken);
+            var tmp1264 = new TField();
             if(__isset.p)
             {
-              tmp1234.Name = "p";
-              tmp1234.Type = TType.I64;
-              tmp1234.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1234, cancellationToken);
+              tmp1264.Name = "p";
+              tmp1264.Type = TType.I64;
+              tmp1264.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1264, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ImageData != null) && __isset.imageData)
             {
-              tmp1234.Name = "imageData";
-              tmp1234.Type = TType.String;
-              tmp1234.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1234, cancellationToken);
+              tmp1264.Name = "imageData";
+              tmp1264.Type = TType.String;
+              tmp1264.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1264, cancellationToken);
               await oprot.WriteBinaryAsync(ImageData, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ImageName != null) && __isset.imageName)
             {
-              tmp1234.Name = "imageName";
-              tmp1234.Type = TType.String;
-              tmp1234.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1234, cancellationToken);
+              tmp1264.Name = "imageName";
+              tmp1264.Type = TType.String;
+              tmp1264.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1264, cancellationToken);
               await oprot.WriteStringAsync(ImageName, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -7647,28 +7909,28 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1235 = new StringBuilder("registerImageData_args(");
-          int tmp1236 = 0;
+          var tmp1265 = new StringBuilder("registerImageData_args(");
+          int tmp1266 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1236++) { tmp1235.Append(", "); }
-            tmp1235.Append("P: ");
-            P.ToString(tmp1235);
+            if(0 < tmp1266++) { tmp1265.Append(", "); }
+            tmp1265.Append("P: ");
+            P.ToString(tmp1265);
           }
           if((ImageData != null) && __isset.imageData)
           {
-            if(0 < tmp1236++) { tmp1235.Append(", "); }
-            tmp1235.Append("ImageData: ");
-            ImageData.ToString(tmp1235);
+            if(0 < tmp1266++) { tmp1265.Append(", "); }
+            tmp1265.Append("ImageData: ");
+            ImageData.ToString(tmp1265);
           }
           if((ImageName != null) && __isset.imageName)
           {
-            if(0 < tmp1236++) { tmp1235.Append(", "); }
-            tmp1235.Append("ImageName: ");
-            ImageName.ToString(tmp1235);
+            if(0 < tmp1266++) { tmp1265.Append(", "); }
+            tmp1265.Append("ImageName: ");
+            ImageName.ToString(tmp1265);
           }
-          tmp1235.Append(')');
-          return tmp1235.ToString();
+          tmp1265.Append(')');
+          return tmp1265.ToString();
         }
       }
 
@@ -7703,13 +7965,13 @@ namespace Yaskawa.Ext.API
 
         public registerImageData_result DeepCopy()
         {
-          var tmp1237 = new registerImageData_result();
+          var tmp1267 = new registerImageData_result();
           if((E != null) && __isset.e)
           {
-            tmp1237.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1267.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1237.__isset.e = this.__isset.e;
-          return tmp1237;
+          tmp1267.__isset.e = this.__isset.e;
+          return tmp1267;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -7761,18 +8023,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1238 = new TStruct("registerImageData_result");
-            await oprot.WriteStructBeginAsync(tmp1238, cancellationToken);
-            var tmp1239 = new TField();
+            var tmp1268 = new TStruct("registerImageData_result");
+            await oprot.WriteStructBeginAsync(tmp1268, cancellationToken);
+            var tmp1269 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1239.Name = "E";
-                tmp1239.Type = TType.Struct;
-                tmp1239.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1239, cancellationToken);
+                tmp1269.Name = "E";
+                tmp1269.Type = TType.Struct;
+                tmp1269.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1269, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -7806,16 +8068,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1240 = new StringBuilder("registerImageData_result(");
-          int tmp1241 = 0;
+          var tmp1270 = new StringBuilder("registerImageData_result(");
+          int tmp1271 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1241++) { tmp1240.Append(", "); }
-            tmp1240.Append("E: ");
-            E.ToString(tmp1240);
+            if(0 < tmp1271++) { tmp1270.Append(", "); }
+            tmp1270.Append("E: ");
+            E.ToString(tmp1270);
           }
-          tmp1240.Append(')');
-          return tmp1240.ToString();
+          tmp1270.Append(')');
+          return tmp1270.ToString();
         }
       }
 
@@ -7865,18 +8127,18 @@ namespace Yaskawa.Ext.API
 
         public registerHTMLFile_args DeepCopy()
         {
-          var tmp1242 = new registerHTMLFile_args();
+          var tmp1272 = new registerHTMLFile_args();
           if(__isset.p)
           {
-            tmp1242.P = this.P;
+            tmp1272.P = this.P;
           }
-          tmp1242.__isset.p = this.__isset.p;
+          tmp1272.__isset.p = this.__isset.p;
           if((HtmlFileName != null) && __isset.htmlFileName)
           {
-            tmp1242.HtmlFileName = this.HtmlFileName;
+            tmp1272.HtmlFileName = this.HtmlFileName;
           }
-          tmp1242.__isset.htmlFileName = this.__isset.htmlFileName;
-          return tmp1242;
+          tmp1272.__isset.htmlFileName = this.__isset.htmlFileName;
+          return tmp1272;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -7937,24 +8199,24 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1243 = new TStruct("registerHTMLFile_args");
-            await oprot.WriteStructBeginAsync(tmp1243, cancellationToken);
-            var tmp1244 = new TField();
+            var tmp1273 = new TStruct("registerHTMLFile_args");
+            await oprot.WriteStructBeginAsync(tmp1273, cancellationToken);
+            var tmp1274 = new TField();
             if(__isset.p)
             {
-              tmp1244.Name = "p";
-              tmp1244.Type = TType.I64;
-              tmp1244.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1244, cancellationToken);
+              tmp1274.Name = "p";
+              tmp1274.Type = TType.I64;
+              tmp1274.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1274, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((HtmlFileName != null) && __isset.htmlFileName)
             {
-              tmp1244.Name = "htmlFileName";
-              tmp1244.Type = TType.String;
-              tmp1244.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1244, cancellationToken);
+              tmp1274.Name = "htmlFileName";
+              tmp1274.Type = TType.String;
+              tmp1274.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1274, cancellationToken);
               await oprot.WriteStringAsync(HtmlFileName, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -7992,22 +8254,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1245 = new StringBuilder("registerHTMLFile_args(");
-          int tmp1246 = 0;
+          var tmp1275 = new StringBuilder("registerHTMLFile_args(");
+          int tmp1276 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1246++) { tmp1245.Append(", "); }
-            tmp1245.Append("P: ");
-            P.ToString(tmp1245);
+            if(0 < tmp1276++) { tmp1275.Append(", "); }
+            tmp1275.Append("P: ");
+            P.ToString(tmp1275);
           }
           if((HtmlFileName != null) && __isset.htmlFileName)
           {
-            if(0 < tmp1246++) { tmp1245.Append(", "); }
-            tmp1245.Append("HtmlFileName: ");
-            HtmlFileName.ToString(tmp1245);
+            if(0 < tmp1276++) { tmp1275.Append(", "); }
+            tmp1275.Append("HtmlFileName: ");
+            HtmlFileName.ToString(tmp1275);
           }
-          tmp1245.Append(')');
-          return tmp1245.ToString();
+          tmp1275.Append(')');
+          return tmp1275.ToString();
         }
       }
 
@@ -8042,13 +8304,13 @@ namespace Yaskawa.Ext.API
 
         public registerHTMLFile_result DeepCopy()
         {
-          var tmp1247 = new registerHTMLFile_result();
+          var tmp1277 = new registerHTMLFile_result();
           if((E != null) && __isset.e)
           {
-            tmp1247.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1277.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1247.__isset.e = this.__isset.e;
-          return tmp1247;
+          tmp1277.__isset.e = this.__isset.e;
+          return tmp1277;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -8100,18 +8362,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1248 = new TStruct("registerHTMLFile_result");
-            await oprot.WriteStructBeginAsync(tmp1248, cancellationToken);
-            var tmp1249 = new TField();
+            var tmp1278 = new TStruct("registerHTMLFile_result");
+            await oprot.WriteStructBeginAsync(tmp1278, cancellationToken);
+            var tmp1279 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1249.Name = "E";
-                tmp1249.Type = TType.Struct;
-                tmp1249.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1249, cancellationToken);
+                tmp1279.Name = "E";
+                tmp1279.Type = TType.Struct;
+                tmp1279.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1279, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -8145,16 +8407,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1250 = new StringBuilder("registerHTMLFile_result(");
-          int tmp1251 = 0;
+          var tmp1280 = new StringBuilder("registerHTMLFile_result(");
+          int tmp1281 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1251++) { tmp1250.Append(", "); }
-            tmp1250.Append("E: ");
-            E.ToString(tmp1250);
+            if(0 < tmp1281++) { tmp1280.Append(", "); }
+            tmp1280.Append("E: ");
+            E.ToString(tmp1280);
           }
-          tmp1250.Append(')');
-          return tmp1250.ToString();
+          tmp1280.Append(')');
+          return tmp1280.ToString();
         }
       }
 
@@ -8219,23 +8481,23 @@ namespace Yaskawa.Ext.API
 
         public registerHTMLData_args DeepCopy()
         {
-          var tmp1252 = new registerHTMLData_args();
+          var tmp1282 = new registerHTMLData_args();
           if(__isset.p)
           {
-            tmp1252.P = this.P;
+            tmp1282.P = this.P;
           }
-          tmp1252.__isset.p = this.__isset.p;
+          tmp1282.__isset.p = this.__isset.p;
           if((HtmlData != null) && __isset.htmlData)
           {
-            tmp1252.HtmlData = this.HtmlData.ToArray();
+            tmp1282.HtmlData = this.HtmlData.ToArray();
           }
-          tmp1252.__isset.htmlData = this.__isset.htmlData;
+          tmp1282.__isset.htmlData = this.__isset.htmlData;
           if((HtmlName != null) && __isset.htmlName)
           {
-            tmp1252.HtmlName = this.HtmlName;
+            tmp1282.HtmlName = this.HtmlName;
           }
-          tmp1252.__isset.htmlName = this.__isset.htmlName;
-          return tmp1252;
+          tmp1282.__isset.htmlName = this.__isset.htmlName;
+          return tmp1282;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -8306,33 +8568,33 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1253 = new TStruct("registerHTMLData_args");
-            await oprot.WriteStructBeginAsync(tmp1253, cancellationToken);
-            var tmp1254 = new TField();
+            var tmp1283 = new TStruct("registerHTMLData_args");
+            await oprot.WriteStructBeginAsync(tmp1283, cancellationToken);
+            var tmp1284 = new TField();
             if(__isset.p)
             {
-              tmp1254.Name = "p";
-              tmp1254.Type = TType.I64;
-              tmp1254.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1254, cancellationToken);
+              tmp1284.Name = "p";
+              tmp1284.Type = TType.I64;
+              tmp1284.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1284, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((HtmlData != null) && __isset.htmlData)
             {
-              tmp1254.Name = "htmlData";
-              tmp1254.Type = TType.String;
-              tmp1254.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1254, cancellationToken);
+              tmp1284.Name = "htmlData";
+              tmp1284.Type = TType.String;
+              tmp1284.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1284, cancellationToken);
               await oprot.WriteBinaryAsync(HtmlData, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((HtmlName != null) && __isset.htmlName)
             {
-              tmp1254.Name = "htmlName";
-              tmp1254.Type = TType.String;
-              tmp1254.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1254, cancellationToken);
+              tmp1284.Name = "htmlName";
+              tmp1284.Type = TType.String;
+              tmp1284.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1284, cancellationToken);
               await oprot.WriteStringAsync(HtmlName, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -8375,28 +8637,28 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1255 = new StringBuilder("registerHTMLData_args(");
-          int tmp1256 = 0;
+          var tmp1285 = new StringBuilder("registerHTMLData_args(");
+          int tmp1286 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1256++) { tmp1255.Append(", "); }
-            tmp1255.Append("P: ");
-            P.ToString(tmp1255);
+            if(0 < tmp1286++) { tmp1285.Append(", "); }
+            tmp1285.Append("P: ");
+            P.ToString(tmp1285);
           }
           if((HtmlData != null) && __isset.htmlData)
           {
-            if(0 < tmp1256++) { tmp1255.Append(", "); }
-            tmp1255.Append("HtmlData: ");
-            HtmlData.ToString(tmp1255);
+            if(0 < tmp1286++) { tmp1285.Append(", "); }
+            tmp1285.Append("HtmlData: ");
+            HtmlData.ToString(tmp1285);
           }
           if((HtmlName != null) && __isset.htmlName)
           {
-            if(0 < tmp1256++) { tmp1255.Append(", "); }
-            tmp1255.Append("HtmlName: ");
-            HtmlName.ToString(tmp1255);
+            if(0 < tmp1286++) { tmp1285.Append(", "); }
+            tmp1285.Append("HtmlName: ");
+            HtmlName.ToString(tmp1285);
           }
-          tmp1255.Append(')');
-          return tmp1255.ToString();
+          tmp1285.Append(')');
+          return tmp1285.ToString();
         }
       }
 
@@ -8431,13 +8693,13 @@ namespace Yaskawa.Ext.API
 
         public registerHTMLData_result DeepCopy()
         {
-          var tmp1257 = new registerHTMLData_result();
+          var tmp1287 = new registerHTMLData_result();
           if((E != null) && __isset.e)
           {
-            tmp1257.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1287.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1257.__isset.e = this.__isset.e;
-          return tmp1257;
+          tmp1287.__isset.e = this.__isset.e;
+          return tmp1287;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -8489,18 +8751,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1258 = new TStruct("registerHTMLData_result");
-            await oprot.WriteStructBeginAsync(tmp1258, cancellationToken);
-            var tmp1259 = new TField();
+            var tmp1288 = new TStruct("registerHTMLData_result");
+            await oprot.WriteStructBeginAsync(tmp1288, cancellationToken);
+            var tmp1289 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1259.Name = "E";
-                tmp1259.Type = TType.Struct;
-                tmp1259.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1259, cancellationToken);
+                tmp1289.Name = "E";
+                tmp1289.Type = TType.Struct;
+                tmp1289.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1289, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -8534,16 +8796,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1260 = new StringBuilder("registerHTMLData_result(");
-          int tmp1261 = 0;
+          var tmp1290 = new StringBuilder("registerHTMLData_result(");
+          int tmp1291 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1261++) { tmp1260.Append(", "); }
-            tmp1260.Append("E: ");
-            E.ToString(tmp1260);
+            if(0 < tmp1291++) { tmp1290.Append(", "); }
+            tmp1290.Append("E: ");
+            E.ToString(tmp1290);
           }
-          tmp1260.Append(')');
-          return tmp1260.ToString();
+          tmp1290.Append(')');
+          return tmp1290.ToString();
         }
       }
 
@@ -8608,23 +8870,23 @@ namespace Yaskawa.Ext.API
 
         public registerTranslationFile_args DeepCopy()
         {
-          var tmp1262 = new registerTranslationFile_args();
+          var tmp1292 = new registerTranslationFile_args();
           if(__isset.p)
           {
-            tmp1262.P = this.P;
+            tmp1292.P = this.P;
           }
-          tmp1262.__isset.p = this.__isset.p;
+          tmp1292.__isset.p = this.__isset.p;
           if((Locale != null) && __isset.locale)
           {
-            tmp1262.Locale = this.Locale;
+            tmp1292.Locale = this.Locale;
           }
-          tmp1262.__isset.locale = this.__isset.locale;
+          tmp1292.__isset.locale = this.__isset.locale;
           if((TranslationFileName != null) && __isset.translationFileName)
           {
-            tmp1262.TranslationFileName = this.TranslationFileName;
+            tmp1292.TranslationFileName = this.TranslationFileName;
           }
-          tmp1262.__isset.translationFileName = this.__isset.translationFileName;
-          return tmp1262;
+          tmp1292.__isset.translationFileName = this.__isset.translationFileName;
+          return tmp1292;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -8695,33 +8957,33 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1263 = new TStruct("registerTranslationFile_args");
-            await oprot.WriteStructBeginAsync(tmp1263, cancellationToken);
-            var tmp1264 = new TField();
+            var tmp1293 = new TStruct("registerTranslationFile_args");
+            await oprot.WriteStructBeginAsync(tmp1293, cancellationToken);
+            var tmp1294 = new TField();
             if(__isset.p)
             {
-              tmp1264.Name = "p";
-              tmp1264.Type = TType.I64;
-              tmp1264.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1264, cancellationToken);
+              tmp1294.Name = "p";
+              tmp1294.Type = TType.I64;
+              tmp1294.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1294, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Locale != null) && __isset.locale)
             {
-              tmp1264.Name = "locale";
-              tmp1264.Type = TType.String;
-              tmp1264.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1264, cancellationToken);
+              tmp1294.Name = "locale";
+              tmp1294.Type = TType.String;
+              tmp1294.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1294, cancellationToken);
               await oprot.WriteStringAsync(Locale, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((TranslationFileName != null) && __isset.translationFileName)
             {
-              tmp1264.Name = "translationFileName";
-              tmp1264.Type = TType.String;
-              tmp1264.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1264, cancellationToken);
+              tmp1294.Name = "translationFileName";
+              tmp1294.Type = TType.String;
+              tmp1294.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1294, cancellationToken);
               await oprot.WriteStringAsync(TranslationFileName, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -8764,28 +9026,28 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1265 = new StringBuilder("registerTranslationFile_args(");
-          int tmp1266 = 0;
+          var tmp1295 = new StringBuilder("registerTranslationFile_args(");
+          int tmp1296 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1266++) { tmp1265.Append(", "); }
-            tmp1265.Append("P: ");
-            P.ToString(tmp1265);
+            if(0 < tmp1296++) { tmp1295.Append(", "); }
+            tmp1295.Append("P: ");
+            P.ToString(tmp1295);
           }
           if((Locale != null) && __isset.locale)
           {
-            if(0 < tmp1266++) { tmp1265.Append(", "); }
-            tmp1265.Append("Locale: ");
-            Locale.ToString(tmp1265);
+            if(0 < tmp1296++) { tmp1295.Append(", "); }
+            tmp1295.Append("Locale: ");
+            Locale.ToString(tmp1295);
           }
           if((TranslationFileName != null) && __isset.translationFileName)
           {
-            if(0 < tmp1266++) { tmp1265.Append(", "); }
-            tmp1265.Append("TranslationFileName: ");
-            TranslationFileName.ToString(tmp1265);
+            if(0 < tmp1296++) { tmp1295.Append(", "); }
+            tmp1295.Append("TranslationFileName: ");
+            TranslationFileName.ToString(tmp1295);
           }
-          tmp1265.Append(')');
-          return tmp1265.ToString();
+          tmp1295.Append(')');
+          return tmp1295.ToString();
         }
       }
 
@@ -8820,13 +9082,13 @@ namespace Yaskawa.Ext.API
 
         public registerTranslationFile_result DeepCopy()
         {
-          var tmp1267 = new registerTranslationFile_result();
+          var tmp1297 = new registerTranslationFile_result();
           if((E != null) && __isset.e)
           {
-            tmp1267.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1297.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1267.__isset.e = this.__isset.e;
-          return tmp1267;
+          tmp1297.__isset.e = this.__isset.e;
+          return tmp1297;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -8878,18 +9140,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1268 = new TStruct("registerTranslationFile_result");
-            await oprot.WriteStructBeginAsync(tmp1268, cancellationToken);
-            var tmp1269 = new TField();
+            var tmp1298 = new TStruct("registerTranslationFile_result");
+            await oprot.WriteStructBeginAsync(tmp1298, cancellationToken);
+            var tmp1299 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1269.Name = "E";
-                tmp1269.Type = TType.Struct;
-                tmp1269.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1269, cancellationToken);
+                tmp1299.Name = "E";
+                tmp1299.Type = TType.Struct;
+                tmp1299.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1299, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -8923,16 +9185,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1270 = new StringBuilder("registerTranslationFile_result(");
-          int tmp1271 = 0;
+          var tmp1300 = new StringBuilder("registerTranslationFile_result(");
+          int tmp1301 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1271++) { tmp1270.Append(", "); }
-            tmp1270.Append("E: ");
-            E.ToString(tmp1270);
+            if(0 < tmp1301++) { tmp1300.Append(", "); }
+            tmp1300.Append("E: ");
+            E.ToString(tmp1300);
           }
-          tmp1270.Append(')');
-          return tmp1270.ToString();
+          tmp1300.Append(')');
+          return tmp1300.ToString();
         }
       }
 
@@ -9012,28 +9274,28 @@ namespace Yaskawa.Ext.API
 
         public registerTranslationData_args DeepCopy()
         {
-          var tmp1272 = new registerTranslationData_args();
+          var tmp1302 = new registerTranslationData_args();
           if(__isset.p)
           {
-            tmp1272.P = this.P;
+            tmp1302.P = this.P;
           }
-          tmp1272.__isset.p = this.__isset.p;
+          tmp1302.__isset.p = this.__isset.p;
           if((Locale != null) && __isset.locale)
           {
-            tmp1272.Locale = this.Locale;
+            tmp1302.Locale = this.Locale;
           }
-          tmp1272.__isset.locale = this.__isset.locale;
+          tmp1302.__isset.locale = this.__isset.locale;
           if((TranslationData != null) && __isset.translationData)
           {
-            tmp1272.TranslationData = this.TranslationData.ToArray();
+            tmp1302.TranslationData = this.TranslationData.ToArray();
           }
-          tmp1272.__isset.translationData = this.__isset.translationData;
+          tmp1302.__isset.translationData = this.__isset.translationData;
           if((TranslationName != null) && __isset.translationName)
           {
-            tmp1272.TranslationName = this.TranslationName;
+            tmp1302.TranslationName = this.TranslationName;
           }
-          tmp1272.__isset.translationName = this.__isset.translationName;
-          return tmp1272;
+          tmp1302.__isset.translationName = this.__isset.translationName;
+          return tmp1302;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -9114,42 +9376,42 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1273 = new TStruct("registerTranslationData_args");
-            await oprot.WriteStructBeginAsync(tmp1273, cancellationToken);
-            var tmp1274 = new TField();
+            var tmp1303 = new TStruct("registerTranslationData_args");
+            await oprot.WriteStructBeginAsync(tmp1303, cancellationToken);
+            var tmp1304 = new TField();
             if(__isset.p)
             {
-              tmp1274.Name = "p";
-              tmp1274.Type = TType.I64;
-              tmp1274.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1274, cancellationToken);
+              tmp1304.Name = "p";
+              tmp1304.Type = TType.I64;
+              tmp1304.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1304, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Locale != null) && __isset.locale)
             {
-              tmp1274.Name = "locale";
-              tmp1274.Type = TType.String;
-              tmp1274.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1274, cancellationToken);
+              tmp1304.Name = "locale";
+              tmp1304.Type = TType.String;
+              tmp1304.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1304, cancellationToken);
               await oprot.WriteStringAsync(Locale, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((TranslationData != null) && __isset.translationData)
             {
-              tmp1274.Name = "translationData";
-              tmp1274.Type = TType.String;
-              tmp1274.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1274, cancellationToken);
+              tmp1304.Name = "translationData";
+              tmp1304.Type = TType.String;
+              tmp1304.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1304, cancellationToken);
               await oprot.WriteBinaryAsync(TranslationData, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((TranslationName != null) && __isset.translationName)
             {
-              tmp1274.Name = "translationName";
-              tmp1274.Type = TType.String;
-              tmp1274.ID = 4;
-              await oprot.WriteFieldBeginAsync(tmp1274, cancellationToken);
+              tmp1304.Name = "translationName";
+              tmp1304.Type = TType.String;
+              tmp1304.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1304, cancellationToken);
               await oprot.WriteStringAsync(TranslationName, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -9197,34 +9459,34 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1275 = new StringBuilder("registerTranslationData_args(");
-          int tmp1276 = 0;
+          var tmp1305 = new StringBuilder("registerTranslationData_args(");
+          int tmp1306 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1276++) { tmp1275.Append(", "); }
-            tmp1275.Append("P: ");
-            P.ToString(tmp1275);
+            if(0 < tmp1306++) { tmp1305.Append(", "); }
+            tmp1305.Append("P: ");
+            P.ToString(tmp1305);
           }
           if((Locale != null) && __isset.locale)
           {
-            if(0 < tmp1276++) { tmp1275.Append(", "); }
-            tmp1275.Append("Locale: ");
-            Locale.ToString(tmp1275);
+            if(0 < tmp1306++) { tmp1305.Append(", "); }
+            tmp1305.Append("Locale: ");
+            Locale.ToString(tmp1305);
           }
           if((TranslationData != null) && __isset.translationData)
           {
-            if(0 < tmp1276++) { tmp1275.Append(", "); }
-            tmp1275.Append("TranslationData: ");
-            TranslationData.ToString(tmp1275);
+            if(0 < tmp1306++) { tmp1305.Append(", "); }
+            tmp1305.Append("TranslationData: ");
+            TranslationData.ToString(tmp1305);
           }
           if((TranslationName != null) && __isset.translationName)
           {
-            if(0 < tmp1276++) { tmp1275.Append(", "); }
-            tmp1275.Append("TranslationName: ");
-            TranslationName.ToString(tmp1275);
+            if(0 < tmp1306++) { tmp1305.Append(", "); }
+            tmp1305.Append("TranslationName: ");
+            TranslationName.ToString(tmp1305);
           }
-          tmp1275.Append(')');
-          return tmp1275.ToString();
+          tmp1305.Append(')');
+          return tmp1305.ToString();
         }
       }
 
@@ -9259,13 +9521,13 @@ namespace Yaskawa.Ext.API
 
         public registerTranslationData_result DeepCopy()
         {
-          var tmp1277 = new registerTranslationData_result();
+          var tmp1307 = new registerTranslationData_result();
           if((E != null) && __isset.e)
           {
-            tmp1277.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1307.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1277.__isset.e = this.__isset.e;
-          return tmp1277;
+          tmp1307.__isset.e = this.__isset.e;
+          return tmp1307;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -9317,18 +9579,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1278 = new TStruct("registerTranslationData_result");
-            await oprot.WriteStructBeginAsync(tmp1278, cancellationToken);
-            var tmp1279 = new TField();
+            var tmp1308 = new TStruct("registerTranslationData_result");
+            await oprot.WriteStructBeginAsync(tmp1308, cancellationToken);
+            var tmp1309 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1279.Name = "E";
-                tmp1279.Type = TType.Struct;
-                tmp1279.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1279, cancellationToken);
+                tmp1309.Name = "E";
+                tmp1309.Type = TType.Struct;
+                tmp1309.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1309, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -9362,16 +9624,794 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1280 = new StringBuilder("registerTranslationData_result(");
-          int tmp1281 = 0;
+          var tmp1310 = new StringBuilder("registerTranslationData_result(");
+          int tmp1311 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1281++) { tmp1280.Append(", "); }
-            tmp1280.Append("E: ");
-            E.ToString(tmp1280);
+            if(0 < tmp1311++) { tmp1310.Append(", "); }
+            tmp1310.Append("E: ");
+            E.ToString(tmp1310);
           }
-          tmp1280.Append(')');
-          return tmp1280.ToString();
+          tmp1310.Append(')');
+          return tmp1310.ToString();
+        }
+      }
+
+
+      public partial class registerUtilityMenu_args : TBase
+      {
+        private long _p;
+        private string _menuName;
+        private string _menuText;
+        private string _menuIcon;
+
+        public long P
+        {
+          get
+          {
+            return _p;
+          }
+          set
+          {
+            __isset.p = true;
+            this._p = value;
+          }
+        }
+
+        public string MenuName
+        {
+          get
+          {
+            return _menuName;
+          }
+          set
+          {
+            __isset.menuName = true;
+            this._menuName = value;
+          }
+        }
+
+        public string MenuText
+        {
+          get
+          {
+            return _menuText;
+          }
+          set
+          {
+            __isset.menuText = true;
+            this._menuText = value;
+          }
+        }
+
+        public string MenuIcon
+        {
+          get
+          {
+            return _menuIcon;
+          }
+          set
+          {
+            __isset.menuIcon = true;
+            this._menuIcon = value;
+          }
+        }
+
+
+        public Isset __isset;
+        public struct Isset
+        {
+          public bool p;
+          public bool menuName;
+          public bool menuText;
+          public bool menuIcon;
+        }
+
+        public registerUtilityMenu_args()
+        {
+        }
+
+        public registerUtilityMenu_args DeepCopy()
+        {
+          var tmp1312 = new registerUtilityMenu_args();
+          if(__isset.p)
+          {
+            tmp1312.P = this.P;
+          }
+          tmp1312.__isset.p = this.__isset.p;
+          if((MenuName != null) && __isset.menuName)
+          {
+            tmp1312.MenuName = this.MenuName;
+          }
+          tmp1312.__isset.menuName = this.__isset.menuName;
+          if((MenuText != null) && __isset.menuText)
+          {
+            tmp1312.MenuText = this.MenuText;
+          }
+          tmp1312.__isset.menuText = this.__isset.menuText;
+          if((MenuIcon != null) && __isset.menuIcon)
+          {
+            tmp1312.MenuIcon = this.MenuIcon;
+          }
+          tmp1312.__isset.menuIcon = this.__isset.menuIcon;
+          return tmp1312;
+        }
+
+        public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
+        {
+          iprot.IncrementRecursionDepth();
+          try
+          {
+            TField field;
+            await iprot.ReadStructBeginAsync(cancellationToken);
+            while (true)
+            {
+              field = await iprot.ReadFieldBeginAsync(cancellationToken);
+              if (field.Type == TType.Stop)
+              {
+                break;
+              }
+
+              switch (field.ID)
+              {
+                case 1:
+                  if (field.Type == TType.I64)
+                  {
+                    P = await iprot.ReadI64Async(cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                case 2:
+                  if (field.Type == TType.String)
+                  {
+                    MenuName = await iprot.ReadStringAsync(cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                case 3:
+                  if (field.Type == TType.String)
+                  {
+                    MenuText = await iprot.ReadStringAsync(cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                case 4:
+                  if (field.Type == TType.String)
+                  {
+                    MenuIcon = await iprot.ReadStringAsync(cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                default: 
+                  await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  break;
+              }
+
+              await iprot.ReadFieldEndAsync(cancellationToken);
+            }
+
+            await iprot.ReadStructEndAsync(cancellationToken);
+          }
+          finally
+          {
+            iprot.DecrementRecursionDepth();
+          }
+        }
+
+        public async global::System.Threading.Tasks.Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
+        {
+          oprot.IncrementRecursionDepth();
+          try
+          {
+            var tmp1313 = new TStruct("registerUtilityMenu_args");
+            await oprot.WriteStructBeginAsync(tmp1313, cancellationToken);
+            var tmp1314 = new TField();
+            if(__isset.p)
+            {
+              tmp1314.Name = "p";
+              tmp1314.Type = TType.I64;
+              tmp1314.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1314, cancellationToken);
+              await oprot.WriteI64Async(P, cancellationToken);
+              await oprot.WriteFieldEndAsync(cancellationToken);
+            }
+            if((MenuName != null) && __isset.menuName)
+            {
+              tmp1314.Name = "menuName";
+              tmp1314.Type = TType.String;
+              tmp1314.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1314, cancellationToken);
+              await oprot.WriteStringAsync(MenuName, cancellationToken);
+              await oprot.WriteFieldEndAsync(cancellationToken);
+            }
+            if((MenuText != null) && __isset.menuText)
+            {
+              tmp1314.Name = "menuText";
+              tmp1314.Type = TType.String;
+              tmp1314.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1314, cancellationToken);
+              await oprot.WriteStringAsync(MenuText, cancellationToken);
+              await oprot.WriteFieldEndAsync(cancellationToken);
+            }
+            if((MenuIcon != null) && __isset.menuIcon)
+            {
+              tmp1314.Name = "menuIcon";
+              tmp1314.Type = TType.String;
+              tmp1314.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1314, cancellationToken);
+              await oprot.WriteStringAsync(MenuIcon, cancellationToken);
+              await oprot.WriteFieldEndAsync(cancellationToken);
+            }
+            await oprot.WriteFieldStopAsync(cancellationToken);
+            await oprot.WriteStructEndAsync(cancellationToken);
+          }
+          finally
+          {
+            oprot.DecrementRecursionDepth();
+          }
+        }
+
+        public override bool Equals(object that)
+        {
+          if (!(that is registerUtilityMenu_args other)) return false;
+          if (ReferenceEquals(this, other)) return true;
+          return ((__isset.p == other.__isset.p) && ((!__isset.p) || (global::System.Object.Equals(P, other.P))))
+            && ((__isset.menuName == other.__isset.menuName) && ((!__isset.menuName) || (global::System.Object.Equals(MenuName, other.MenuName))))
+            && ((__isset.menuText == other.__isset.menuText) && ((!__isset.menuText) || (global::System.Object.Equals(MenuText, other.MenuText))))
+            && ((__isset.menuIcon == other.__isset.menuIcon) && ((!__isset.menuIcon) || (global::System.Object.Equals(MenuIcon, other.MenuIcon))));
+        }
+
+        public override int GetHashCode() {
+          int hashcode = 157;
+          unchecked {
+            if(__isset.p)
+            {
+              hashcode = (hashcode * 397) + P.GetHashCode();
+            }
+            if((MenuName != null) && __isset.menuName)
+            {
+              hashcode = (hashcode * 397) + MenuName.GetHashCode();
+            }
+            if((MenuText != null) && __isset.menuText)
+            {
+              hashcode = (hashcode * 397) + MenuText.GetHashCode();
+            }
+            if((MenuIcon != null) && __isset.menuIcon)
+            {
+              hashcode = (hashcode * 397) + MenuIcon.GetHashCode();
+            }
+          }
+          return hashcode;
+        }
+
+        public override string ToString()
+        {
+          var tmp1315 = new StringBuilder("registerUtilityMenu_args(");
+          int tmp1316 = 0;
+          if(__isset.p)
+          {
+            if(0 < tmp1316++) { tmp1315.Append(", "); }
+            tmp1315.Append("P: ");
+            P.ToString(tmp1315);
+          }
+          if((MenuName != null) && __isset.menuName)
+          {
+            if(0 < tmp1316++) { tmp1315.Append(", "); }
+            tmp1315.Append("MenuName: ");
+            MenuName.ToString(tmp1315);
+          }
+          if((MenuText != null) && __isset.menuText)
+          {
+            if(0 < tmp1316++) { tmp1315.Append(", "); }
+            tmp1315.Append("MenuText: ");
+            MenuText.ToString(tmp1315);
+          }
+          if((MenuIcon != null) && __isset.menuIcon)
+          {
+            if(0 < tmp1316++) { tmp1315.Append(", "); }
+            tmp1315.Append("MenuIcon: ");
+            MenuIcon.ToString(tmp1315);
+          }
+          tmp1315.Append(')');
+          return tmp1315.ToString();
+        }
+      }
+
+
+      public partial class registerUtilityMenu_result : TBase
+      {
+        private global::Yaskawa.Ext.API.IllegalArgument _e;
+
+        public global::Yaskawa.Ext.API.IllegalArgument E
+        {
+          get
+          {
+            return _e;
+          }
+          set
+          {
+            __isset.e = true;
+            this._e = value;
+          }
+        }
+
+
+        public Isset __isset;
+        public struct Isset
+        {
+          public bool e;
+        }
+
+        public registerUtilityMenu_result()
+        {
+        }
+
+        public registerUtilityMenu_result DeepCopy()
+        {
+          var tmp1317 = new registerUtilityMenu_result();
+          if((E != null) && __isset.e)
+          {
+            tmp1317.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+          }
+          tmp1317.__isset.e = this.__isset.e;
+          return tmp1317;
+        }
+
+        public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
+        {
+          iprot.IncrementRecursionDepth();
+          try
+          {
+            TField field;
+            await iprot.ReadStructBeginAsync(cancellationToken);
+            while (true)
+            {
+              field = await iprot.ReadFieldBeginAsync(cancellationToken);
+              if (field.Type == TType.Stop)
+              {
+                break;
+              }
+
+              switch (field.ID)
+              {
+                case 1:
+                  if (field.Type == TType.Struct)
+                  {
+                    E = new global::Yaskawa.Ext.API.IllegalArgument();
+                    await E.ReadAsync(iprot, cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                default: 
+                  await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  break;
+              }
+
+              await iprot.ReadFieldEndAsync(cancellationToken);
+            }
+
+            await iprot.ReadStructEndAsync(cancellationToken);
+          }
+          finally
+          {
+            iprot.DecrementRecursionDepth();
+          }
+        }
+
+        public async global::System.Threading.Tasks.Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
+        {
+          oprot.IncrementRecursionDepth();
+          try
+          {
+            var tmp1318 = new TStruct("registerUtilityMenu_result");
+            await oprot.WriteStructBeginAsync(tmp1318, cancellationToken);
+            var tmp1319 = new TField();
+
+            if(this.__isset.e)
+            {
+              if (E != null)
+              {
+                tmp1319.Name = "E";
+                tmp1319.Type = TType.Struct;
+                tmp1319.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1319, cancellationToken);
+                await E.WriteAsync(oprot, cancellationToken);
+                await oprot.WriteFieldEndAsync(cancellationToken);
+              }
+            }
+            await oprot.WriteFieldStopAsync(cancellationToken);
+            await oprot.WriteStructEndAsync(cancellationToken);
+          }
+          finally
+          {
+            oprot.DecrementRecursionDepth();
+          }
+        }
+
+        public override bool Equals(object that)
+        {
+          if (!(that is registerUtilityMenu_result other)) return false;
+          if (ReferenceEquals(this, other)) return true;
+          return ((__isset.e == other.__isset.e) && ((!__isset.e) || (global::System.Object.Equals(E, other.E))));
+        }
+
+        public override int GetHashCode() {
+          int hashcode = 157;
+          unchecked {
+            if((E != null) && __isset.e)
+            {
+              hashcode = (hashcode * 397) + E.GetHashCode();
+            }
+          }
+          return hashcode;
+        }
+
+        public override string ToString()
+        {
+          var tmp1320 = new StringBuilder("registerUtilityMenu_result(");
+          int tmp1321 = 0;
+          if((E != null) && __isset.e)
+          {
+            if(0 < tmp1321++) { tmp1320.Append(", "); }
+            tmp1320.Append("E: ");
+            E.ToString(tmp1320);
+          }
+          tmp1320.Append(')');
+          return tmp1320.ToString();
+        }
+      }
+
+
+      public partial class unregisterUtilityMenu_args : TBase
+      {
+        private long _p;
+        private string _menuName;
+
+        public long P
+        {
+          get
+          {
+            return _p;
+          }
+          set
+          {
+            __isset.p = true;
+            this._p = value;
+          }
+        }
+
+        public string MenuName
+        {
+          get
+          {
+            return _menuName;
+          }
+          set
+          {
+            __isset.menuName = true;
+            this._menuName = value;
+          }
+        }
+
+
+        public Isset __isset;
+        public struct Isset
+        {
+          public bool p;
+          public bool menuName;
+        }
+
+        public unregisterUtilityMenu_args()
+        {
+        }
+
+        public unregisterUtilityMenu_args DeepCopy()
+        {
+          var tmp1322 = new unregisterUtilityMenu_args();
+          if(__isset.p)
+          {
+            tmp1322.P = this.P;
+          }
+          tmp1322.__isset.p = this.__isset.p;
+          if((MenuName != null) && __isset.menuName)
+          {
+            tmp1322.MenuName = this.MenuName;
+          }
+          tmp1322.__isset.menuName = this.__isset.menuName;
+          return tmp1322;
+        }
+
+        public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
+        {
+          iprot.IncrementRecursionDepth();
+          try
+          {
+            TField field;
+            await iprot.ReadStructBeginAsync(cancellationToken);
+            while (true)
+            {
+              field = await iprot.ReadFieldBeginAsync(cancellationToken);
+              if (field.Type == TType.Stop)
+              {
+                break;
+              }
+
+              switch (field.ID)
+              {
+                case 1:
+                  if (field.Type == TType.I64)
+                  {
+                    P = await iprot.ReadI64Async(cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                case 2:
+                  if (field.Type == TType.String)
+                  {
+                    MenuName = await iprot.ReadStringAsync(cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                default: 
+                  await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  break;
+              }
+
+              await iprot.ReadFieldEndAsync(cancellationToken);
+            }
+
+            await iprot.ReadStructEndAsync(cancellationToken);
+          }
+          finally
+          {
+            iprot.DecrementRecursionDepth();
+          }
+        }
+
+        public async global::System.Threading.Tasks.Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
+        {
+          oprot.IncrementRecursionDepth();
+          try
+          {
+            var tmp1323 = new TStruct("unregisterUtilityMenu_args");
+            await oprot.WriteStructBeginAsync(tmp1323, cancellationToken);
+            var tmp1324 = new TField();
+            if(__isset.p)
+            {
+              tmp1324.Name = "p";
+              tmp1324.Type = TType.I64;
+              tmp1324.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1324, cancellationToken);
+              await oprot.WriteI64Async(P, cancellationToken);
+              await oprot.WriteFieldEndAsync(cancellationToken);
+            }
+            if((MenuName != null) && __isset.menuName)
+            {
+              tmp1324.Name = "menuName";
+              tmp1324.Type = TType.String;
+              tmp1324.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1324, cancellationToken);
+              await oprot.WriteStringAsync(MenuName, cancellationToken);
+              await oprot.WriteFieldEndAsync(cancellationToken);
+            }
+            await oprot.WriteFieldStopAsync(cancellationToken);
+            await oprot.WriteStructEndAsync(cancellationToken);
+          }
+          finally
+          {
+            oprot.DecrementRecursionDepth();
+          }
+        }
+
+        public override bool Equals(object that)
+        {
+          if (!(that is unregisterUtilityMenu_args other)) return false;
+          if (ReferenceEquals(this, other)) return true;
+          return ((__isset.p == other.__isset.p) && ((!__isset.p) || (global::System.Object.Equals(P, other.P))))
+            && ((__isset.menuName == other.__isset.menuName) && ((!__isset.menuName) || (global::System.Object.Equals(MenuName, other.MenuName))));
+        }
+
+        public override int GetHashCode() {
+          int hashcode = 157;
+          unchecked {
+            if(__isset.p)
+            {
+              hashcode = (hashcode * 397) + P.GetHashCode();
+            }
+            if((MenuName != null) && __isset.menuName)
+            {
+              hashcode = (hashcode * 397) + MenuName.GetHashCode();
+            }
+          }
+          return hashcode;
+        }
+
+        public override string ToString()
+        {
+          var tmp1325 = new StringBuilder("unregisterUtilityMenu_args(");
+          int tmp1326 = 0;
+          if(__isset.p)
+          {
+            if(0 < tmp1326++) { tmp1325.Append(", "); }
+            tmp1325.Append("P: ");
+            P.ToString(tmp1325);
+          }
+          if((MenuName != null) && __isset.menuName)
+          {
+            if(0 < tmp1326++) { tmp1325.Append(", "); }
+            tmp1325.Append("MenuName: ");
+            MenuName.ToString(tmp1325);
+          }
+          tmp1325.Append(')');
+          return tmp1325.ToString();
+        }
+      }
+
+
+      public partial class unregisterUtilityMenu_result : TBase
+      {
+        private global::Yaskawa.Ext.API.IllegalArgument _e;
+
+        public global::Yaskawa.Ext.API.IllegalArgument E
+        {
+          get
+          {
+            return _e;
+          }
+          set
+          {
+            __isset.e = true;
+            this._e = value;
+          }
+        }
+
+
+        public Isset __isset;
+        public struct Isset
+        {
+          public bool e;
+        }
+
+        public unregisterUtilityMenu_result()
+        {
+        }
+
+        public unregisterUtilityMenu_result DeepCopy()
+        {
+          var tmp1327 = new unregisterUtilityMenu_result();
+          if((E != null) && __isset.e)
+          {
+            tmp1327.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+          }
+          tmp1327.__isset.e = this.__isset.e;
+          return tmp1327;
+        }
+
+        public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
+        {
+          iprot.IncrementRecursionDepth();
+          try
+          {
+            TField field;
+            await iprot.ReadStructBeginAsync(cancellationToken);
+            while (true)
+            {
+              field = await iprot.ReadFieldBeginAsync(cancellationToken);
+              if (field.Type == TType.Stop)
+              {
+                break;
+              }
+
+              switch (field.ID)
+              {
+                case 1:
+                  if (field.Type == TType.Struct)
+                  {
+                    E = new global::Yaskawa.Ext.API.IllegalArgument();
+                    await E.ReadAsync(iprot, cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                default: 
+                  await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  break;
+              }
+
+              await iprot.ReadFieldEndAsync(cancellationToken);
+            }
+
+            await iprot.ReadStructEndAsync(cancellationToken);
+          }
+          finally
+          {
+            iprot.DecrementRecursionDepth();
+          }
+        }
+
+        public async global::System.Threading.Tasks.Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
+        {
+          oprot.IncrementRecursionDepth();
+          try
+          {
+            var tmp1328 = new TStruct("unregisterUtilityMenu_result");
+            await oprot.WriteStructBeginAsync(tmp1328, cancellationToken);
+            var tmp1329 = new TField();
+
+            if(this.__isset.e)
+            {
+              if (E != null)
+              {
+                tmp1329.Name = "E";
+                tmp1329.Type = TType.Struct;
+                tmp1329.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1329, cancellationToken);
+                await E.WriteAsync(oprot, cancellationToken);
+                await oprot.WriteFieldEndAsync(cancellationToken);
+              }
+            }
+            await oprot.WriteFieldStopAsync(cancellationToken);
+            await oprot.WriteStructEndAsync(cancellationToken);
+          }
+          finally
+          {
+            oprot.DecrementRecursionDepth();
+          }
+        }
+
+        public override bool Equals(object that)
+        {
+          if (!(that is unregisterUtilityMenu_result other)) return false;
+          if (ReferenceEquals(this, other)) return true;
+          return ((__isset.e == other.__isset.e) && ((!__isset.e) || (global::System.Object.Equals(E, other.E))));
+        }
+
+        public override int GetHashCode() {
+          int hashcode = 157;
+          unchecked {
+            if((E != null) && __isset.e)
+            {
+              hashcode = (hashcode * 397) + E.GetHashCode();
+            }
+          }
+          return hashcode;
+        }
+
+        public override string ToString()
+        {
+          var tmp1330 = new StringBuilder("unregisterUtilityMenu_result(");
+          int tmp1331 = 0;
+          if((E != null) && __isset.e)
+          {
+            if(0 < tmp1331++) { tmp1330.Append(", "); }
+            tmp1330.Append("E: ");
+            E.ToString(tmp1330);
+          }
+          tmp1330.Append(')');
+          return tmp1330.ToString();
         }
       }
 
@@ -9466,33 +10506,33 @@ namespace Yaskawa.Ext.API
 
         public registerUtilityWindow_args DeepCopy()
         {
-          var tmp1282 = new registerUtilityWindow_args();
+          var tmp1332 = new registerUtilityWindow_args();
           if(__isset.p)
           {
-            tmp1282.P = this.P;
+            tmp1332.P = this.P;
           }
-          tmp1282.__isset.p = this.__isset.p;
+          tmp1332.__isset.p = this.__isset.p;
           if((Identifier != null) && __isset.identifier)
           {
-            tmp1282.Identifier = this.Identifier;
+            tmp1332.Identifier = this.Identifier;
           }
-          tmp1282.__isset.identifier = this.__isset.identifier;
+          tmp1332.__isset.identifier = this.__isset.identifier;
           if((ItemType != null) && __isset.itemType)
           {
-            tmp1282.ItemType = this.ItemType;
+            tmp1332.ItemType = this.ItemType;
           }
-          tmp1282.__isset.itemType = this.__isset.itemType;
+          tmp1332.__isset.itemType = this.__isset.itemType;
           if((MenuItemName != null) && __isset.menuItemName)
           {
-            tmp1282.MenuItemName = this.MenuItemName;
+            tmp1332.MenuItemName = this.MenuItemName;
           }
-          tmp1282.__isset.menuItemName = this.__isset.menuItemName;
+          tmp1332.__isset.menuItemName = this.__isset.menuItemName;
           if((WindowTitle != null) && __isset.windowTitle)
           {
-            tmp1282.WindowTitle = this.WindowTitle;
+            tmp1332.WindowTitle = this.WindowTitle;
           }
-          tmp1282.__isset.windowTitle = this.__isset.windowTitle;
-          return tmp1282;
+          tmp1332.__isset.windowTitle = this.__isset.windowTitle;
+          return tmp1332;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -9583,51 +10623,51 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1283 = new TStruct("registerUtilityWindow_args");
-            await oprot.WriteStructBeginAsync(tmp1283, cancellationToken);
-            var tmp1284 = new TField();
+            var tmp1333 = new TStruct("registerUtilityWindow_args");
+            await oprot.WriteStructBeginAsync(tmp1333, cancellationToken);
+            var tmp1334 = new TField();
             if(__isset.p)
             {
-              tmp1284.Name = "p";
-              tmp1284.Type = TType.I64;
-              tmp1284.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1284, cancellationToken);
+              tmp1334.Name = "p";
+              tmp1334.Type = TType.I64;
+              tmp1334.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1334, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Identifier != null) && __isset.identifier)
             {
-              tmp1284.Name = "identifier";
-              tmp1284.Type = TType.String;
-              tmp1284.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1284, cancellationToken);
+              tmp1334.Name = "identifier";
+              tmp1334.Type = TType.String;
+              tmp1334.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1334, cancellationToken);
               await oprot.WriteStringAsync(Identifier, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ItemType != null) && __isset.itemType)
             {
-              tmp1284.Name = "itemType";
-              tmp1284.Type = TType.String;
-              tmp1284.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1284, cancellationToken);
+              tmp1334.Name = "itemType";
+              tmp1334.Type = TType.String;
+              tmp1334.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1334, cancellationToken);
               await oprot.WriteStringAsync(ItemType, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((MenuItemName != null) && __isset.menuItemName)
             {
-              tmp1284.Name = "menuItemName";
-              tmp1284.Type = TType.String;
-              tmp1284.ID = 4;
-              await oprot.WriteFieldBeginAsync(tmp1284, cancellationToken);
+              tmp1334.Name = "menuItemName";
+              tmp1334.Type = TType.String;
+              tmp1334.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1334, cancellationToken);
               await oprot.WriteStringAsync(MenuItemName, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((WindowTitle != null) && __isset.windowTitle)
             {
-              tmp1284.Name = "windowTitle";
-              tmp1284.Type = TType.String;
-              tmp1284.ID = 5;
-              await oprot.WriteFieldBeginAsync(tmp1284, cancellationToken);
+              tmp1334.Name = "windowTitle";
+              tmp1334.Type = TType.String;
+              tmp1334.ID = 5;
+              await oprot.WriteFieldBeginAsync(tmp1334, cancellationToken);
               await oprot.WriteStringAsync(WindowTitle, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -9680,40 +10720,40 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1285 = new StringBuilder("registerUtilityWindow_args(");
-          int tmp1286 = 0;
+          var tmp1335 = new StringBuilder("registerUtilityWindow_args(");
+          int tmp1336 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1286++) { tmp1285.Append(", "); }
-            tmp1285.Append("P: ");
-            P.ToString(tmp1285);
+            if(0 < tmp1336++) { tmp1335.Append(", "); }
+            tmp1335.Append("P: ");
+            P.ToString(tmp1335);
           }
           if((Identifier != null) && __isset.identifier)
           {
-            if(0 < tmp1286++) { tmp1285.Append(", "); }
-            tmp1285.Append("Identifier: ");
-            Identifier.ToString(tmp1285);
+            if(0 < tmp1336++) { tmp1335.Append(", "); }
+            tmp1335.Append("Identifier: ");
+            Identifier.ToString(tmp1335);
           }
           if((ItemType != null) && __isset.itemType)
           {
-            if(0 < tmp1286++) { tmp1285.Append(", "); }
-            tmp1285.Append("ItemType: ");
-            ItemType.ToString(tmp1285);
+            if(0 < tmp1336++) { tmp1335.Append(", "); }
+            tmp1335.Append("ItemType: ");
+            ItemType.ToString(tmp1335);
           }
           if((MenuItemName != null) && __isset.menuItemName)
           {
-            if(0 < tmp1286++) { tmp1285.Append(", "); }
-            tmp1285.Append("MenuItemName: ");
-            MenuItemName.ToString(tmp1285);
+            if(0 < tmp1336++) { tmp1335.Append(", "); }
+            tmp1335.Append("MenuItemName: ");
+            MenuItemName.ToString(tmp1335);
           }
           if((WindowTitle != null) && __isset.windowTitle)
           {
-            if(0 < tmp1286++) { tmp1285.Append(", "); }
-            tmp1285.Append("WindowTitle: ");
-            WindowTitle.ToString(tmp1285);
+            if(0 < tmp1336++) { tmp1335.Append(", "); }
+            tmp1335.Append("WindowTitle: ");
+            WindowTitle.ToString(tmp1335);
           }
-          tmp1285.Append(')');
-          return tmp1285.ToString();
+          tmp1335.Append(')');
+          return tmp1335.ToString();
         }
       }
 
@@ -9748,13 +10788,13 @@ namespace Yaskawa.Ext.API
 
         public registerUtilityWindow_result DeepCopy()
         {
-          var tmp1287 = new registerUtilityWindow_result();
+          var tmp1337 = new registerUtilityWindow_result();
           if((E != null) && __isset.e)
           {
-            tmp1287.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1337.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1287.__isset.e = this.__isset.e;
-          return tmp1287;
+          tmp1337.__isset.e = this.__isset.e;
+          return tmp1337;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -9806,18 +10846,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1288 = new TStruct("registerUtilityWindow_result");
-            await oprot.WriteStructBeginAsync(tmp1288, cancellationToken);
-            var tmp1289 = new TField();
+            var tmp1338 = new TStruct("registerUtilityWindow_result");
+            await oprot.WriteStructBeginAsync(tmp1338, cancellationToken);
+            var tmp1339 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1289.Name = "E";
-                tmp1289.Type = TType.Struct;
-                tmp1289.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1289, cancellationToken);
+                tmp1339.Name = "E";
+                tmp1339.Type = TType.Struct;
+                tmp1339.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1339, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -9851,16 +10891,555 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1290 = new StringBuilder("registerUtilityWindow_result(");
-          int tmp1291 = 0;
+          var tmp1340 = new StringBuilder("registerUtilityWindow_result(");
+          int tmp1341 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1291++) { tmp1290.Append(", "); }
-            tmp1290.Append("E: ");
-            E.ToString(tmp1290);
+            if(0 < tmp1341++) { tmp1340.Append(", "); }
+            tmp1340.Append("E: ");
+            E.ToString(tmp1340);
           }
-          tmp1290.Append(')');
-          return tmp1290.ToString();
+          tmp1340.Append(')');
+          return tmp1340.ToString();
+        }
+      }
+
+
+      public partial class registerUtilityWindowWithMenu_args : TBase
+      {
+        private long _p;
+        private string _identifier;
+        private string _itemType;
+        private string _menuItemName;
+        private string _windowTitle;
+        private string _menuName;
+
+        public long P
+        {
+          get
+          {
+            return _p;
+          }
+          set
+          {
+            __isset.p = true;
+            this._p = value;
+          }
+        }
+
+        public string Identifier
+        {
+          get
+          {
+            return _identifier;
+          }
+          set
+          {
+            __isset.identifier = true;
+            this._identifier = value;
+          }
+        }
+
+        public string ItemType
+        {
+          get
+          {
+            return _itemType;
+          }
+          set
+          {
+            __isset.itemType = true;
+            this._itemType = value;
+          }
+        }
+
+        public string MenuItemName
+        {
+          get
+          {
+            return _menuItemName;
+          }
+          set
+          {
+            __isset.menuItemName = true;
+            this._menuItemName = value;
+          }
+        }
+
+        public string WindowTitle
+        {
+          get
+          {
+            return _windowTitle;
+          }
+          set
+          {
+            __isset.windowTitle = true;
+            this._windowTitle = value;
+          }
+        }
+
+        public string MenuName
+        {
+          get
+          {
+            return _menuName;
+          }
+          set
+          {
+            __isset.menuName = true;
+            this._menuName = value;
+          }
+        }
+
+
+        public Isset __isset;
+        public struct Isset
+        {
+          public bool p;
+          public bool identifier;
+          public bool itemType;
+          public bool menuItemName;
+          public bool windowTitle;
+          public bool menuName;
+        }
+
+        public registerUtilityWindowWithMenu_args()
+        {
+        }
+
+        public registerUtilityWindowWithMenu_args DeepCopy()
+        {
+          var tmp1342 = new registerUtilityWindowWithMenu_args();
+          if(__isset.p)
+          {
+            tmp1342.P = this.P;
+          }
+          tmp1342.__isset.p = this.__isset.p;
+          if((Identifier != null) && __isset.identifier)
+          {
+            tmp1342.Identifier = this.Identifier;
+          }
+          tmp1342.__isset.identifier = this.__isset.identifier;
+          if((ItemType != null) && __isset.itemType)
+          {
+            tmp1342.ItemType = this.ItemType;
+          }
+          tmp1342.__isset.itemType = this.__isset.itemType;
+          if((MenuItemName != null) && __isset.menuItemName)
+          {
+            tmp1342.MenuItemName = this.MenuItemName;
+          }
+          tmp1342.__isset.menuItemName = this.__isset.menuItemName;
+          if((WindowTitle != null) && __isset.windowTitle)
+          {
+            tmp1342.WindowTitle = this.WindowTitle;
+          }
+          tmp1342.__isset.windowTitle = this.__isset.windowTitle;
+          if((MenuName != null) && __isset.menuName)
+          {
+            tmp1342.MenuName = this.MenuName;
+          }
+          tmp1342.__isset.menuName = this.__isset.menuName;
+          return tmp1342;
+        }
+
+        public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
+        {
+          iprot.IncrementRecursionDepth();
+          try
+          {
+            TField field;
+            await iprot.ReadStructBeginAsync(cancellationToken);
+            while (true)
+            {
+              field = await iprot.ReadFieldBeginAsync(cancellationToken);
+              if (field.Type == TType.Stop)
+              {
+                break;
+              }
+
+              switch (field.ID)
+              {
+                case 1:
+                  if (field.Type == TType.I64)
+                  {
+                    P = await iprot.ReadI64Async(cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                case 2:
+                  if (field.Type == TType.String)
+                  {
+                    Identifier = await iprot.ReadStringAsync(cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                case 3:
+                  if (field.Type == TType.String)
+                  {
+                    ItemType = await iprot.ReadStringAsync(cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                case 4:
+                  if (field.Type == TType.String)
+                  {
+                    MenuItemName = await iprot.ReadStringAsync(cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                case 5:
+                  if (field.Type == TType.String)
+                  {
+                    WindowTitle = await iprot.ReadStringAsync(cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                case 6:
+                  if (field.Type == TType.String)
+                  {
+                    MenuName = await iprot.ReadStringAsync(cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                default: 
+                  await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  break;
+              }
+
+              await iprot.ReadFieldEndAsync(cancellationToken);
+            }
+
+            await iprot.ReadStructEndAsync(cancellationToken);
+          }
+          finally
+          {
+            iprot.DecrementRecursionDepth();
+          }
+        }
+
+        public async global::System.Threading.Tasks.Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
+        {
+          oprot.IncrementRecursionDepth();
+          try
+          {
+            var tmp1343 = new TStruct("registerUtilityWindowWithMenu_args");
+            await oprot.WriteStructBeginAsync(tmp1343, cancellationToken);
+            var tmp1344 = new TField();
+            if(__isset.p)
+            {
+              tmp1344.Name = "p";
+              tmp1344.Type = TType.I64;
+              tmp1344.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1344, cancellationToken);
+              await oprot.WriteI64Async(P, cancellationToken);
+              await oprot.WriteFieldEndAsync(cancellationToken);
+            }
+            if((Identifier != null) && __isset.identifier)
+            {
+              tmp1344.Name = "identifier";
+              tmp1344.Type = TType.String;
+              tmp1344.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1344, cancellationToken);
+              await oprot.WriteStringAsync(Identifier, cancellationToken);
+              await oprot.WriteFieldEndAsync(cancellationToken);
+            }
+            if((ItemType != null) && __isset.itemType)
+            {
+              tmp1344.Name = "itemType";
+              tmp1344.Type = TType.String;
+              tmp1344.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1344, cancellationToken);
+              await oprot.WriteStringAsync(ItemType, cancellationToken);
+              await oprot.WriteFieldEndAsync(cancellationToken);
+            }
+            if((MenuItemName != null) && __isset.menuItemName)
+            {
+              tmp1344.Name = "menuItemName";
+              tmp1344.Type = TType.String;
+              tmp1344.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1344, cancellationToken);
+              await oprot.WriteStringAsync(MenuItemName, cancellationToken);
+              await oprot.WriteFieldEndAsync(cancellationToken);
+            }
+            if((WindowTitle != null) && __isset.windowTitle)
+            {
+              tmp1344.Name = "windowTitle";
+              tmp1344.Type = TType.String;
+              tmp1344.ID = 5;
+              await oprot.WriteFieldBeginAsync(tmp1344, cancellationToken);
+              await oprot.WriteStringAsync(WindowTitle, cancellationToken);
+              await oprot.WriteFieldEndAsync(cancellationToken);
+            }
+            if((MenuName != null) && __isset.menuName)
+            {
+              tmp1344.Name = "menuName";
+              tmp1344.Type = TType.String;
+              tmp1344.ID = 6;
+              await oprot.WriteFieldBeginAsync(tmp1344, cancellationToken);
+              await oprot.WriteStringAsync(MenuName, cancellationToken);
+              await oprot.WriteFieldEndAsync(cancellationToken);
+            }
+            await oprot.WriteFieldStopAsync(cancellationToken);
+            await oprot.WriteStructEndAsync(cancellationToken);
+          }
+          finally
+          {
+            oprot.DecrementRecursionDepth();
+          }
+        }
+
+        public override bool Equals(object that)
+        {
+          if (!(that is registerUtilityWindowWithMenu_args other)) return false;
+          if (ReferenceEquals(this, other)) return true;
+          return ((__isset.p == other.__isset.p) && ((!__isset.p) || (global::System.Object.Equals(P, other.P))))
+            && ((__isset.identifier == other.__isset.identifier) && ((!__isset.identifier) || (global::System.Object.Equals(Identifier, other.Identifier))))
+            && ((__isset.itemType == other.__isset.itemType) && ((!__isset.itemType) || (global::System.Object.Equals(ItemType, other.ItemType))))
+            && ((__isset.menuItemName == other.__isset.menuItemName) && ((!__isset.menuItemName) || (global::System.Object.Equals(MenuItemName, other.MenuItemName))))
+            && ((__isset.windowTitle == other.__isset.windowTitle) && ((!__isset.windowTitle) || (global::System.Object.Equals(WindowTitle, other.WindowTitle))))
+            && ((__isset.menuName == other.__isset.menuName) && ((!__isset.menuName) || (global::System.Object.Equals(MenuName, other.MenuName))));
+        }
+
+        public override int GetHashCode() {
+          int hashcode = 157;
+          unchecked {
+            if(__isset.p)
+            {
+              hashcode = (hashcode * 397) + P.GetHashCode();
+            }
+            if((Identifier != null) && __isset.identifier)
+            {
+              hashcode = (hashcode * 397) + Identifier.GetHashCode();
+            }
+            if((ItemType != null) && __isset.itemType)
+            {
+              hashcode = (hashcode * 397) + ItemType.GetHashCode();
+            }
+            if((MenuItemName != null) && __isset.menuItemName)
+            {
+              hashcode = (hashcode * 397) + MenuItemName.GetHashCode();
+            }
+            if((WindowTitle != null) && __isset.windowTitle)
+            {
+              hashcode = (hashcode * 397) + WindowTitle.GetHashCode();
+            }
+            if((MenuName != null) && __isset.menuName)
+            {
+              hashcode = (hashcode * 397) + MenuName.GetHashCode();
+            }
+          }
+          return hashcode;
+        }
+
+        public override string ToString()
+        {
+          var tmp1345 = new StringBuilder("registerUtilityWindowWithMenu_args(");
+          int tmp1346 = 0;
+          if(__isset.p)
+          {
+            if(0 < tmp1346++) { tmp1345.Append(", "); }
+            tmp1345.Append("P: ");
+            P.ToString(tmp1345);
+          }
+          if((Identifier != null) && __isset.identifier)
+          {
+            if(0 < tmp1346++) { tmp1345.Append(", "); }
+            tmp1345.Append("Identifier: ");
+            Identifier.ToString(tmp1345);
+          }
+          if((ItemType != null) && __isset.itemType)
+          {
+            if(0 < tmp1346++) { tmp1345.Append(", "); }
+            tmp1345.Append("ItemType: ");
+            ItemType.ToString(tmp1345);
+          }
+          if((MenuItemName != null) && __isset.menuItemName)
+          {
+            if(0 < tmp1346++) { tmp1345.Append(", "); }
+            tmp1345.Append("MenuItemName: ");
+            MenuItemName.ToString(tmp1345);
+          }
+          if((WindowTitle != null) && __isset.windowTitle)
+          {
+            if(0 < tmp1346++) { tmp1345.Append(", "); }
+            tmp1345.Append("WindowTitle: ");
+            WindowTitle.ToString(tmp1345);
+          }
+          if((MenuName != null) && __isset.menuName)
+          {
+            if(0 < tmp1346++) { tmp1345.Append(", "); }
+            tmp1345.Append("MenuName: ");
+            MenuName.ToString(tmp1345);
+          }
+          tmp1345.Append(')');
+          return tmp1345.ToString();
+        }
+      }
+
+
+      public partial class registerUtilityWindowWithMenu_result : TBase
+      {
+        private global::Yaskawa.Ext.API.IllegalArgument _e;
+
+        public global::Yaskawa.Ext.API.IllegalArgument E
+        {
+          get
+          {
+            return _e;
+          }
+          set
+          {
+            __isset.e = true;
+            this._e = value;
+          }
+        }
+
+
+        public Isset __isset;
+        public struct Isset
+        {
+          public bool e;
+        }
+
+        public registerUtilityWindowWithMenu_result()
+        {
+        }
+
+        public registerUtilityWindowWithMenu_result DeepCopy()
+        {
+          var tmp1347 = new registerUtilityWindowWithMenu_result();
+          if((E != null) && __isset.e)
+          {
+            tmp1347.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+          }
+          tmp1347.__isset.e = this.__isset.e;
+          return tmp1347;
+        }
+
+        public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
+        {
+          iprot.IncrementRecursionDepth();
+          try
+          {
+            TField field;
+            await iprot.ReadStructBeginAsync(cancellationToken);
+            while (true)
+            {
+              field = await iprot.ReadFieldBeginAsync(cancellationToken);
+              if (field.Type == TType.Stop)
+              {
+                break;
+              }
+
+              switch (field.ID)
+              {
+                case 1:
+                  if (field.Type == TType.Struct)
+                  {
+                    E = new global::Yaskawa.Ext.API.IllegalArgument();
+                    await E.ReadAsync(iprot, cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                default: 
+                  await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  break;
+              }
+
+              await iprot.ReadFieldEndAsync(cancellationToken);
+            }
+
+            await iprot.ReadStructEndAsync(cancellationToken);
+          }
+          finally
+          {
+            iprot.DecrementRecursionDepth();
+          }
+        }
+
+        public async global::System.Threading.Tasks.Task WriteAsync(TProtocol oprot, CancellationToken cancellationToken)
+        {
+          oprot.IncrementRecursionDepth();
+          try
+          {
+            var tmp1348 = new TStruct("registerUtilityWindowWithMenu_result");
+            await oprot.WriteStructBeginAsync(tmp1348, cancellationToken);
+            var tmp1349 = new TField();
+
+            if(this.__isset.e)
+            {
+              if (E != null)
+              {
+                tmp1349.Name = "E";
+                tmp1349.Type = TType.Struct;
+                tmp1349.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1349, cancellationToken);
+                await E.WriteAsync(oprot, cancellationToken);
+                await oprot.WriteFieldEndAsync(cancellationToken);
+              }
+            }
+            await oprot.WriteFieldStopAsync(cancellationToken);
+            await oprot.WriteStructEndAsync(cancellationToken);
+          }
+          finally
+          {
+            oprot.DecrementRecursionDepth();
+          }
+        }
+
+        public override bool Equals(object that)
+        {
+          if (!(that is registerUtilityWindowWithMenu_result other)) return false;
+          if (ReferenceEquals(this, other)) return true;
+          return ((__isset.e == other.__isset.e) && ((!__isset.e) || (global::System.Object.Equals(E, other.E))));
+        }
+
+        public override int GetHashCode() {
+          int hashcode = 157;
+          unchecked {
+            if((E != null) && __isset.e)
+            {
+              hashcode = (hashcode * 397) + E.GetHashCode();
+            }
+          }
+          return hashcode;
+        }
+
+        public override string ToString()
+        {
+          var tmp1350 = new StringBuilder("registerUtilityWindowWithMenu_result(");
+          int tmp1351 = 0;
+          if((E != null) && __isset.e)
+          {
+            if(0 < tmp1351++) { tmp1350.Append(", "); }
+            tmp1350.Append("E: ");
+            E.ToString(tmp1350);
+          }
+          tmp1350.Append(')');
+          return tmp1350.ToString();
         }
       }
 
@@ -9910,18 +11489,18 @@ namespace Yaskawa.Ext.API
 
         public unregisterUtilityWindow_args DeepCopy()
         {
-          var tmp1292 = new unregisterUtilityWindow_args();
+          var tmp1352 = new unregisterUtilityWindow_args();
           if(__isset.p)
           {
-            tmp1292.P = this.P;
+            tmp1352.P = this.P;
           }
-          tmp1292.__isset.p = this.__isset.p;
+          tmp1352.__isset.p = this.__isset.p;
           if((Identifier != null) && __isset.identifier)
           {
-            tmp1292.Identifier = this.Identifier;
+            tmp1352.Identifier = this.Identifier;
           }
-          tmp1292.__isset.identifier = this.__isset.identifier;
-          return tmp1292;
+          tmp1352.__isset.identifier = this.__isset.identifier;
+          return tmp1352;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -9982,24 +11561,24 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1293 = new TStruct("unregisterUtilityWindow_args");
-            await oprot.WriteStructBeginAsync(tmp1293, cancellationToken);
-            var tmp1294 = new TField();
+            var tmp1353 = new TStruct("unregisterUtilityWindow_args");
+            await oprot.WriteStructBeginAsync(tmp1353, cancellationToken);
+            var tmp1354 = new TField();
             if(__isset.p)
             {
-              tmp1294.Name = "p";
-              tmp1294.Type = TType.I64;
-              tmp1294.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1294, cancellationToken);
+              tmp1354.Name = "p";
+              tmp1354.Type = TType.I64;
+              tmp1354.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1354, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Identifier != null) && __isset.identifier)
             {
-              tmp1294.Name = "identifier";
-              tmp1294.Type = TType.String;
-              tmp1294.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1294, cancellationToken);
+              tmp1354.Name = "identifier";
+              tmp1354.Type = TType.String;
+              tmp1354.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1354, cancellationToken);
               await oprot.WriteStringAsync(Identifier, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -10037,22 +11616,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1295 = new StringBuilder("unregisterUtilityWindow_args(");
-          int tmp1296 = 0;
+          var tmp1355 = new StringBuilder("unregisterUtilityWindow_args(");
+          int tmp1356 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1296++) { tmp1295.Append(", "); }
-            tmp1295.Append("P: ");
-            P.ToString(tmp1295);
+            if(0 < tmp1356++) { tmp1355.Append(", "); }
+            tmp1355.Append("P: ");
+            P.ToString(tmp1355);
           }
           if((Identifier != null) && __isset.identifier)
           {
-            if(0 < tmp1296++) { tmp1295.Append(", "); }
-            tmp1295.Append("Identifier: ");
-            Identifier.ToString(tmp1295);
+            if(0 < tmp1356++) { tmp1355.Append(", "); }
+            tmp1355.Append("Identifier: ");
+            Identifier.ToString(tmp1355);
           }
-          tmp1295.Append(')');
-          return tmp1295.ToString();
+          tmp1355.Append(')');
+          return tmp1355.ToString();
         }
       }
 
@@ -10087,13 +11666,13 @@ namespace Yaskawa.Ext.API
 
         public unregisterUtilityWindow_result DeepCopy()
         {
-          var tmp1297 = new unregisterUtilityWindow_result();
+          var tmp1357 = new unregisterUtilityWindow_result();
           if((E != null) && __isset.e)
           {
-            tmp1297.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1357.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1297.__isset.e = this.__isset.e;
-          return tmp1297;
+          tmp1357.__isset.e = this.__isset.e;
+          return tmp1357;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -10145,18 +11724,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1298 = new TStruct("unregisterUtilityWindow_result");
-            await oprot.WriteStructBeginAsync(tmp1298, cancellationToken);
-            var tmp1299 = new TField();
+            var tmp1358 = new TStruct("unregisterUtilityWindow_result");
+            await oprot.WriteStructBeginAsync(tmp1358, cancellationToken);
+            var tmp1359 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1299.Name = "E";
-                tmp1299.Type = TType.Struct;
-                tmp1299.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1299, cancellationToken);
+                tmp1359.Name = "E";
+                tmp1359.Type = TType.Struct;
+                tmp1359.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1359, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -10190,16 +11769,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1300 = new StringBuilder("unregisterUtilityWindow_result(");
-          int tmp1301 = 0;
+          var tmp1360 = new StringBuilder("unregisterUtilityWindow_result(");
+          int tmp1361 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1301++) { tmp1300.Append(", "); }
-            tmp1300.Append("E: ");
-            E.ToString(tmp1300);
+            if(0 < tmp1361++) { tmp1360.Append(", "); }
+            tmp1360.Append("E: ");
+            E.ToString(tmp1360);
           }
-          tmp1300.Append(')');
-          return tmp1300.ToString();
+          tmp1360.Append(')');
+          return tmp1360.ToString();
         }
       }
 
@@ -10249,18 +11828,18 @@ namespace Yaskawa.Ext.API
 
         public openUtilityWindow_args DeepCopy()
         {
-          var tmp1302 = new openUtilityWindow_args();
+          var tmp1362 = new openUtilityWindow_args();
           if(__isset.p)
           {
-            tmp1302.P = this.P;
+            tmp1362.P = this.P;
           }
-          tmp1302.__isset.p = this.__isset.p;
+          tmp1362.__isset.p = this.__isset.p;
           if((Identifier != null) && __isset.identifier)
           {
-            tmp1302.Identifier = this.Identifier;
+            tmp1362.Identifier = this.Identifier;
           }
-          tmp1302.__isset.identifier = this.__isset.identifier;
-          return tmp1302;
+          tmp1362.__isset.identifier = this.__isset.identifier;
+          return tmp1362;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -10321,24 +11900,24 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1303 = new TStruct("openUtilityWindow_args");
-            await oprot.WriteStructBeginAsync(tmp1303, cancellationToken);
-            var tmp1304 = new TField();
+            var tmp1363 = new TStruct("openUtilityWindow_args");
+            await oprot.WriteStructBeginAsync(tmp1363, cancellationToken);
+            var tmp1364 = new TField();
             if(__isset.p)
             {
-              tmp1304.Name = "p";
-              tmp1304.Type = TType.I64;
-              tmp1304.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1304, cancellationToken);
+              tmp1364.Name = "p";
+              tmp1364.Type = TType.I64;
+              tmp1364.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1364, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Identifier != null) && __isset.identifier)
             {
-              tmp1304.Name = "identifier";
-              tmp1304.Type = TType.String;
-              tmp1304.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1304, cancellationToken);
+              tmp1364.Name = "identifier";
+              tmp1364.Type = TType.String;
+              tmp1364.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1364, cancellationToken);
               await oprot.WriteStringAsync(Identifier, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -10376,22 +11955,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1305 = new StringBuilder("openUtilityWindow_args(");
-          int tmp1306 = 0;
+          var tmp1365 = new StringBuilder("openUtilityWindow_args(");
+          int tmp1366 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1306++) { tmp1305.Append(", "); }
-            tmp1305.Append("P: ");
-            P.ToString(tmp1305);
+            if(0 < tmp1366++) { tmp1365.Append(", "); }
+            tmp1365.Append("P: ");
+            P.ToString(tmp1365);
           }
           if((Identifier != null) && __isset.identifier)
           {
-            if(0 < tmp1306++) { tmp1305.Append(", "); }
-            tmp1305.Append("Identifier: ");
-            Identifier.ToString(tmp1305);
+            if(0 < tmp1366++) { tmp1365.Append(", "); }
+            tmp1365.Append("Identifier: ");
+            Identifier.ToString(tmp1365);
           }
-          tmp1305.Append(')');
-          return tmp1305.ToString();
+          tmp1365.Append(')');
+          return tmp1365.ToString();
         }
       }
 
@@ -10405,8 +11984,8 @@ namespace Yaskawa.Ext.API
 
         public openUtilityWindow_result DeepCopy()
         {
-          var tmp1307 = new openUtilityWindow_result();
-          return tmp1307;
+          var tmp1367 = new openUtilityWindow_result();
+          return tmp1367;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -10447,8 +12026,8 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1308 = new TStruct("openUtilityWindow_result");
-            await oprot.WriteStructBeginAsync(tmp1308, cancellationToken);
+            var tmp1368 = new TStruct("openUtilityWindow_result");
+            await oprot.WriteStructBeginAsync(tmp1368, cancellationToken);
             await oprot.WriteFieldStopAsync(cancellationToken);
             await oprot.WriteStructEndAsync(cancellationToken);
           }
@@ -10474,9 +12053,9 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1309 = new StringBuilder("openUtilityWindow_result(");
-          tmp1309.Append(')');
-          return tmp1309.ToString();
+          var tmp1369 = new StringBuilder("openUtilityWindow_result(");
+          tmp1369.Append(')');
+          return tmp1369.ToString();
         }
       }
 
@@ -10526,18 +12105,18 @@ namespace Yaskawa.Ext.API
 
         public closeUtilityWindow_args DeepCopy()
         {
-          var tmp1311 = new closeUtilityWindow_args();
+          var tmp1371 = new closeUtilityWindow_args();
           if(__isset.p)
           {
-            tmp1311.P = this.P;
+            tmp1371.P = this.P;
           }
-          tmp1311.__isset.p = this.__isset.p;
+          tmp1371.__isset.p = this.__isset.p;
           if((Identifier != null) && __isset.identifier)
           {
-            tmp1311.Identifier = this.Identifier;
+            tmp1371.Identifier = this.Identifier;
           }
-          tmp1311.__isset.identifier = this.__isset.identifier;
-          return tmp1311;
+          tmp1371.__isset.identifier = this.__isset.identifier;
+          return tmp1371;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -10598,24 +12177,24 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1312 = new TStruct("closeUtilityWindow_args");
-            await oprot.WriteStructBeginAsync(tmp1312, cancellationToken);
-            var tmp1313 = new TField();
+            var tmp1372 = new TStruct("closeUtilityWindow_args");
+            await oprot.WriteStructBeginAsync(tmp1372, cancellationToken);
+            var tmp1373 = new TField();
             if(__isset.p)
             {
-              tmp1313.Name = "p";
-              tmp1313.Type = TType.I64;
-              tmp1313.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1313, cancellationToken);
+              tmp1373.Name = "p";
+              tmp1373.Type = TType.I64;
+              tmp1373.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1373, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Identifier != null) && __isset.identifier)
             {
-              tmp1313.Name = "identifier";
-              tmp1313.Type = TType.String;
-              tmp1313.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1313, cancellationToken);
+              tmp1373.Name = "identifier";
+              tmp1373.Type = TType.String;
+              tmp1373.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1373, cancellationToken);
               await oprot.WriteStringAsync(Identifier, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -10653,22 +12232,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1314 = new StringBuilder("closeUtilityWindow_args(");
-          int tmp1315 = 0;
+          var tmp1374 = new StringBuilder("closeUtilityWindow_args(");
+          int tmp1375 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1315++) { tmp1314.Append(", "); }
-            tmp1314.Append("P: ");
-            P.ToString(tmp1314);
+            if(0 < tmp1375++) { tmp1374.Append(", "); }
+            tmp1374.Append("P: ");
+            P.ToString(tmp1374);
           }
           if((Identifier != null) && __isset.identifier)
           {
-            if(0 < tmp1315++) { tmp1314.Append(", "); }
-            tmp1314.Append("Identifier: ");
-            Identifier.ToString(tmp1314);
+            if(0 < tmp1375++) { tmp1374.Append(", "); }
+            tmp1374.Append("Identifier: ");
+            Identifier.ToString(tmp1374);
           }
-          tmp1314.Append(')');
-          return tmp1314.ToString();
+          tmp1374.Append(')');
+          return tmp1374.ToString();
         }
       }
 
@@ -10682,8 +12261,8 @@ namespace Yaskawa.Ext.API
 
         public closeUtilityWindow_result DeepCopy()
         {
-          var tmp1316 = new closeUtilityWindow_result();
-          return tmp1316;
+          var tmp1376 = new closeUtilityWindow_result();
+          return tmp1376;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -10724,8 +12303,8 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1317 = new TStruct("closeUtilityWindow_result");
-            await oprot.WriteStructBeginAsync(tmp1317, cancellationToken);
+            var tmp1377 = new TStruct("closeUtilityWindow_result");
+            await oprot.WriteStructBeginAsync(tmp1377, cancellationToken);
             await oprot.WriteFieldStopAsync(cancellationToken);
             await oprot.WriteStructEndAsync(cancellationToken);
           }
@@ -10751,9 +12330,9 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1318 = new StringBuilder("closeUtilityWindow_result(");
-          tmp1318.Append(')');
-          return tmp1318.ToString();
+          var tmp1378 = new StringBuilder("closeUtilityWindow_result(");
+          tmp1378.Append(')');
+          return tmp1378.ToString();
         }
       }
 
@@ -10803,18 +12382,18 @@ namespace Yaskawa.Ext.API
 
         public collapseUtilityWindow_args DeepCopy()
         {
-          var tmp1320 = new collapseUtilityWindow_args();
+          var tmp1380 = new collapseUtilityWindow_args();
           if(__isset.p)
           {
-            tmp1320.P = this.P;
+            tmp1380.P = this.P;
           }
-          tmp1320.__isset.p = this.__isset.p;
+          tmp1380.__isset.p = this.__isset.p;
           if((Identifier != null) && __isset.identifier)
           {
-            tmp1320.Identifier = this.Identifier;
+            tmp1380.Identifier = this.Identifier;
           }
-          tmp1320.__isset.identifier = this.__isset.identifier;
-          return tmp1320;
+          tmp1380.__isset.identifier = this.__isset.identifier;
+          return tmp1380;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -10875,24 +12454,24 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1321 = new TStruct("collapseUtilityWindow_args");
-            await oprot.WriteStructBeginAsync(tmp1321, cancellationToken);
-            var tmp1322 = new TField();
+            var tmp1381 = new TStruct("collapseUtilityWindow_args");
+            await oprot.WriteStructBeginAsync(tmp1381, cancellationToken);
+            var tmp1382 = new TField();
             if(__isset.p)
             {
-              tmp1322.Name = "p";
-              tmp1322.Type = TType.I64;
-              tmp1322.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1322, cancellationToken);
+              tmp1382.Name = "p";
+              tmp1382.Type = TType.I64;
+              tmp1382.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1382, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Identifier != null) && __isset.identifier)
             {
-              tmp1322.Name = "identifier";
-              tmp1322.Type = TType.String;
-              tmp1322.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1322, cancellationToken);
+              tmp1382.Name = "identifier";
+              tmp1382.Type = TType.String;
+              tmp1382.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1382, cancellationToken);
               await oprot.WriteStringAsync(Identifier, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -10930,22 +12509,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1323 = new StringBuilder("collapseUtilityWindow_args(");
-          int tmp1324 = 0;
+          var tmp1383 = new StringBuilder("collapseUtilityWindow_args(");
+          int tmp1384 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1324++) { tmp1323.Append(", "); }
-            tmp1323.Append("P: ");
-            P.ToString(tmp1323);
+            if(0 < tmp1384++) { tmp1383.Append(", "); }
+            tmp1383.Append("P: ");
+            P.ToString(tmp1383);
           }
           if((Identifier != null) && __isset.identifier)
           {
-            if(0 < tmp1324++) { tmp1323.Append(", "); }
-            tmp1323.Append("Identifier: ");
-            Identifier.ToString(tmp1323);
+            if(0 < tmp1384++) { tmp1383.Append(", "); }
+            tmp1383.Append("Identifier: ");
+            Identifier.ToString(tmp1383);
           }
-          tmp1323.Append(')');
-          return tmp1323.ToString();
+          tmp1383.Append(')');
+          return tmp1383.ToString();
         }
       }
 
@@ -10959,8 +12538,8 @@ namespace Yaskawa.Ext.API
 
         public collapseUtilityWindow_result DeepCopy()
         {
-          var tmp1325 = new collapseUtilityWindow_result();
-          return tmp1325;
+          var tmp1385 = new collapseUtilityWindow_result();
+          return tmp1385;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -11001,8 +12580,8 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1326 = new TStruct("collapseUtilityWindow_result");
-            await oprot.WriteStructBeginAsync(tmp1326, cancellationToken);
+            var tmp1386 = new TStruct("collapseUtilityWindow_result");
+            await oprot.WriteStructBeginAsync(tmp1386, cancellationToken);
             await oprot.WriteFieldStopAsync(cancellationToken);
             await oprot.WriteStructEndAsync(cancellationToken);
           }
@@ -11028,9 +12607,9 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1327 = new StringBuilder("collapseUtilityWindow_result(");
-          tmp1327.Append(')');
-          return tmp1327.ToString();
+          var tmp1387 = new StringBuilder("collapseUtilityWindow_result(");
+          tmp1387.Append(')');
+          return tmp1387.ToString();
         }
       }
 
@@ -11080,18 +12659,18 @@ namespace Yaskawa.Ext.API
 
         public expandUtilityWindow_args DeepCopy()
         {
-          var tmp1329 = new expandUtilityWindow_args();
+          var tmp1389 = new expandUtilityWindow_args();
           if(__isset.p)
           {
-            tmp1329.P = this.P;
+            tmp1389.P = this.P;
           }
-          tmp1329.__isset.p = this.__isset.p;
+          tmp1389.__isset.p = this.__isset.p;
           if((Identifier != null) && __isset.identifier)
           {
-            tmp1329.Identifier = this.Identifier;
+            tmp1389.Identifier = this.Identifier;
           }
-          tmp1329.__isset.identifier = this.__isset.identifier;
-          return tmp1329;
+          tmp1389.__isset.identifier = this.__isset.identifier;
+          return tmp1389;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -11152,24 +12731,24 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1330 = new TStruct("expandUtilityWindow_args");
-            await oprot.WriteStructBeginAsync(tmp1330, cancellationToken);
-            var tmp1331 = new TField();
+            var tmp1390 = new TStruct("expandUtilityWindow_args");
+            await oprot.WriteStructBeginAsync(tmp1390, cancellationToken);
+            var tmp1391 = new TField();
             if(__isset.p)
             {
-              tmp1331.Name = "p";
-              tmp1331.Type = TType.I64;
-              tmp1331.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1331, cancellationToken);
+              tmp1391.Name = "p";
+              tmp1391.Type = TType.I64;
+              tmp1391.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1391, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Identifier != null) && __isset.identifier)
             {
-              tmp1331.Name = "identifier";
-              tmp1331.Type = TType.String;
-              tmp1331.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1331, cancellationToken);
+              tmp1391.Name = "identifier";
+              tmp1391.Type = TType.String;
+              tmp1391.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1391, cancellationToken);
               await oprot.WriteStringAsync(Identifier, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -11207,22 +12786,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1332 = new StringBuilder("expandUtilityWindow_args(");
-          int tmp1333 = 0;
+          var tmp1392 = new StringBuilder("expandUtilityWindow_args(");
+          int tmp1393 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1333++) { tmp1332.Append(", "); }
-            tmp1332.Append("P: ");
-            P.ToString(tmp1332);
+            if(0 < tmp1393++) { tmp1392.Append(", "); }
+            tmp1392.Append("P: ");
+            P.ToString(tmp1392);
           }
           if((Identifier != null) && __isset.identifier)
           {
-            if(0 < tmp1333++) { tmp1332.Append(", "); }
-            tmp1332.Append("Identifier: ");
-            Identifier.ToString(tmp1332);
+            if(0 < tmp1393++) { tmp1392.Append(", "); }
+            tmp1392.Append("Identifier: ");
+            Identifier.ToString(tmp1392);
           }
-          tmp1332.Append(')');
-          return tmp1332.ToString();
+          tmp1392.Append(')');
+          return tmp1392.ToString();
         }
       }
 
@@ -11236,8 +12815,8 @@ namespace Yaskawa.Ext.API
 
         public expandUtilityWindow_result DeepCopy()
         {
-          var tmp1334 = new expandUtilityWindow_result();
-          return tmp1334;
+          var tmp1394 = new expandUtilityWindow_result();
+          return tmp1394;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -11278,8 +12857,8 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1335 = new TStruct("expandUtilityWindow_result");
-            await oprot.WriteStructBeginAsync(tmp1335, cancellationToken);
+            var tmp1395 = new TStruct("expandUtilityWindow_result");
+            await oprot.WriteStructBeginAsync(tmp1395, cancellationToken);
             await oprot.WriteFieldStopAsync(cancellationToken);
             await oprot.WriteStructEndAsync(cancellationToken);
           }
@@ -11305,9 +12884,9 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1336 = new StringBuilder("expandUtilityWindow_result(");
-          tmp1336.Append(')');
-          return tmp1336.ToString();
+          var tmp1396 = new StringBuilder("expandUtilityWindow_result(");
+          tmp1396.Append(')');
+          return tmp1396.ToString();
         }
       }
 
@@ -11421,38 +13000,38 @@ namespace Yaskawa.Ext.API
 
         public registerIntegration_args DeepCopy()
         {
-          var tmp1338 = new registerIntegration_args();
+          var tmp1398 = new registerIntegration_args();
           if(__isset.p)
           {
-            tmp1338.P = this.P;
+            tmp1398.P = this.P;
           }
-          tmp1338.__isset.p = this.__isset.p;
+          tmp1398.__isset.p = this.__isset.p;
           if((Identifier != null) && __isset.identifier)
           {
-            tmp1338.Identifier = this.Identifier;
+            tmp1398.Identifier = this.Identifier;
           }
-          tmp1338.__isset.identifier = this.__isset.identifier;
+          tmp1398.__isset.identifier = this.__isset.identifier;
           if(__isset.integrationPoint)
           {
-            tmp1338.IntegrationPoint = this.IntegrationPoint;
+            tmp1398.IntegrationPoint = this.IntegrationPoint;
           }
-          tmp1338.__isset.integrationPoint = this.__isset.integrationPoint;
+          tmp1398.__isset.integrationPoint = this.__isset.integrationPoint;
           if((ItemType != null) && __isset.itemType)
           {
-            tmp1338.ItemType = this.ItemType;
+            tmp1398.ItemType = this.ItemType;
           }
-          tmp1338.__isset.itemType = this.__isset.itemType;
+          tmp1398.__isset.itemType = this.__isset.itemType;
           if((ButtonLabel != null) && __isset.buttonLabel)
           {
-            tmp1338.ButtonLabel = this.ButtonLabel;
+            tmp1398.ButtonLabel = this.ButtonLabel;
           }
-          tmp1338.__isset.buttonLabel = this.__isset.buttonLabel;
+          tmp1398.__isset.buttonLabel = this.__isset.buttonLabel;
           if((ButtonImage != null) && __isset.buttonImage)
           {
-            tmp1338.ButtonImage = this.ButtonImage;
+            tmp1398.ButtonImage = this.ButtonImage;
           }
-          tmp1338.__isset.buttonImage = this.__isset.buttonImage;
-          return tmp1338;
+          tmp1398.__isset.buttonImage = this.__isset.buttonImage;
+          return tmp1398;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -11553,60 +13132,60 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1339 = new TStruct("registerIntegration_args");
-            await oprot.WriteStructBeginAsync(tmp1339, cancellationToken);
-            var tmp1340 = new TField();
+            var tmp1399 = new TStruct("registerIntegration_args");
+            await oprot.WriteStructBeginAsync(tmp1399, cancellationToken);
+            var tmp1400 = new TField();
             if(__isset.p)
             {
-              tmp1340.Name = "p";
-              tmp1340.Type = TType.I64;
-              tmp1340.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1340, cancellationToken);
+              tmp1400.Name = "p";
+              tmp1400.Type = TType.I64;
+              tmp1400.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1400, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Identifier != null) && __isset.identifier)
             {
-              tmp1340.Name = "identifier";
-              tmp1340.Type = TType.String;
-              tmp1340.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1340, cancellationToken);
+              tmp1400.Name = "identifier";
+              tmp1400.Type = TType.String;
+              tmp1400.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1400, cancellationToken);
               await oprot.WriteStringAsync(Identifier, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if(__isset.integrationPoint)
             {
-              tmp1340.Name = "integrationPoint";
-              tmp1340.Type = TType.I32;
-              tmp1340.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1340, cancellationToken);
+              tmp1400.Name = "integrationPoint";
+              tmp1400.Type = TType.I32;
+              tmp1400.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1400, cancellationToken);
               await oprot.WriteI32Async((int)IntegrationPoint, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ItemType != null) && __isset.itemType)
             {
-              tmp1340.Name = "itemType";
-              tmp1340.Type = TType.String;
-              tmp1340.ID = 4;
-              await oprot.WriteFieldBeginAsync(tmp1340, cancellationToken);
+              tmp1400.Name = "itemType";
+              tmp1400.Type = TType.String;
+              tmp1400.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1400, cancellationToken);
               await oprot.WriteStringAsync(ItemType, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ButtonLabel != null) && __isset.buttonLabel)
             {
-              tmp1340.Name = "buttonLabel";
-              tmp1340.Type = TType.String;
-              tmp1340.ID = 5;
-              await oprot.WriteFieldBeginAsync(tmp1340, cancellationToken);
+              tmp1400.Name = "buttonLabel";
+              tmp1400.Type = TType.String;
+              tmp1400.ID = 5;
+              await oprot.WriteFieldBeginAsync(tmp1400, cancellationToken);
               await oprot.WriteStringAsync(ButtonLabel, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ButtonImage != null) && __isset.buttonImage)
             {
-              tmp1340.Name = "buttonImage";
-              tmp1340.Type = TType.String;
-              tmp1340.ID = 6;
-              await oprot.WriteFieldBeginAsync(tmp1340, cancellationToken);
+              tmp1400.Name = "buttonImage";
+              tmp1400.Type = TType.String;
+              tmp1400.ID = 6;
+              await oprot.WriteFieldBeginAsync(tmp1400, cancellationToken);
               await oprot.WriteStringAsync(ButtonImage, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -11664,46 +13243,46 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1341 = new StringBuilder("registerIntegration_args(");
-          int tmp1342 = 0;
+          var tmp1401 = new StringBuilder("registerIntegration_args(");
+          int tmp1402 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1342++) { tmp1341.Append(", "); }
-            tmp1341.Append("P: ");
-            P.ToString(tmp1341);
+            if(0 < tmp1402++) { tmp1401.Append(", "); }
+            tmp1401.Append("P: ");
+            P.ToString(tmp1401);
           }
           if((Identifier != null) && __isset.identifier)
           {
-            if(0 < tmp1342++) { tmp1341.Append(", "); }
-            tmp1341.Append("Identifier: ");
-            Identifier.ToString(tmp1341);
+            if(0 < tmp1402++) { tmp1401.Append(", "); }
+            tmp1401.Append("Identifier: ");
+            Identifier.ToString(tmp1401);
           }
           if(__isset.integrationPoint)
           {
-            if(0 < tmp1342++) { tmp1341.Append(", "); }
-            tmp1341.Append("IntegrationPoint: ");
-            IntegrationPoint.ToString(tmp1341);
+            if(0 < tmp1402++) { tmp1401.Append(", "); }
+            tmp1401.Append("IntegrationPoint: ");
+            IntegrationPoint.ToString(tmp1401);
           }
           if((ItemType != null) && __isset.itemType)
           {
-            if(0 < tmp1342++) { tmp1341.Append(", "); }
-            tmp1341.Append("ItemType: ");
-            ItemType.ToString(tmp1341);
+            if(0 < tmp1402++) { tmp1401.Append(", "); }
+            tmp1401.Append("ItemType: ");
+            ItemType.ToString(tmp1401);
           }
           if((ButtonLabel != null) && __isset.buttonLabel)
           {
-            if(0 < tmp1342++) { tmp1341.Append(", "); }
-            tmp1341.Append("ButtonLabel: ");
-            ButtonLabel.ToString(tmp1341);
+            if(0 < tmp1402++) { tmp1401.Append(", "); }
+            tmp1401.Append("ButtonLabel: ");
+            ButtonLabel.ToString(tmp1401);
           }
           if((ButtonImage != null) && __isset.buttonImage)
           {
-            if(0 < tmp1342++) { tmp1341.Append(", "); }
-            tmp1341.Append("ButtonImage: ");
-            ButtonImage.ToString(tmp1341);
+            if(0 < tmp1402++) { tmp1401.Append(", "); }
+            tmp1401.Append("ButtonImage: ");
+            ButtonImage.ToString(tmp1401);
           }
-          tmp1341.Append(')');
-          return tmp1341.ToString();
+          tmp1401.Append(')');
+          return tmp1401.ToString();
         }
       }
 
@@ -11738,13 +13317,13 @@ namespace Yaskawa.Ext.API
 
         public registerIntegration_result DeepCopy()
         {
-          var tmp1343 = new registerIntegration_result();
+          var tmp1403 = new registerIntegration_result();
           if((E != null) && __isset.e)
           {
-            tmp1343.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1403.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1343.__isset.e = this.__isset.e;
-          return tmp1343;
+          tmp1403.__isset.e = this.__isset.e;
+          return tmp1403;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -11796,18 +13375,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1344 = new TStruct("registerIntegration_result");
-            await oprot.WriteStructBeginAsync(tmp1344, cancellationToken);
-            var tmp1345 = new TField();
+            var tmp1404 = new TStruct("registerIntegration_result");
+            await oprot.WriteStructBeginAsync(tmp1404, cancellationToken);
+            var tmp1405 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1345.Name = "E";
-                tmp1345.Type = TType.Struct;
-                tmp1345.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1345, cancellationToken);
+                tmp1405.Name = "E";
+                tmp1405.Type = TType.Struct;
+                tmp1405.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1405, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -11841,16 +13420,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1346 = new StringBuilder("registerIntegration_result(");
-          int tmp1347 = 0;
+          var tmp1406 = new StringBuilder("registerIntegration_result(");
+          int tmp1407 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1347++) { tmp1346.Append(", "); }
-            tmp1346.Append("E: ");
-            E.ToString(tmp1346);
+            if(0 < tmp1407++) { tmp1406.Append(", "); }
+            tmp1406.Append("E: ");
+            E.ToString(tmp1406);
           }
-          tmp1346.Append(')');
-          return tmp1346.ToString();
+          tmp1406.Append(')');
+          return tmp1406.ToString();
         }
       }
 
@@ -11900,18 +13479,18 @@ namespace Yaskawa.Ext.API
 
         public unregisterIntegration_args DeepCopy()
         {
-          var tmp1348 = new unregisterIntegration_args();
+          var tmp1408 = new unregisterIntegration_args();
           if(__isset.p)
           {
-            tmp1348.P = this.P;
+            tmp1408.P = this.P;
           }
-          tmp1348.__isset.p = this.__isset.p;
+          tmp1408.__isset.p = this.__isset.p;
           if((Identifier != null) && __isset.identifier)
           {
-            tmp1348.Identifier = this.Identifier;
+            tmp1408.Identifier = this.Identifier;
           }
-          tmp1348.__isset.identifier = this.__isset.identifier;
-          return tmp1348;
+          tmp1408.__isset.identifier = this.__isset.identifier;
+          return tmp1408;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -11972,24 +13551,24 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1349 = new TStruct("unregisterIntegration_args");
-            await oprot.WriteStructBeginAsync(tmp1349, cancellationToken);
-            var tmp1350 = new TField();
+            var tmp1409 = new TStruct("unregisterIntegration_args");
+            await oprot.WriteStructBeginAsync(tmp1409, cancellationToken);
+            var tmp1410 = new TField();
             if(__isset.p)
             {
-              tmp1350.Name = "p";
-              tmp1350.Type = TType.I64;
-              tmp1350.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1350, cancellationToken);
+              tmp1410.Name = "p";
+              tmp1410.Type = TType.I64;
+              tmp1410.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1410, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Identifier != null) && __isset.identifier)
             {
-              tmp1350.Name = "identifier";
-              tmp1350.Type = TType.String;
-              tmp1350.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1350, cancellationToken);
+              tmp1410.Name = "identifier";
+              tmp1410.Type = TType.String;
+              tmp1410.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1410, cancellationToken);
               await oprot.WriteStringAsync(Identifier, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -12027,22 +13606,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1351 = new StringBuilder("unregisterIntegration_args(");
-          int tmp1352 = 0;
+          var tmp1411 = new StringBuilder("unregisterIntegration_args(");
+          int tmp1412 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1352++) { tmp1351.Append(", "); }
-            tmp1351.Append("P: ");
-            P.ToString(tmp1351);
+            if(0 < tmp1412++) { tmp1411.Append(", "); }
+            tmp1411.Append("P: ");
+            P.ToString(tmp1411);
           }
           if((Identifier != null) && __isset.identifier)
           {
-            if(0 < tmp1352++) { tmp1351.Append(", "); }
-            tmp1351.Append("Identifier: ");
-            Identifier.ToString(tmp1351);
+            if(0 < tmp1412++) { tmp1411.Append(", "); }
+            tmp1411.Append("Identifier: ");
+            Identifier.ToString(tmp1411);
           }
-          tmp1351.Append(')');
-          return tmp1351.ToString();
+          tmp1411.Append(')');
+          return tmp1411.ToString();
         }
       }
 
@@ -12077,13 +13656,13 @@ namespace Yaskawa.Ext.API
 
         public unregisterIntegration_result DeepCopy()
         {
-          var tmp1353 = new unregisterIntegration_result();
+          var tmp1413 = new unregisterIntegration_result();
           if((E != null) && __isset.e)
           {
-            tmp1353.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1413.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1353.__isset.e = this.__isset.e;
-          return tmp1353;
+          tmp1413.__isset.e = this.__isset.e;
+          return tmp1413;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -12135,18 +13714,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1354 = new TStruct("unregisterIntegration_result");
-            await oprot.WriteStructBeginAsync(tmp1354, cancellationToken);
-            var tmp1355 = new TField();
+            var tmp1414 = new TStruct("unregisterIntegration_result");
+            await oprot.WriteStructBeginAsync(tmp1414, cancellationToken);
+            var tmp1415 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1355.Name = "E";
-                tmp1355.Type = TType.Struct;
-                tmp1355.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1355, cancellationToken);
+                tmp1415.Name = "E";
+                tmp1415.Type = TType.Struct;
+                tmp1415.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1415, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -12180,16 +13759,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1356 = new StringBuilder("unregisterIntegration_result(");
-          int tmp1357 = 0;
+          var tmp1416 = new StringBuilder("unregisterIntegration_result(");
+          int tmp1417 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1357++) { tmp1356.Append(", "); }
-            tmp1356.Append("E: ");
-            E.ToString(tmp1356);
+            if(0 < tmp1417++) { tmp1416.Append(", "); }
+            tmp1416.Append("E: ");
+            E.ToString(tmp1416);
           }
-          tmp1356.Append(')');
-          return tmp1356.ToString();
+          tmp1416.Append(')');
+          return tmp1416.ToString();
         }
       }
 
@@ -12318,43 +13897,43 @@ namespace Yaskawa.Ext.API
 
         public registerSwitch_args DeepCopy()
         {
-          var tmp1358 = new registerSwitch_args();
+          var tmp1418 = new registerSwitch_args();
           if(__isset.p)
           {
-            tmp1358.P = this.P;
+            tmp1418.P = this.P;
           }
-          tmp1358.__isset.p = this.__isset.p;
+          tmp1418.__isset.p = this.__isset.p;
           if((Identifier != null) && __isset.identifier)
           {
-            tmp1358.Identifier = this.Identifier;
+            tmp1418.Identifier = this.Identifier;
           }
-          tmp1358.__isset.identifier = this.__isset.identifier;
+          tmp1418.__isset.identifier = this.__isset.identifier;
           if(__isset.integrationPoint)
           {
-            tmp1358.IntegrationPoint = this.IntegrationPoint;
+            tmp1418.IntegrationPoint = this.IntegrationPoint;
           }
-          tmp1358.__isset.integrationPoint = this.__isset.integrationPoint;
+          tmp1418.__isset.integrationPoint = this.__isset.integrationPoint;
           if((SwitchLabel != null) && __isset.switchLabel)
           {
-            tmp1358.SwitchLabel = this.SwitchLabel;
+            tmp1418.SwitchLabel = this.SwitchLabel;
           }
-          tmp1358.__isset.switchLabel = this.__isset.switchLabel;
+          tmp1418.__isset.switchLabel = this.__isset.switchLabel;
           if((OffPositionLabel != null) && __isset.offPositionLabel)
           {
-            tmp1358.OffPositionLabel = this.OffPositionLabel;
+            tmp1418.OffPositionLabel = this.OffPositionLabel;
           }
-          tmp1358.__isset.offPositionLabel = this.__isset.offPositionLabel;
+          tmp1418.__isset.offPositionLabel = this.__isset.offPositionLabel;
           if((OnPositionLabel != null) && __isset.onPositionLabel)
           {
-            tmp1358.OnPositionLabel = this.OnPositionLabel;
+            tmp1418.OnPositionLabel = this.OnPositionLabel;
           }
-          tmp1358.__isset.onPositionLabel = this.__isset.onPositionLabel;
+          tmp1418.__isset.onPositionLabel = this.__isset.onPositionLabel;
           if(__isset.defaultState)
           {
-            tmp1358.DefaultState = this.DefaultState;
+            tmp1418.DefaultState = this.DefaultState;
           }
-          tmp1358.__isset.defaultState = this.__isset.defaultState;
-          return tmp1358;
+          tmp1418.__isset.defaultState = this.__isset.defaultState;
+          return tmp1418;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -12465,69 +14044,69 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1359 = new TStruct("registerSwitch_args");
-            await oprot.WriteStructBeginAsync(tmp1359, cancellationToken);
-            var tmp1360 = new TField();
+            var tmp1419 = new TStruct("registerSwitch_args");
+            await oprot.WriteStructBeginAsync(tmp1419, cancellationToken);
+            var tmp1420 = new TField();
             if(__isset.p)
             {
-              tmp1360.Name = "p";
-              tmp1360.Type = TType.I64;
-              tmp1360.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1360, cancellationToken);
+              tmp1420.Name = "p";
+              tmp1420.Type = TType.I64;
+              tmp1420.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1420, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Identifier != null) && __isset.identifier)
             {
-              tmp1360.Name = "identifier";
-              tmp1360.Type = TType.String;
-              tmp1360.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1360, cancellationToken);
+              tmp1420.Name = "identifier";
+              tmp1420.Type = TType.String;
+              tmp1420.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1420, cancellationToken);
               await oprot.WriteStringAsync(Identifier, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if(__isset.integrationPoint)
             {
-              tmp1360.Name = "integrationPoint";
-              tmp1360.Type = TType.I32;
-              tmp1360.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1360, cancellationToken);
+              tmp1420.Name = "integrationPoint";
+              tmp1420.Type = TType.I32;
+              tmp1420.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1420, cancellationToken);
               await oprot.WriteI32Async((int)IntegrationPoint, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((SwitchLabel != null) && __isset.switchLabel)
             {
-              tmp1360.Name = "switchLabel";
-              tmp1360.Type = TType.String;
-              tmp1360.ID = 4;
-              await oprot.WriteFieldBeginAsync(tmp1360, cancellationToken);
+              tmp1420.Name = "switchLabel";
+              tmp1420.Type = TType.String;
+              tmp1420.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1420, cancellationToken);
               await oprot.WriteStringAsync(SwitchLabel, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((OffPositionLabel != null) && __isset.offPositionLabel)
             {
-              tmp1360.Name = "offPositionLabel";
-              tmp1360.Type = TType.String;
-              tmp1360.ID = 5;
-              await oprot.WriteFieldBeginAsync(tmp1360, cancellationToken);
+              tmp1420.Name = "offPositionLabel";
+              tmp1420.Type = TType.String;
+              tmp1420.ID = 5;
+              await oprot.WriteFieldBeginAsync(tmp1420, cancellationToken);
               await oprot.WriteStringAsync(OffPositionLabel, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((OnPositionLabel != null) && __isset.onPositionLabel)
             {
-              tmp1360.Name = "onPositionLabel";
-              tmp1360.Type = TType.String;
-              tmp1360.ID = 6;
-              await oprot.WriteFieldBeginAsync(tmp1360, cancellationToken);
+              tmp1420.Name = "onPositionLabel";
+              tmp1420.Type = TType.String;
+              tmp1420.ID = 6;
+              await oprot.WriteFieldBeginAsync(tmp1420, cancellationToken);
               await oprot.WriteStringAsync(OnPositionLabel, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if(__isset.defaultState)
             {
-              tmp1360.Name = "defaultState";
-              tmp1360.Type = TType.Bool;
-              tmp1360.ID = 7;
-              await oprot.WriteFieldBeginAsync(tmp1360, cancellationToken);
+              tmp1420.Name = "defaultState";
+              tmp1420.Type = TType.Bool;
+              tmp1420.ID = 7;
+              await oprot.WriteFieldBeginAsync(tmp1420, cancellationToken);
               await oprot.WriteBoolAsync(DefaultState, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -12590,52 +14169,52 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1361 = new StringBuilder("registerSwitch_args(");
-          int tmp1362 = 0;
+          var tmp1421 = new StringBuilder("registerSwitch_args(");
+          int tmp1422 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1362++) { tmp1361.Append(", "); }
-            tmp1361.Append("P: ");
-            P.ToString(tmp1361);
+            if(0 < tmp1422++) { tmp1421.Append(", "); }
+            tmp1421.Append("P: ");
+            P.ToString(tmp1421);
           }
           if((Identifier != null) && __isset.identifier)
           {
-            if(0 < tmp1362++) { tmp1361.Append(", "); }
-            tmp1361.Append("Identifier: ");
-            Identifier.ToString(tmp1361);
+            if(0 < tmp1422++) { tmp1421.Append(", "); }
+            tmp1421.Append("Identifier: ");
+            Identifier.ToString(tmp1421);
           }
           if(__isset.integrationPoint)
           {
-            if(0 < tmp1362++) { tmp1361.Append(", "); }
-            tmp1361.Append("IntegrationPoint: ");
-            IntegrationPoint.ToString(tmp1361);
+            if(0 < tmp1422++) { tmp1421.Append(", "); }
+            tmp1421.Append("IntegrationPoint: ");
+            IntegrationPoint.ToString(tmp1421);
           }
           if((SwitchLabel != null) && __isset.switchLabel)
           {
-            if(0 < tmp1362++) { tmp1361.Append(", "); }
-            tmp1361.Append("SwitchLabel: ");
-            SwitchLabel.ToString(tmp1361);
+            if(0 < tmp1422++) { tmp1421.Append(", "); }
+            tmp1421.Append("SwitchLabel: ");
+            SwitchLabel.ToString(tmp1421);
           }
           if((OffPositionLabel != null) && __isset.offPositionLabel)
           {
-            if(0 < tmp1362++) { tmp1361.Append(", "); }
-            tmp1361.Append("OffPositionLabel: ");
-            OffPositionLabel.ToString(tmp1361);
+            if(0 < tmp1422++) { tmp1421.Append(", "); }
+            tmp1421.Append("OffPositionLabel: ");
+            OffPositionLabel.ToString(tmp1421);
           }
           if((OnPositionLabel != null) && __isset.onPositionLabel)
           {
-            if(0 < tmp1362++) { tmp1361.Append(", "); }
-            tmp1361.Append("OnPositionLabel: ");
-            OnPositionLabel.ToString(tmp1361);
+            if(0 < tmp1422++) { tmp1421.Append(", "); }
+            tmp1421.Append("OnPositionLabel: ");
+            OnPositionLabel.ToString(tmp1421);
           }
           if(__isset.defaultState)
           {
-            if(0 < tmp1362++) { tmp1361.Append(", "); }
-            tmp1361.Append("DefaultState: ");
-            DefaultState.ToString(tmp1361);
+            if(0 < tmp1422++) { tmp1421.Append(", "); }
+            tmp1421.Append("DefaultState: ");
+            DefaultState.ToString(tmp1421);
           }
-          tmp1361.Append(')');
-          return tmp1361.ToString();
+          tmp1421.Append(')');
+          return tmp1421.ToString();
         }
       }
 
@@ -12670,13 +14249,13 @@ namespace Yaskawa.Ext.API
 
         public registerSwitch_result DeepCopy()
         {
-          var tmp1363 = new registerSwitch_result();
+          var tmp1423 = new registerSwitch_result();
           if((E != null) && __isset.e)
           {
-            tmp1363.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1423.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1363.__isset.e = this.__isset.e;
-          return tmp1363;
+          tmp1423.__isset.e = this.__isset.e;
+          return tmp1423;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -12728,18 +14307,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1364 = new TStruct("registerSwitch_result");
-            await oprot.WriteStructBeginAsync(tmp1364, cancellationToken);
-            var tmp1365 = new TField();
+            var tmp1424 = new TStruct("registerSwitch_result");
+            await oprot.WriteStructBeginAsync(tmp1424, cancellationToken);
+            var tmp1425 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1365.Name = "E";
-                tmp1365.Type = TType.Struct;
-                tmp1365.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1365, cancellationToken);
+                tmp1425.Name = "E";
+                tmp1425.Type = TType.Struct;
+                tmp1425.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1425, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -12773,16 +14352,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1366 = new StringBuilder("registerSwitch_result(");
-          int tmp1367 = 0;
+          var tmp1426 = new StringBuilder("registerSwitch_result(");
+          int tmp1427 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1367++) { tmp1366.Append(", "); }
-            tmp1366.Append("E: ");
-            E.ToString(tmp1366);
+            if(0 < tmp1427++) { tmp1426.Append(", "); }
+            tmp1426.Append("E: ");
+            E.ToString(tmp1426);
           }
-          tmp1366.Append(')');
-          return tmp1366.ToString();
+          tmp1426.Append(')');
+          return tmp1426.ToString();
         }
       }
 
@@ -12847,23 +14426,23 @@ namespace Yaskawa.Ext.API
 
         public property_args DeepCopy()
         {
-          var tmp1368 = new property_args();
+          var tmp1428 = new property_args();
           if(__isset.p)
           {
-            tmp1368.P = this.P;
+            tmp1428.P = this.P;
           }
-          tmp1368.__isset.p = this.__isset.p;
+          tmp1428.__isset.p = this.__isset.p;
           if((ItemID != null) && __isset.itemID)
           {
-            tmp1368.ItemID = this.ItemID;
+            tmp1428.ItemID = this.ItemID;
           }
-          tmp1368.__isset.itemID = this.__isset.itemID;
+          tmp1428.__isset.itemID = this.__isset.itemID;
           if((Name != null) && __isset.name)
           {
-            tmp1368.Name = this.Name;
+            tmp1428.Name = this.Name;
           }
-          tmp1368.__isset.name = this.__isset.name;
-          return tmp1368;
+          tmp1428.__isset.name = this.__isset.name;
+          return tmp1428;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -12934,33 +14513,33 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1369 = new TStruct("property_args");
-            await oprot.WriteStructBeginAsync(tmp1369, cancellationToken);
-            var tmp1370 = new TField();
+            var tmp1429 = new TStruct("property_args");
+            await oprot.WriteStructBeginAsync(tmp1429, cancellationToken);
+            var tmp1430 = new TField();
             if(__isset.p)
             {
-              tmp1370.Name = "p";
-              tmp1370.Type = TType.I64;
-              tmp1370.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1370, cancellationToken);
+              tmp1430.Name = "p";
+              tmp1430.Type = TType.I64;
+              tmp1430.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1430, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ItemID != null) && __isset.itemID)
             {
-              tmp1370.Name = "itemID";
-              tmp1370.Type = TType.String;
-              tmp1370.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1370, cancellationToken);
+              tmp1430.Name = "itemID";
+              tmp1430.Type = TType.String;
+              tmp1430.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1430, cancellationToken);
               await oprot.WriteStringAsync(ItemID, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Name != null) && __isset.name)
             {
-              tmp1370.Name = "name";
-              tmp1370.Type = TType.String;
-              tmp1370.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1370, cancellationToken);
+              tmp1430.Name = "name";
+              tmp1430.Type = TType.String;
+              tmp1430.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1430, cancellationToken);
               await oprot.WriteStringAsync(Name, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -13003,28 +14582,28 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1371 = new StringBuilder("property_args(");
-          int tmp1372 = 0;
+          var tmp1431 = new StringBuilder("property_args(");
+          int tmp1432 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1372++) { tmp1371.Append(", "); }
-            tmp1371.Append("P: ");
-            P.ToString(tmp1371);
+            if(0 < tmp1432++) { tmp1431.Append(", "); }
+            tmp1431.Append("P: ");
+            P.ToString(tmp1431);
           }
           if((ItemID != null) && __isset.itemID)
           {
-            if(0 < tmp1372++) { tmp1371.Append(", "); }
-            tmp1371.Append("ItemID: ");
-            ItemID.ToString(tmp1371);
+            if(0 < tmp1432++) { tmp1431.Append(", "); }
+            tmp1431.Append("ItemID: ");
+            ItemID.ToString(tmp1431);
           }
           if((Name != null) && __isset.name)
           {
-            if(0 < tmp1372++) { tmp1371.Append(", "); }
-            tmp1371.Append("Name: ");
-            Name.ToString(tmp1371);
+            if(0 < tmp1432++) { tmp1431.Append(", "); }
+            tmp1431.Append("Name: ");
+            Name.ToString(tmp1431);
           }
-          tmp1371.Append(')');
-          return tmp1371.ToString();
+          tmp1431.Append(')');
+          return tmp1431.ToString();
         }
       }
 
@@ -13074,18 +14653,18 @@ namespace Yaskawa.Ext.API
 
         public property_result DeepCopy()
         {
-          var tmp1373 = new property_result();
+          var tmp1433 = new property_result();
           if((Success != null) && __isset.success)
           {
-            tmp1373.Success = (global::Yaskawa.Ext.API.Any)this.Success.DeepCopy();
+            tmp1433.Success = (global::Yaskawa.Ext.API.Any)this.Success.DeepCopy();
           }
-          tmp1373.__isset.success = this.__isset.success;
+          tmp1433.__isset.success = this.__isset.success;
           if((E != null) && __isset.e)
           {
-            tmp1373.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1433.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1373.__isset.e = this.__isset.e;
-          return tmp1373;
+          tmp1433.__isset.e = this.__isset.e;
+          return tmp1433;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -13148,18 +14727,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1374 = new TStruct("property_result");
-            await oprot.WriteStructBeginAsync(tmp1374, cancellationToken);
-            var tmp1375 = new TField();
+            var tmp1434 = new TStruct("property_result");
+            await oprot.WriteStructBeginAsync(tmp1434, cancellationToken);
+            var tmp1435 = new TField();
 
             if(this.__isset.success)
             {
               if (Success != null)
               {
-                tmp1375.Name = "Success";
-                tmp1375.Type = TType.Struct;
-                tmp1375.ID = 0;
-                await oprot.WriteFieldBeginAsync(tmp1375, cancellationToken);
+                tmp1435.Name = "Success";
+                tmp1435.Type = TType.Struct;
+                tmp1435.ID = 0;
+                await oprot.WriteFieldBeginAsync(tmp1435, cancellationToken);
                 await Success.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -13168,10 +14747,10 @@ namespace Yaskawa.Ext.API
             {
               if (E != null)
               {
-                tmp1375.Name = "E";
-                tmp1375.Type = TType.Struct;
-                tmp1375.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1375, cancellationToken);
+                tmp1435.Name = "E";
+                tmp1435.Type = TType.Struct;
+                tmp1435.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1435, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -13210,22 +14789,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1376 = new StringBuilder("property_result(");
-          int tmp1377 = 0;
+          var tmp1436 = new StringBuilder("property_result(");
+          int tmp1437 = 0;
           if((Success != null) && __isset.success)
           {
-            if(0 < tmp1377++) { tmp1376.Append(", "); }
-            tmp1376.Append("Success: ");
-            Success.ToString(tmp1376);
+            if(0 < tmp1437++) { tmp1436.Append(", "); }
+            tmp1436.Append("Success: ");
+            Success.ToString(tmp1436);
           }
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1377++) { tmp1376.Append(", "); }
-            tmp1376.Append("E: ");
-            E.ToString(tmp1376);
+            if(0 < tmp1437++) { tmp1436.Append(", "); }
+            tmp1436.Append("E: ");
+            E.ToString(tmp1436);
           }
-          tmp1376.Append(')');
-          return tmp1376.ToString();
+          tmp1436.Append(')');
+          return tmp1436.ToString();
         }
       }
 
@@ -13305,28 +14884,28 @@ namespace Yaskawa.Ext.API
 
         public setProperty_args DeepCopy()
         {
-          var tmp1378 = new setProperty_args();
+          var tmp1438 = new setProperty_args();
           if(__isset.p)
           {
-            tmp1378.P = this.P;
+            tmp1438.P = this.P;
           }
-          tmp1378.__isset.p = this.__isset.p;
+          tmp1438.__isset.p = this.__isset.p;
           if((ItemID != null) && __isset.itemID)
           {
-            tmp1378.ItemID = this.ItemID;
+            tmp1438.ItemID = this.ItemID;
           }
-          tmp1378.__isset.itemID = this.__isset.itemID;
+          tmp1438.__isset.itemID = this.__isset.itemID;
           if((Name != null) && __isset.name)
           {
-            tmp1378.Name = this.Name;
+            tmp1438.Name = this.Name;
           }
-          tmp1378.__isset.name = this.__isset.name;
+          tmp1438.__isset.name = this.__isset.name;
           if((Value != null) && __isset.@value)
           {
-            tmp1378.Value = (global::Yaskawa.Ext.API.Any)this.Value.DeepCopy();
+            tmp1438.Value = (global::Yaskawa.Ext.API.Any)this.Value.DeepCopy();
           }
-          tmp1378.__isset.@value = this.__isset.@value;
-          return tmp1378;
+          tmp1438.__isset.@value = this.__isset.@value;
+          return tmp1438;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -13408,42 +14987,42 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1379 = new TStruct("setProperty_args");
-            await oprot.WriteStructBeginAsync(tmp1379, cancellationToken);
-            var tmp1380 = new TField();
+            var tmp1439 = new TStruct("setProperty_args");
+            await oprot.WriteStructBeginAsync(tmp1439, cancellationToken);
+            var tmp1440 = new TField();
             if(__isset.p)
             {
-              tmp1380.Name = "p";
-              tmp1380.Type = TType.I64;
-              tmp1380.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1380, cancellationToken);
+              tmp1440.Name = "p";
+              tmp1440.Type = TType.I64;
+              tmp1440.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1440, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ItemID != null) && __isset.itemID)
             {
-              tmp1380.Name = "itemID";
-              tmp1380.Type = TType.String;
-              tmp1380.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1380, cancellationToken);
+              tmp1440.Name = "itemID";
+              tmp1440.Type = TType.String;
+              tmp1440.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1440, cancellationToken);
               await oprot.WriteStringAsync(ItemID, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Name != null) && __isset.name)
             {
-              tmp1380.Name = "name";
-              tmp1380.Type = TType.String;
-              tmp1380.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1380, cancellationToken);
+              tmp1440.Name = "name";
+              tmp1440.Type = TType.String;
+              tmp1440.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1440, cancellationToken);
               await oprot.WriteStringAsync(Name, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Value != null) && __isset.@value)
             {
-              tmp1380.Name = "value";
-              tmp1380.Type = TType.Struct;
-              tmp1380.ID = 4;
-              await oprot.WriteFieldBeginAsync(tmp1380, cancellationToken);
+              tmp1440.Name = "value";
+              tmp1440.Type = TType.Struct;
+              tmp1440.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1440, cancellationToken);
               await Value.WriteAsync(oprot, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -13491,34 +15070,34 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1381 = new StringBuilder("setProperty_args(");
-          int tmp1382 = 0;
+          var tmp1441 = new StringBuilder("setProperty_args(");
+          int tmp1442 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1382++) { tmp1381.Append(", "); }
-            tmp1381.Append("P: ");
-            P.ToString(tmp1381);
+            if(0 < tmp1442++) { tmp1441.Append(", "); }
+            tmp1441.Append("P: ");
+            P.ToString(tmp1441);
           }
           if((ItemID != null) && __isset.itemID)
           {
-            if(0 < tmp1382++) { tmp1381.Append(", "); }
-            tmp1381.Append("ItemID: ");
-            ItemID.ToString(tmp1381);
+            if(0 < tmp1442++) { tmp1441.Append(", "); }
+            tmp1441.Append("ItemID: ");
+            ItemID.ToString(tmp1441);
           }
           if((Name != null) && __isset.name)
           {
-            if(0 < tmp1382++) { tmp1381.Append(", "); }
-            tmp1381.Append("Name: ");
-            Name.ToString(tmp1381);
+            if(0 < tmp1442++) { tmp1441.Append(", "); }
+            tmp1441.Append("Name: ");
+            Name.ToString(tmp1441);
           }
           if((Value != null) && __isset.@value)
           {
-            if(0 < tmp1382++) { tmp1381.Append(", "); }
-            tmp1381.Append("Value: ");
-            Value.ToString(tmp1381);
+            if(0 < tmp1442++) { tmp1441.Append(", "); }
+            tmp1441.Append("Value: ");
+            Value.ToString(tmp1441);
           }
-          tmp1381.Append(')');
-          return tmp1381.ToString();
+          tmp1441.Append(')');
+          return tmp1441.ToString();
         }
       }
 
@@ -13553,13 +15132,13 @@ namespace Yaskawa.Ext.API
 
         public setProperty_result DeepCopy()
         {
-          var tmp1383 = new setProperty_result();
+          var tmp1443 = new setProperty_result();
           if((E != null) && __isset.e)
           {
-            tmp1383.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1443.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1383.__isset.e = this.__isset.e;
-          return tmp1383;
+          tmp1443.__isset.e = this.__isset.e;
+          return tmp1443;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -13611,18 +15190,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1384 = new TStruct("setProperty_result");
-            await oprot.WriteStructBeginAsync(tmp1384, cancellationToken);
-            var tmp1385 = new TField();
+            var tmp1444 = new TStruct("setProperty_result");
+            await oprot.WriteStructBeginAsync(tmp1444, cancellationToken);
+            var tmp1445 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1385.Name = "E";
-                tmp1385.Type = TType.Struct;
-                tmp1385.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1385, cancellationToken);
+                tmp1445.Name = "E";
+                tmp1445.Type = TType.Struct;
+                tmp1445.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1445, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -13656,16 +15235,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1386 = new StringBuilder("setProperty_result(");
-          int tmp1387 = 0;
+          var tmp1446 = new StringBuilder("setProperty_result(");
+          int tmp1447 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1387++) { tmp1386.Append(", "); }
-            tmp1386.Append("E: ");
-            E.ToString(tmp1386);
+            if(0 < tmp1447++) { tmp1446.Append(", "); }
+            tmp1446.Append("E: ");
+            E.ToString(tmp1446);
           }
-          tmp1386.Append(')');
-          return tmp1386.ToString();
+          tmp1446.Append(')');
+          return tmp1446.ToString();
         }
       }
 
@@ -13715,18 +15294,18 @@ namespace Yaskawa.Ext.API
 
         public setProperties_args DeepCopy()
         {
-          var tmp1388 = new setProperties_args();
+          var tmp1448 = new setProperties_args();
           if(__isset.p)
           {
-            tmp1388.P = this.P;
+            tmp1448.P = this.P;
           }
-          tmp1388.__isset.p = this.__isset.p;
+          tmp1448.__isset.p = this.__isset.p;
           if((PropValuesList != null) && __isset.propValuesList)
           {
-            tmp1388.PropValuesList = this.PropValuesList.DeepCopy();
+            tmp1448.PropValuesList = this.PropValuesList.DeepCopy();
           }
-          tmp1388.__isset.propValuesList = this.__isset.propValuesList;
-          return tmp1388;
+          tmp1448.__isset.propValuesList = this.__isset.propValuesList;
+          return tmp1448;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -13760,14 +15339,14 @@ namespace Yaskawa.Ext.API
                   if (field.Type == TType.List)
                   {
                     {
-                      var _list1389 = await iprot.ReadListBeginAsync(cancellationToken);
-                      PropValuesList = new List<global::Yaskawa.Ext.API.PropValues>(_list1389.Count);
-                      for(int _i1390 = 0; _i1390 < _list1389.Count; ++_i1390)
+                      var _list1449 = await iprot.ReadListBeginAsync(cancellationToken);
+                      PropValuesList = new List<global::Yaskawa.Ext.API.PropValues>(_list1449.Count);
+                      for(int _i1450 = 0; _i1450 < _list1449.Count; ++_i1450)
                       {
-                        global::Yaskawa.Ext.API.PropValues _elem1391;
-                        _elem1391 = new global::Yaskawa.Ext.API.PropValues();
-                        await _elem1391.ReadAsync(iprot, cancellationToken);
-                        PropValuesList.Add(_elem1391);
+                        global::Yaskawa.Ext.API.PropValues _elem1451;
+                        _elem1451 = new global::Yaskawa.Ext.API.PropValues();
+                        await _elem1451.ReadAsync(iprot, cancellationToken);
+                        PropValuesList.Add(_elem1451);
                       }
                       await iprot.ReadListEndAsync(cancellationToken);
                     }
@@ -13798,28 +15377,28 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1392 = new TStruct("setProperties_args");
-            await oprot.WriteStructBeginAsync(tmp1392, cancellationToken);
-            var tmp1393 = new TField();
+            var tmp1452 = new TStruct("setProperties_args");
+            await oprot.WriteStructBeginAsync(tmp1452, cancellationToken);
+            var tmp1453 = new TField();
             if(__isset.p)
             {
-              tmp1393.Name = "p";
-              tmp1393.Type = TType.I64;
-              tmp1393.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1393, cancellationToken);
+              tmp1453.Name = "p";
+              tmp1453.Type = TType.I64;
+              tmp1453.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1453, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((PropValuesList != null) && __isset.propValuesList)
             {
-              tmp1393.Name = "propValuesList";
-              tmp1393.Type = TType.List;
-              tmp1393.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1393, cancellationToken);
+              tmp1453.Name = "propValuesList";
+              tmp1453.Type = TType.List;
+              tmp1453.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1453, cancellationToken);
               await oprot.WriteListBeginAsync(new TList(TType.Struct, PropValuesList.Count), cancellationToken);
-              foreach (global::Yaskawa.Ext.API.PropValues _iter1394 in PropValuesList)
+              foreach (global::Yaskawa.Ext.API.PropValues _iter1454 in PropValuesList)
               {
-                await _iter1394.WriteAsync(oprot, cancellationToken);
+                await _iter1454.WriteAsync(oprot, cancellationToken);
               }
               await oprot.WriteListEndAsync(cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
@@ -13858,22 +15437,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1395 = new StringBuilder("setProperties_args(");
-          int tmp1396 = 0;
+          var tmp1455 = new StringBuilder("setProperties_args(");
+          int tmp1456 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1396++) { tmp1395.Append(", "); }
-            tmp1395.Append("P: ");
-            P.ToString(tmp1395);
+            if(0 < tmp1456++) { tmp1455.Append(", "); }
+            tmp1455.Append("P: ");
+            P.ToString(tmp1455);
           }
           if((PropValuesList != null) && __isset.propValuesList)
           {
-            if(0 < tmp1396++) { tmp1395.Append(", "); }
-            tmp1395.Append("PropValuesList: ");
-            PropValuesList.ToString(tmp1395);
+            if(0 < tmp1456++) { tmp1455.Append(", "); }
+            tmp1455.Append("PropValuesList: ");
+            PropValuesList.ToString(tmp1455);
           }
-          tmp1395.Append(')');
-          return tmp1395.ToString();
+          tmp1455.Append(')');
+          return tmp1455.ToString();
         }
       }
 
@@ -13938,23 +15517,23 @@ namespace Yaskawa.Ext.API
 
         public setChartConfig_args DeepCopy()
         {
-          var tmp1397 = new setChartConfig_args();
+          var tmp1457 = new setChartConfig_args();
           if(__isset.p)
           {
-            tmp1397.P = this.P;
+            tmp1457.P = this.P;
           }
-          tmp1397.__isset.p = this.__isset.p;
+          tmp1457.__isset.p = this.__isset.p;
           if((ChartID != null) && __isset.chartID)
           {
-            tmp1397.ChartID = this.ChartID;
+            tmp1457.ChartID = this.ChartID;
           }
-          tmp1397.__isset.chartID = this.__isset.chartID;
+          tmp1457.__isset.chartID = this.__isset.chartID;
           if((Config != null) && __isset.config)
           {
-            tmp1397.Config = (global::Yaskawa.Ext.API.Any)this.Config.DeepCopy();
+            tmp1457.Config = (global::Yaskawa.Ext.API.Any)this.Config.DeepCopy();
           }
-          tmp1397.__isset.config = this.__isset.config;
-          return tmp1397;
+          tmp1457.__isset.config = this.__isset.config;
+          return tmp1457;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -14026,33 +15605,33 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1398 = new TStruct("setChartConfig_args");
-            await oprot.WriteStructBeginAsync(tmp1398, cancellationToken);
-            var tmp1399 = new TField();
+            var tmp1458 = new TStruct("setChartConfig_args");
+            await oprot.WriteStructBeginAsync(tmp1458, cancellationToken);
+            var tmp1459 = new TField();
             if(__isset.p)
             {
-              tmp1399.Name = "p";
-              tmp1399.Type = TType.I64;
-              tmp1399.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1399, cancellationToken);
+              tmp1459.Name = "p";
+              tmp1459.Type = TType.I64;
+              tmp1459.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1459, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ChartID != null) && __isset.chartID)
             {
-              tmp1399.Name = "chartID";
-              tmp1399.Type = TType.String;
-              tmp1399.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1399, cancellationToken);
+              tmp1459.Name = "chartID";
+              tmp1459.Type = TType.String;
+              tmp1459.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1459, cancellationToken);
               await oprot.WriteStringAsync(ChartID, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Config != null) && __isset.config)
             {
-              tmp1399.Name = "config";
-              tmp1399.Type = TType.Struct;
-              tmp1399.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1399, cancellationToken);
+              tmp1459.Name = "config";
+              tmp1459.Type = TType.Struct;
+              tmp1459.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1459, cancellationToken);
               await Config.WriteAsync(oprot, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -14095,28 +15674,28 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1400 = new StringBuilder("setChartConfig_args(");
-          int tmp1401 = 0;
+          var tmp1460 = new StringBuilder("setChartConfig_args(");
+          int tmp1461 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1401++) { tmp1400.Append(", "); }
-            tmp1400.Append("P: ");
-            P.ToString(tmp1400);
+            if(0 < tmp1461++) { tmp1460.Append(", "); }
+            tmp1460.Append("P: ");
+            P.ToString(tmp1460);
           }
           if((ChartID != null) && __isset.chartID)
           {
-            if(0 < tmp1401++) { tmp1400.Append(", "); }
-            tmp1400.Append("ChartID: ");
-            ChartID.ToString(tmp1400);
+            if(0 < tmp1461++) { tmp1460.Append(", "); }
+            tmp1460.Append("ChartID: ");
+            ChartID.ToString(tmp1460);
           }
           if((Config != null) && __isset.config)
           {
-            if(0 < tmp1401++) { tmp1400.Append(", "); }
-            tmp1400.Append("Config: ");
-            Config.ToString(tmp1400);
+            if(0 < tmp1461++) { tmp1460.Append(", "); }
+            tmp1460.Append("Config: ");
+            Config.ToString(tmp1460);
           }
-          tmp1400.Append(')');
-          return tmp1400.ToString();
+          tmp1460.Append(')');
+          return tmp1460.ToString();
         }
       }
 
@@ -14151,13 +15730,13 @@ namespace Yaskawa.Ext.API
 
         public setChartConfig_result DeepCopy()
         {
-          var tmp1402 = new setChartConfig_result();
+          var tmp1462 = new setChartConfig_result();
           if((E != null) && __isset.e)
           {
-            tmp1402.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1462.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1402.__isset.e = this.__isset.e;
-          return tmp1402;
+          tmp1462.__isset.e = this.__isset.e;
+          return tmp1462;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -14209,18 +15788,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1403 = new TStruct("setChartConfig_result");
-            await oprot.WriteStructBeginAsync(tmp1403, cancellationToken);
-            var tmp1404 = new TField();
+            var tmp1463 = new TStruct("setChartConfig_result");
+            await oprot.WriteStructBeginAsync(tmp1463, cancellationToken);
+            var tmp1464 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1404.Name = "E";
-                tmp1404.Type = TType.Struct;
-                tmp1404.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1404, cancellationToken);
+                tmp1464.Name = "E";
+                tmp1464.Type = TType.Struct;
+                tmp1464.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1464, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -14254,16 +15833,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1405 = new StringBuilder("setChartConfig_result(");
-          int tmp1406 = 0;
+          var tmp1465 = new StringBuilder("setChartConfig_result(");
+          int tmp1466 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1406++) { tmp1405.Append(", "); }
-            tmp1405.Append("E: ");
-            E.ToString(tmp1405);
+            if(0 < tmp1466++) { tmp1465.Append(", "); }
+            tmp1465.Append("E: ");
+            E.ToString(tmp1465);
           }
-          tmp1405.Append(')');
-          return tmp1405.ToString();
+          tmp1465.Append(')');
+          return tmp1465.ToString();
         }
       }
 
@@ -14313,18 +15892,18 @@ namespace Yaskawa.Ext.API
 
         public getChartConfig_args DeepCopy()
         {
-          var tmp1407 = new getChartConfig_args();
+          var tmp1467 = new getChartConfig_args();
           if(__isset.p)
           {
-            tmp1407.P = this.P;
+            tmp1467.P = this.P;
           }
-          tmp1407.__isset.p = this.__isset.p;
+          tmp1467.__isset.p = this.__isset.p;
           if((ChartID != null) && __isset.chartID)
           {
-            tmp1407.ChartID = this.ChartID;
+            tmp1467.ChartID = this.ChartID;
           }
-          tmp1407.__isset.chartID = this.__isset.chartID;
-          return tmp1407;
+          tmp1467.__isset.chartID = this.__isset.chartID;
+          return tmp1467;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -14385,24 +15964,24 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1408 = new TStruct("getChartConfig_args");
-            await oprot.WriteStructBeginAsync(tmp1408, cancellationToken);
-            var tmp1409 = new TField();
+            var tmp1468 = new TStruct("getChartConfig_args");
+            await oprot.WriteStructBeginAsync(tmp1468, cancellationToken);
+            var tmp1469 = new TField();
             if(__isset.p)
             {
-              tmp1409.Name = "p";
-              tmp1409.Type = TType.I64;
-              tmp1409.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1409, cancellationToken);
+              tmp1469.Name = "p";
+              tmp1469.Type = TType.I64;
+              tmp1469.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1469, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ChartID != null) && __isset.chartID)
             {
-              tmp1409.Name = "chartID";
-              tmp1409.Type = TType.String;
-              tmp1409.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1409, cancellationToken);
+              tmp1469.Name = "chartID";
+              tmp1469.Type = TType.String;
+              tmp1469.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1469, cancellationToken);
               await oprot.WriteStringAsync(ChartID, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -14440,22 +16019,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1410 = new StringBuilder("getChartConfig_args(");
-          int tmp1411 = 0;
+          var tmp1470 = new StringBuilder("getChartConfig_args(");
+          int tmp1471 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1411++) { tmp1410.Append(", "); }
-            tmp1410.Append("P: ");
-            P.ToString(tmp1410);
+            if(0 < tmp1471++) { tmp1470.Append(", "); }
+            tmp1470.Append("P: ");
+            P.ToString(tmp1470);
           }
           if((ChartID != null) && __isset.chartID)
           {
-            if(0 < tmp1411++) { tmp1410.Append(", "); }
-            tmp1410.Append("ChartID: ");
-            ChartID.ToString(tmp1410);
+            if(0 < tmp1471++) { tmp1470.Append(", "); }
+            tmp1470.Append("ChartID: ");
+            ChartID.ToString(tmp1470);
           }
-          tmp1410.Append(')');
-          return tmp1410.ToString();
+          tmp1470.Append(')');
+          return tmp1470.ToString();
         }
       }
 
@@ -14505,18 +16084,18 @@ namespace Yaskawa.Ext.API
 
         public getChartConfig_result DeepCopy()
         {
-          var tmp1412 = new getChartConfig_result();
+          var tmp1472 = new getChartConfig_result();
           if((Success != null) && __isset.success)
           {
-            tmp1412.Success = (global::Yaskawa.Ext.API.Any)this.Success.DeepCopy();
+            tmp1472.Success = (global::Yaskawa.Ext.API.Any)this.Success.DeepCopy();
           }
-          tmp1412.__isset.success = this.__isset.success;
+          tmp1472.__isset.success = this.__isset.success;
           if((E != null) && __isset.e)
           {
-            tmp1412.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1472.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1412.__isset.e = this.__isset.e;
-          return tmp1412;
+          tmp1472.__isset.e = this.__isset.e;
+          return tmp1472;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -14579,18 +16158,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1413 = new TStruct("getChartConfig_result");
-            await oprot.WriteStructBeginAsync(tmp1413, cancellationToken);
-            var tmp1414 = new TField();
+            var tmp1473 = new TStruct("getChartConfig_result");
+            await oprot.WriteStructBeginAsync(tmp1473, cancellationToken);
+            var tmp1474 = new TField();
 
             if(this.__isset.success)
             {
               if (Success != null)
               {
-                tmp1414.Name = "Success";
-                tmp1414.Type = TType.Struct;
-                tmp1414.ID = 0;
-                await oprot.WriteFieldBeginAsync(tmp1414, cancellationToken);
+                tmp1474.Name = "Success";
+                tmp1474.Type = TType.Struct;
+                tmp1474.ID = 0;
+                await oprot.WriteFieldBeginAsync(tmp1474, cancellationToken);
                 await Success.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -14599,10 +16178,10 @@ namespace Yaskawa.Ext.API
             {
               if (E != null)
               {
-                tmp1414.Name = "E";
-                tmp1414.Type = TType.Struct;
-                tmp1414.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1414, cancellationToken);
+                tmp1474.Name = "E";
+                tmp1474.Type = TType.Struct;
+                tmp1474.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1474, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -14641,22 +16220,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1415 = new StringBuilder("getChartConfig_result(");
-          int tmp1416 = 0;
+          var tmp1475 = new StringBuilder("getChartConfig_result(");
+          int tmp1476 = 0;
           if((Success != null) && __isset.success)
           {
-            if(0 < tmp1416++) { tmp1415.Append(", "); }
-            tmp1415.Append("Success: ");
-            Success.ToString(tmp1415);
+            if(0 < tmp1476++) { tmp1475.Append(", "); }
+            tmp1475.Append("Success: ");
+            Success.ToString(tmp1475);
           }
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1416++) { tmp1415.Append(", "); }
-            tmp1415.Append("E: ");
-            E.ToString(tmp1415);
+            if(0 < tmp1476++) { tmp1475.Append(", "); }
+            tmp1475.Append("E: ");
+            E.ToString(tmp1475);
           }
-          tmp1415.Append(')');
-          return tmp1415.ToString();
+          tmp1475.Append(')');
+          return tmp1475.ToString();
         }
       }
 
@@ -14736,28 +16315,28 @@ namespace Yaskawa.Ext.API
 
         public setChartData_args DeepCopy()
         {
-          var tmp1417 = new setChartData_args();
+          var tmp1477 = new setChartData_args();
           if(__isset.p)
           {
-            tmp1417.P = this.P;
+            tmp1477.P = this.P;
           }
-          tmp1417.__isset.p = this.__isset.p;
+          tmp1477.__isset.p = this.__isset.p;
           if((ChartID != null) && __isset.chartID)
           {
-            tmp1417.ChartID = this.ChartID;
+            tmp1477.ChartID = this.ChartID;
           }
-          tmp1417.__isset.chartID = this.__isset.chartID;
+          tmp1477.__isset.chartID = this.__isset.chartID;
           if((Dataset != null) && __isset.dataset)
           {
-            tmp1417.Dataset = this.Dataset.DeepCopy();
+            tmp1477.Dataset = this.Dataset.DeepCopy();
           }
-          tmp1417.__isset.dataset = this.__isset.dataset;
+          tmp1477.__isset.dataset = this.__isset.dataset;
           if(__isset.right)
           {
-            tmp1417.Right = this.Right;
+            tmp1477.Right = this.Right;
           }
-          tmp1417.__isset.right = this.__isset.right;
-          return tmp1417;
+          tmp1477.__isset.right = this.__isset.right;
+          return tmp1477;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -14801,16 +16380,16 @@ namespace Yaskawa.Ext.API
                   if (field.Type == TType.Map)
                   {
                     {
-                      var _map1418 = await iprot.ReadMapBeginAsync(cancellationToken);
-                      Dataset = new Dictionary<string, global::Yaskawa.Ext.API.Data>(_map1418.Count);
-                      for(int _i1419 = 0; _i1419 < _map1418.Count; ++_i1419)
+                      var _map1478 = await iprot.ReadMapBeginAsync(cancellationToken);
+                      Dataset = new Dictionary<string, global::Yaskawa.Ext.API.Data>(_map1478.Count);
+                      for(int _i1479 = 0; _i1479 < _map1478.Count; ++_i1479)
                       {
-                        string _key1420;
-                        global::Yaskawa.Ext.API.Data _val1421;
-                        _key1420 = await iprot.ReadStringAsync(cancellationToken);
-                        _val1421 = new global::Yaskawa.Ext.API.Data();
-                        await _val1421.ReadAsync(iprot, cancellationToken);
-                        Dataset[_key1420] = _val1421;
+                        string _key1480;
+                        global::Yaskawa.Ext.API.Data _val1481;
+                        _key1480 = await iprot.ReadStringAsync(cancellationToken);
+                        _val1481 = new global::Yaskawa.Ext.API.Data();
+                        await _val1481.ReadAsync(iprot, cancellationToken);
+                        Dataset[_key1480] = _val1481;
                       }
                       await iprot.ReadMapEndAsync(cancellationToken);
                     }
@@ -14851,48 +16430,48 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1422 = new TStruct("setChartData_args");
-            await oprot.WriteStructBeginAsync(tmp1422, cancellationToken);
-            var tmp1423 = new TField();
+            var tmp1482 = new TStruct("setChartData_args");
+            await oprot.WriteStructBeginAsync(tmp1482, cancellationToken);
+            var tmp1483 = new TField();
             if(__isset.p)
             {
-              tmp1423.Name = "p";
-              tmp1423.Type = TType.I64;
-              tmp1423.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1423, cancellationToken);
+              tmp1483.Name = "p";
+              tmp1483.Type = TType.I64;
+              tmp1483.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1483, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ChartID != null) && __isset.chartID)
             {
-              tmp1423.Name = "chartID";
-              tmp1423.Type = TType.String;
-              tmp1423.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1423, cancellationToken);
+              tmp1483.Name = "chartID";
+              tmp1483.Type = TType.String;
+              tmp1483.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1483, cancellationToken);
               await oprot.WriteStringAsync(ChartID, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Dataset != null) && __isset.dataset)
             {
-              tmp1423.Name = "dataset";
-              tmp1423.Type = TType.Map;
-              tmp1423.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1423, cancellationToken);
+              tmp1483.Name = "dataset";
+              tmp1483.Type = TType.Map;
+              tmp1483.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1483, cancellationToken);
               await oprot.WriteMapBeginAsync(new TMap(TType.String, TType.Struct, Dataset.Count), cancellationToken);
-              foreach (string _iter1424 in Dataset.Keys)
+              foreach (string _iter1484 in Dataset.Keys)
               {
-                await oprot.WriteStringAsync(_iter1424, cancellationToken);
-                await Dataset[_iter1424].WriteAsync(oprot, cancellationToken);
+                await oprot.WriteStringAsync(_iter1484, cancellationToken);
+                await Dataset[_iter1484].WriteAsync(oprot, cancellationToken);
               }
               await oprot.WriteMapEndAsync(cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if(__isset.right)
             {
-              tmp1423.Name = "right";
-              tmp1423.Type = TType.Bool;
-              tmp1423.ID = 4;
-              await oprot.WriteFieldBeginAsync(tmp1423, cancellationToken);
+              tmp1483.Name = "right";
+              tmp1483.Type = TType.Bool;
+              tmp1483.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1483, cancellationToken);
               await oprot.WriteBoolAsync(Right, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -14940,34 +16519,34 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1425 = new StringBuilder("setChartData_args(");
-          int tmp1426 = 0;
+          var tmp1485 = new StringBuilder("setChartData_args(");
+          int tmp1486 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1426++) { tmp1425.Append(", "); }
-            tmp1425.Append("P: ");
-            P.ToString(tmp1425);
+            if(0 < tmp1486++) { tmp1485.Append(", "); }
+            tmp1485.Append("P: ");
+            P.ToString(tmp1485);
           }
           if((ChartID != null) && __isset.chartID)
           {
-            if(0 < tmp1426++) { tmp1425.Append(", "); }
-            tmp1425.Append("ChartID: ");
-            ChartID.ToString(tmp1425);
+            if(0 < tmp1486++) { tmp1485.Append(", "); }
+            tmp1485.Append("ChartID: ");
+            ChartID.ToString(tmp1485);
           }
           if((Dataset != null) && __isset.dataset)
           {
-            if(0 < tmp1426++) { tmp1425.Append(", "); }
-            tmp1425.Append("Dataset: ");
-            Dataset.ToString(tmp1425);
+            if(0 < tmp1486++) { tmp1485.Append(", "); }
+            tmp1485.Append("Dataset: ");
+            Dataset.ToString(tmp1485);
           }
           if(__isset.right)
           {
-            if(0 < tmp1426++) { tmp1425.Append(", "); }
-            tmp1425.Append("Right: ");
-            Right.ToString(tmp1425);
+            if(0 < tmp1486++) { tmp1485.Append(", "); }
+            tmp1485.Append("Right: ");
+            Right.ToString(tmp1485);
           }
-          tmp1425.Append(')');
-          return tmp1425.ToString();
+          tmp1485.Append(')');
+          return tmp1485.ToString();
         }
       }
 
@@ -15002,13 +16581,13 @@ namespace Yaskawa.Ext.API
 
         public setChartData_result DeepCopy()
         {
-          var tmp1427 = new setChartData_result();
+          var tmp1487 = new setChartData_result();
           if((E != null) && __isset.e)
           {
-            tmp1427.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1487.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1427.__isset.e = this.__isset.e;
-          return tmp1427;
+          tmp1487.__isset.e = this.__isset.e;
+          return tmp1487;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -15060,18 +16639,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1428 = new TStruct("setChartData_result");
-            await oprot.WriteStructBeginAsync(tmp1428, cancellationToken);
-            var tmp1429 = new TField();
+            var tmp1488 = new TStruct("setChartData_result");
+            await oprot.WriteStructBeginAsync(tmp1488, cancellationToken);
+            var tmp1489 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1429.Name = "E";
-                tmp1429.Type = TType.Struct;
-                tmp1429.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1429, cancellationToken);
+                tmp1489.Name = "E";
+                tmp1489.Type = TType.Struct;
+                tmp1489.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1489, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -15105,16 +16684,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1430 = new StringBuilder("setChartData_result(");
-          int tmp1431 = 0;
+          var tmp1490 = new StringBuilder("setChartData_result(");
+          int tmp1491 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1431++) { tmp1430.Append(", "); }
-            tmp1430.Append("E: ");
-            E.ToString(tmp1430);
+            if(0 < tmp1491++) { tmp1490.Append(", "); }
+            tmp1490.Append("E: ");
+            E.ToString(tmp1490);
           }
-          tmp1430.Append(')');
-          return tmp1430.ToString();
+          tmp1490.Append(')');
+          return tmp1490.ToString();
         }
       }
 
@@ -15179,23 +16758,23 @@ namespace Yaskawa.Ext.API
 
         public getChartData_args DeepCopy()
         {
-          var tmp1432 = new getChartData_args();
+          var tmp1492 = new getChartData_args();
           if(__isset.p)
           {
-            tmp1432.P = this.P;
+            tmp1492.P = this.P;
           }
-          tmp1432.__isset.p = this.__isset.p;
+          tmp1492.__isset.p = this.__isset.p;
           if((ChartID != null) && __isset.chartID)
           {
-            tmp1432.ChartID = this.ChartID;
+            tmp1492.ChartID = this.ChartID;
           }
-          tmp1432.__isset.chartID = this.__isset.chartID;
+          tmp1492.__isset.chartID = this.__isset.chartID;
           if(__isset.right)
           {
-            tmp1432.Right = this.Right;
+            tmp1492.Right = this.Right;
           }
-          tmp1432.__isset.right = this.__isset.right;
-          return tmp1432;
+          tmp1492.__isset.right = this.__isset.right;
+          return tmp1492;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -15266,33 +16845,33 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1433 = new TStruct("getChartData_args");
-            await oprot.WriteStructBeginAsync(tmp1433, cancellationToken);
-            var tmp1434 = new TField();
+            var tmp1493 = new TStruct("getChartData_args");
+            await oprot.WriteStructBeginAsync(tmp1493, cancellationToken);
+            var tmp1494 = new TField();
             if(__isset.p)
             {
-              tmp1434.Name = "p";
-              tmp1434.Type = TType.I64;
-              tmp1434.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1434, cancellationToken);
+              tmp1494.Name = "p";
+              tmp1494.Type = TType.I64;
+              tmp1494.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1494, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ChartID != null) && __isset.chartID)
             {
-              tmp1434.Name = "chartID";
-              tmp1434.Type = TType.String;
-              tmp1434.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1434, cancellationToken);
+              tmp1494.Name = "chartID";
+              tmp1494.Type = TType.String;
+              tmp1494.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1494, cancellationToken);
               await oprot.WriteStringAsync(ChartID, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if(__isset.right)
             {
-              tmp1434.Name = "right";
-              tmp1434.Type = TType.Bool;
-              tmp1434.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1434, cancellationToken);
+              tmp1494.Name = "right";
+              tmp1494.Type = TType.Bool;
+              tmp1494.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1494, cancellationToken);
               await oprot.WriteBoolAsync(Right, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -15335,28 +16914,28 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1435 = new StringBuilder("getChartData_args(");
-          int tmp1436 = 0;
+          var tmp1495 = new StringBuilder("getChartData_args(");
+          int tmp1496 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1436++) { tmp1435.Append(", "); }
-            tmp1435.Append("P: ");
-            P.ToString(tmp1435);
+            if(0 < tmp1496++) { tmp1495.Append(", "); }
+            tmp1495.Append("P: ");
+            P.ToString(tmp1495);
           }
           if((ChartID != null) && __isset.chartID)
           {
-            if(0 < tmp1436++) { tmp1435.Append(", "); }
-            tmp1435.Append("ChartID: ");
-            ChartID.ToString(tmp1435);
+            if(0 < tmp1496++) { tmp1495.Append(", "); }
+            tmp1495.Append("ChartID: ");
+            ChartID.ToString(tmp1495);
           }
           if(__isset.right)
           {
-            if(0 < tmp1436++) { tmp1435.Append(", "); }
-            tmp1435.Append("Right: ");
-            Right.ToString(tmp1435);
+            if(0 < tmp1496++) { tmp1495.Append(", "); }
+            tmp1495.Append("Right: ");
+            Right.ToString(tmp1495);
           }
-          tmp1435.Append(')');
-          return tmp1435.ToString();
+          tmp1495.Append(')');
+          return tmp1495.ToString();
         }
       }
 
@@ -15406,18 +16985,18 @@ namespace Yaskawa.Ext.API
 
         public getChartData_result DeepCopy()
         {
-          var tmp1437 = new getChartData_result();
+          var tmp1497 = new getChartData_result();
           if((Success != null) && __isset.success)
           {
-            tmp1437.Success = this.Success.DeepCopy();
+            tmp1497.Success = this.Success.DeepCopy();
           }
-          tmp1437.__isset.success = this.__isset.success;
+          tmp1497.__isset.success = this.__isset.success;
           if((E != null) && __isset.e)
           {
-            tmp1437.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1497.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1437.__isset.e = this.__isset.e;
-          return tmp1437;
+          tmp1497.__isset.e = this.__isset.e;
+          return tmp1497;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -15441,16 +17020,16 @@ namespace Yaskawa.Ext.API
                   if (field.Type == TType.Map)
                   {
                     {
-                      var _map1438 = await iprot.ReadMapBeginAsync(cancellationToken);
-                      Success = new Dictionary<string, global::Yaskawa.Ext.API.Data>(_map1438.Count);
-                      for(int _i1439 = 0; _i1439 < _map1438.Count; ++_i1439)
+                      var _map1498 = await iprot.ReadMapBeginAsync(cancellationToken);
+                      Success = new Dictionary<string, global::Yaskawa.Ext.API.Data>(_map1498.Count);
+                      for(int _i1499 = 0; _i1499 < _map1498.Count; ++_i1499)
                       {
-                        string _key1440;
-                        global::Yaskawa.Ext.API.Data _val1441;
-                        _key1440 = await iprot.ReadStringAsync(cancellationToken);
-                        _val1441 = new global::Yaskawa.Ext.API.Data();
-                        await _val1441.ReadAsync(iprot, cancellationToken);
-                        Success[_key1440] = _val1441;
+                        string _key1500;
+                        global::Yaskawa.Ext.API.Data _val1501;
+                        _key1500 = await iprot.ReadStringAsync(cancellationToken);
+                        _val1501 = new global::Yaskawa.Ext.API.Data();
+                        await _val1501.ReadAsync(iprot, cancellationToken);
+                        Success[_key1500] = _val1501;
                       }
                       await iprot.ReadMapEndAsync(cancellationToken);
                     }
@@ -15492,23 +17071,23 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1442 = new TStruct("getChartData_result");
-            await oprot.WriteStructBeginAsync(tmp1442, cancellationToken);
-            var tmp1443 = new TField();
+            var tmp1502 = new TStruct("getChartData_result");
+            await oprot.WriteStructBeginAsync(tmp1502, cancellationToken);
+            var tmp1503 = new TField();
 
             if(this.__isset.success)
             {
               if (Success != null)
               {
-                tmp1443.Name = "Success";
-                tmp1443.Type = TType.Map;
-                tmp1443.ID = 0;
-                await oprot.WriteFieldBeginAsync(tmp1443, cancellationToken);
+                tmp1503.Name = "Success";
+                tmp1503.Type = TType.Map;
+                tmp1503.ID = 0;
+                await oprot.WriteFieldBeginAsync(tmp1503, cancellationToken);
                 await oprot.WriteMapBeginAsync(new TMap(TType.String, TType.Struct, Success.Count), cancellationToken);
-                foreach (string _iter1444 in Success.Keys)
+                foreach (string _iter1504 in Success.Keys)
                 {
-                  await oprot.WriteStringAsync(_iter1444, cancellationToken);
-                  await Success[_iter1444].WriteAsync(oprot, cancellationToken);
+                  await oprot.WriteStringAsync(_iter1504, cancellationToken);
+                  await Success[_iter1504].WriteAsync(oprot, cancellationToken);
                 }
                 await oprot.WriteMapEndAsync(cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
@@ -15518,10 +17097,10 @@ namespace Yaskawa.Ext.API
             {
               if (E != null)
               {
-                tmp1443.Name = "E";
-                tmp1443.Type = TType.Struct;
-                tmp1443.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1443, cancellationToken);
+                tmp1503.Name = "E";
+                tmp1503.Type = TType.Struct;
+                tmp1503.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1503, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -15560,22 +17139,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1445 = new StringBuilder("getChartData_result(");
-          int tmp1446 = 0;
+          var tmp1505 = new StringBuilder("getChartData_result(");
+          int tmp1506 = 0;
           if((Success != null) && __isset.success)
           {
-            if(0 < tmp1446++) { tmp1445.Append(", "); }
-            tmp1445.Append("Success: ");
-            Success.ToString(tmp1445);
+            if(0 < tmp1506++) { tmp1505.Append(", "); }
+            tmp1505.Append("Success: ");
+            Success.ToString(tmp1505);
           }
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1446++) { tmp1445.Append(", "); }
-            tmp1445.Append("E: ");
-            E.ToString(tmp1445);
+            if(0 < tmp1506++) { tmp1505.Append(", "); }
+            tmp1505.Append("E: ");
+            E.ToString(tmp1505);
           }
-          tmp1445.Append(')');
-          return tmp1445.ToString();
+          tmp1505.Append(')');
+          return tmp1505.ToString();
         }
       }
 
@@ -15670,33 +17249,33 @@ namespace Yaskawa.Ext.API
 
         public addChartKey_args DeepCopy()
         {
-          var tmp1447 = new addChartKey_args();
+          var tmp1507 = new addChartKey_args();
           if(__isset.p)
           {
-            tmp1447.P = this.P;
+            tmp1507.P = this.P;
           }
-          tmp1447.__isset.p = this.__isset.p;
+          tmp1507.__isset.p = this.__isset.p;
           if((ChartID != null) && __isset.chartID)
           {
-            tmp1447.ChartID = this.ChartID;
+            tmp1507.ChartID = this.ChartID;
           }
-          tmp1447.__isset.chartID = this.__isset.chartID;
+          tmp1507.__isset.chartID = this.__isset.chartID;
           if((Key != null) && __isset.key)
           {
-            tmp1447.Key = this.Key;
+            tmp1507.Key = this.Key;
           }
-          tmp1447.__isset.key = this.__isset.key;
+          tmp1507.__isset.key = this.__isset.key;
           if((Data != null) && __isset.data)
           {
-            tmp1447.Data = (global::Yaskawa.Ext.API.Data)this.Data.DeepCopy();
+            tmp1507.Data = (global::Yaskawa.Ext.API.Data)this.Data.DeepCopy();
           }
-          tmp1447.__isset.data = this.__isset.data;
+          tmp1507.__isset.data = this.__isset.data;
           if(__isset.right)
           {
-            tmp1447.Right = this.Right;
+            tmp1507.Right = this.Right;
           }
-          tmp1447.__isset.right = this.__isset.right;
-          return tmp1447;
+          tmp1507.__isset.right = this.__isset.right;
+          return tmp1507;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -15788,51 +17367,51 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1448 = new TStruct("addChartKey_args");
-            await oprot.WriteStructBeginAsync(tmp1448, cancellationToken);
-            var tmp1449 = new TField();
+            var tmp1508 = new TStruct("addChartKey_args");
+            await oprot.WriteStructBeginAsync(tmp1508, cancellationToken);
+            var tmp1509 = new TField();
             if(__isset.p)
             {
-              tmp1449.Name = "p";
-              tmp1449.Type = TType.I64;
-              tmp1449.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1449, cancellationToken);
+              tmp1509.Name = "p";
+              tmp1509.Type = TType.I64;
+              tmp1509.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1509, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ChartID != null) && __isset.chartID)
             {
-              tmp1449.Name = "chartID";
-              tmp1449.Type = TType.String;
-              tmp1449.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1449, cancellationToken);
+              tmp1509.Name = "chartID";
+              tmp1509.Type = TType.String;
+              tmp1509.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1509, cancellationToken);
               await oprot.WriteStringAsync(ChartID, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Key != null) && __isset.key)
             {
-              tmp1449.Name = "key";
-              tmp1449.Type = TType.String;
-              tmp1449.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1449, cancellationToken);
+              tmp1509.Name = "key";
+              tmp1509.Type = TType.String;
+              tmp1509.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1509, cancellationToken);
               await oprot.WriteStringAsync(Key, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Data != null) && __isset.data)
             {
-              tmp1449.Name = "data";
-              tmp1449.Type = TType.Struct;
-              tmp1449.ID = 4;
-              await oprot.WriteFieldBeginAsync(tmp1449, cancellationToken);
+              tmp1509.Name = "data";
+              tmp1509.Type = TType.Struct;
+              tmp1509.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1509, cancellationToken);
               await Data.WriteAsync(oprot, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if(__isset.right)
             {
-              tmp1449.Name = "right";
-              tmp1449.Type = TType.Bool;
-              tmp1449.ID = 5;
-              await oprot.WriteFieldBeginAsync(tmp1449, cancellationToken);
+              tmp1509.Name = "right";
+              tmp1509.Type = TType.Bool;
+              tmp1509.ID = 5;
+              await oprot.WriteFieldBeginAsync(tmp1509, cancellationToken);
               await oprot.WriteBoolAsync(Right, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -15885,40 +17464,40 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1450 = new StringBuilder("addChartKey_args(");
-          int tmp1451 = 0;
+          var tmp1510 = new StringBuilder("addChartKey_args(");
+          int tmp1511 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1451++) { tmp1450.Append(", "); }
-            tmp1450.Append("P: ");
-            P.ToString(tmp1450);
+            if(0 < tmp1511++) { tmp1510.Append(", "); }
+            tmp1510.Append("P: ");
+            P.ToString(tmp1510);
           }
           if((ChartID != null) && __isset.chartID)
           {
-            if(0 < tmp1451++) { tmp1450.Append(", "); }
-            tmp1450.Append("ChartID: ");
-            ChartID.ToString(tmp1450);
+            if(0 < tmp1511++) { tmp1510.Append(", "); }
+            tmp1510.Append("ChartID: ");
+            ChartID.ToString(tmp1510);
           }
           if((Key != null) && __isset.key)
           {
-            if(0 < tmp1451++) { tmp1450.Append(", "); }
-            tmp1450.Append("Key: ");
-            Key.ToString(tmp1450);
+            if(0 < tmp1511++) { tmp1510.Append(", "); }
+            tmp1510.Append("Key: ");
+            Key.ToString(tmp1510);
           }
           if((Data != null) && __isset.data)
           {
-            if(0 < tmp1451++) { tmp1450.Append(", "); }
-            tmp1450.Append("Data: ");
-            Data.ToString(tmp1450);
+            if(0 < tmp1511++) { tmp1510.Append(", "); }
+            tmp1510.Append("Data: ");
+            Data.ToString(tmp1510);
           }
           if(__isset.right)
           {
-            if(0 < tmp1451++) { tmp1450.Append(", "); }
-            tmp1450.Append("Right: ");
-            Right.ToString(tmp1450);
+            if(0 < tmp1511++) { tmp1510.Append(", "); }
+            tmp1510.Append("Right: ");
+            Right.ToString(tmp1510);
           }
-          tmp1450.Append(')');
-          return tmp1450.ToString();
+          tmp1510.Append(')');
+          return tmp1510.ToString();
         }
       }
 
@@ -15953,13 +17532,13 @@ namespace Yaskawa.Ext.API
 
         public addChartKey_result DeepCopy()
         {
-          var tmp1452 = new addChartKey_result();
+          var tmp1512 = new addChartKey_result();
           if((E != null) && __isset.e)
           {
-            tmp1452.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1512.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1452.__isset.e = this.__isset.e;
-          return tmp1452;
+          tmp1512.__isset.e = this.__isset.e;
+          return tmp1512;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -16011,18 +17590,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1453 = new TStruct("addChartKey_result");
-            await oprot.WriteStructBeginAsync(tmp1453, cancellationToken);
-            var tmp1454 = new TField();
+            var tmp1513 = new TStruct("addChartKey_result");
+            await oprot.WriteStructBeginAsync(tmp1513, cancellationToken);
+            var tmp1514 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1454.Name = "E";
-                tmp1454.Type = TType.Struct;
-                tmp1454.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1454, cancellationToken);
+                tmp1514.Name = "E";
+                tmp1514.Type = TType.Struct;
+                tmp1514.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1514, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -16056,16 +17635,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1455 = new StringBuilder("addChartKey_result(");
-          int tmp1456 = 0;
+          var tmp1515 = new StringBuilder("addChartKey_result(");
+          int tmp1516 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1456++) { tmp1455.Append(", "); }
-            tmp1455.Append("E: ");
-            E.ToString(tmp1455);
+            if(0 < tmp1516++) { tmp1515.Append(", "); }
+            tmp1515.Append("E: ");
+            E.ToString(tmp1515);
           }
-          tmp1455.Append(')');
-          return tmp1455.ToString();
+          tmp1515.Append(')');
+          return tmp1515.ToString();
         }
       }
 
@@ -16145,28 +17724,28 @@ namespace Yaskawa.Ext.API
 
         public removeChartKey_args DeepCopy()
         {
-          var tmp1457 = new removeChartKey_args();
+          var tmp1517 = new removeChartKey_args();
           if(__isset.p)
           {
-            tmp1457.P = this.P;
+            tmp1517.P = this.P;
           }
-          tmp1457.__isset.p = this.__isset.p;
+          tmp1517.__isset.p = this.__isset.p;
           if((ChartID != null) && __isset.chartID)
           {
-            tmp1457.ChartID = this.ChartID;
+            tmp1517.ChartID = this.ChartID;
           }
-          tmp1457.__isset.chartID = this.__isset.chartID;
+          tmp1517.__isset.chartID = this.__isset.chartID;
           if((Key != null) && __isset.key)
           {
-            tmp1457.Key = this.Key;
+            tmp1517.Key = this.Key;
           }
-          tmp1457.__isset.key = this.__isset.key;
+          tmp1517.__isset.key = this.__isset.key;
           if(__isset.right)
           {
-            tmp1457.Right = this.Right;
+            tmp1517.Right = this.Right;
           }
-          tmp1457.__isset.right = this.__isset.right;
-          return tmp1457;
+          tmp1517.__isset.right = this.__isset.right;
+          return tmp1517;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -16247,42 +17826,42 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1458 = new TStruct("removeChartKey_args");
-            await oprot.WriteStructBeginAsync(tmp1458, cancellationToken);
-            var tmp1459 = new TField();
+            var tmp1518 = new TStruct("removeChartKey_args");
+            await oprot.WriteStructBeginAsync(tmp1518, cancellationToken);
+            var tmp1519 = new TField();
             if(__isset.p)
             {
-              tmp1459.Name = "p";
-              tmp1459.Type = TType.I64;
-              tmp1459.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1459, cancellationToken);
+              tmp1519.Name = "p";
+              tmp1519.Type = TType.I64;
+              tmp1519.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1519, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ChartID != null) && __isset.chartID)
             {
-              tmp1459.Name = "chartID";
-              tmp1459.Type = TType.String;
-              tmp1459.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1459, cancellationToken);
+              tmp1519.Name = "chartID";
+              tmp1519.Type = TType.String;
+              tmp1519.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1519, cancellationToken);
               await oprot.WriteStringAsync(ChartID, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Key != null) && __isset.key)
             {
-              tmp1459.Name = "key";
-              tmp1459.Type = TType.String;
-              tmp1459.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1459, cancellationToken);
+              tmp1519.Name = "key";
+              tmp1519.Type = TType.String;
+              tmp1519.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1519, cancellationToken);
               await oprot.WriteStringAsync(Key, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if(__isset.right)
             {
-              tmp1459.Name = "right";
-              tmp1459.Type = TType.Bool;
-              tmp1459.ID = 4;
-              await oprot.WriteFieldBeginAsync(tmp1459, cancellationToken);
+              tmp1519.Name = "right";
+              tmp1519.Type = TType.Bool;
+              tmp1519.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1519, cancellationToken);
               await oprot.WriteBoolAsync(Right, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -16330,34 +17909,34 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1460 = new StringBuilder("removeChartKey_args(");
-          int tmp1461 = 0;
+          var tmp1520 = new StringBuilder("removeChartKey_args(");
+          int tmp1521 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1461++) { tmp1460.Append(", "); }
-            tmp1460.Append("P: ");
-            P.ToString(tmp1460);
+            if(0 < tmp1521++) { tmp1520.Append(", "); }
+            tmp1520.Append("P: ");
+            P.ToString(tmp1520);
           }
           if((ChartID != null) && __isset.chartID)
           {
-            if(0 < tmp1461++) { tmp1460.Append(", "); }
-            tmp1460.Append("ChartID: ");
-            ChartID.ToString(tmp1460);
+            if(0 < tmp1521++) { tmp1520.Append(", "); }
+            tmp1520.Append("ChartID: ");
+            ChartID.ToString(tmp1520);
           }
           if((Key != null) && __isset.key)
           {
-            if(0 < tmp1461++) { tmp1460.Append(", "); }
-            tmp1460.Append("Key: ");
-            Key.ToString(tmp1460);
+            if(0 < tmp1521++) { tmp1520.Append(", "); }
+            tmp1520.Append("Key: ");
+            Key.ToString(tmp1520);
           }
           if(__isset.right)
           {
-            if(0 < tmp1461++) { tmp1460.Append(", "); }
-            tmp1460.Append("Right: ");
-            Right.ToString(tmp1460);
+            if(0 < tmp1521++) { tmp1520.Append(", "); }
+            tmp1520.Append("Right: ");
+            Right.ToString(tmp1520);
           }
-          tmp1460.Append(')');
-          return tmp1460.ToString();
+          tmp1520.Append(')');
+          return tmp1520.ToString();
         }
       }
 
@@ -16392,13 +17971,13 @@ namespace Yaskawa.Ext.API
 
         public removeChartKey_result DeepCopy()
         {
-          var tmp1462 = new removeChartKey_result();
+          var tmp1522 = new removeChartKey_result();
           if((E != null) && __isset.e)
           {
-            tmp1462.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1522.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1462.__isset.e = this.__isset.e;
-          return tmp1462;
+          tmp1522.__isset.e = this.__isset.e;
+          return tmp1522;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -16450,18 +18029,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1463 = new TStruct("removeChartKey_result");
-            await oprot.WriteStructBeginAsync(tmp1463, cancellationToken);
-            var tmp1464 = new TField();
+            var tmp1523 = new TStruct("removeChartKey_result");
+            await oprot.WriteStructBeginAsync(tmp1523, cancellationToken);
+            var tmp1524 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1464.Name = "E";
-                tmp1464.Type = TType.Struct;
-                tmp1464.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1464, cancellationToken);
+                tmp1524.Name = "E";
+                tmp1524.Type = TType.Struct;
+                tmp1524.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1524, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -16495,16 +18074,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1465 = new StringBuilder("removeChartKey_result(");
-          int tmp1466 = 0;
+          var tmp1525 = new StringBuilder("removeChartKey_result(");
+          int tmp1526 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1466++) { tmp1465.Append(", "); }
-            tmp1465.Append("E: ");
-            E.ToString(tmp1465);
+            if(0 < tmp1526++) { tmp1525.Append(", "); }
+            tmp1525.Append("E: ");
+            E.ToString(tmp1525);
           }
-          tmp1465.Append(')');
-          return tmp1465.ToString();
+          tmp1525.Append(')');
+          return tmp1525.ToString();
         }
       }
 
@@ -16599,33 +18178,33 @@ namespace Yaskawa.Ext.API
 
         public hideChartKey_args DeepCopy()
         {
-          var tmp1467 = new hideChartKey_args();
+          var tmp1527 = new hideChartKey_args();
           if(__isset.p)
           {
-            tmp1467.P = this.P;
+            tmp1527.P = this.P;
           }
-          tmp1467.__isset.p = this.__isset.p;
+          tmp1527.__isset.p = this.__isset.p;
           if((ChartID != null) && __isset.chartID)
           {
-            tmp1467.ChartID = this.ChartID;
+            tmp1527.ChartID = this.ChartID;
           }
-          tmp1467.__isset.chartID = this.__isset.chartID;
+          tmp1527.__isset.chartID = this.__isset.chartID;
           if((Key != null) && __isset.key)
           {
-            tmp1467.Key = this.Key;
+            tmp1527.Key = this.Key;
           }
-          tmp1467.__isset.key = this.__isset.key;
+          tmp1527.__isset.key = this.__isset.key;
           if(__isset.hidden)
           {
-            tmp1467.Hidden = this.Hidden;
+            tmp1527.Hidden = this.Hidden;
           }
-          tmp1467.__isset.hidden = this.__isset.hidden;
+          tmp1527.__isset.hidden = this.__isset.hidden;
           if(__isset.right)
           {
-            tmp1467.Right = this.Right;
+            tmp1527.Right = this.Right;
           }
-          tmp1467.__isset.right = this.__isset.right;
-          return tmp1467;
+          tmp1527.__isset.right = this.__isset.right;
+          return tmp1527;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -16716,51 +18295,51 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1468 = new TStruct("hideChartKey_args");
-            await oprot.WriteStructBeginAsync(tmp1468, cancellationToken);
-            var tmp1469 = new TField();
+            var tmp1528 = new TStruct("hideChartKey_args");
+            await oprot.WriteStructBeginAsync(tmp1528, cancellationToken);
+            var tmp1529 = new TField();
             if(__isset.p)
             {
-              tmp1469.Name = "p";
-              tmp1469.Type = TType.I64;
-              tmp1469.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1469, cancellationToken);
+              tmp1529.Name = "p";
+              tmp1529.Type = TType.I64;
+              tmp1529.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1529, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ChartID != null) && __isset.chartID)
             {
-              tmp1469.Name = "chartID";
-              tmp1469.Type = TType.String;
-              tmp1469.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1469, cancellationToken);
+              tmp1529.Name = "chartID";
+              tmp1529.Type = TType.String;
+              tmp1529.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1529, cancellationToken);
               await oprot.WriteStringAsync(ChartID, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Key != null) && __isset.key)
             {
-              tmp1469.Name = "key";
-              tmp1469.Type = TType.String;
-              tmp1469.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1469, cancellationToken);
+              tmp1529.Name = "key";
+              tmp1529.Type = TType.String;
+              tmp1529.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1529, cancellationToken);
               await oprot.WriteStringAsync(Key, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if(__isset.hidden)
             {
-              tmp1469.Name = "hidden";
-              tmp1469.Type = TType.Bool;
-              tmp1469.ID = 4;
-              await oprot.WriteFieldBeginAsync(tmp1469, cancellationToken);
+              tmp1529.Name = "hidden";
+              tmp1529.Type = TType.Bool;
+              tmp1529.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1529, cancellationToken);
               await oprot.WriteBoolAsync(Hidden, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if(__isset.right)
             {
-              tmp1469.Name = "right";
-              tmp1469.Type = TType.Bool;
-              tmp1469.ID = 5;
-              await oprot.WriteFieldBeginAsync(tmp1469, cancellationToken);
+              tmp1529.Name = "right";
+              tmp1529.Type = TType.Bool;
+              tmp1529.ID = 5;
+              await oprot.WriteFieldBeginAsync(tmp1529, cancellationToken);
               await oprot.WriteBoolAsync(Right, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -16813,40 +18392,40 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1470 = new StringBuilder("hideChartKey_args(");
-          int tmp1471 = 0;
+          var tmp1530 = new StringBuilder("hideChartKey_args(");
+          int tmp1531 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1471++) { tmp1470.Append(", "); }
-            tmp1470.Append("P: ");
-            P.ToString(tmp1470);
+            if(0 < tmp1531++) { tmp1530.Append(", "); }
+            tmp1530.Append("P: ");
+            P.ToString(tmp1530);
           }
           if((ChartID != null) && __isset.chartID)
           {
-            if(0 < tmp1471++) { tmp1470.Append(", "); }
-            tmp1470.Append("ChartID: ");
-            ChartID.ToString(tmp1470);
+            if(0 < tmp1531++) { tmp1530.Append(", "); }
+            tmp1530.Append("ChartID: ");
+            ChartID.ToString(tmp1530);
           }
           if((Key != null) && __isset.key)
           {
-            if(0 < tmp1471++) { tmp1470.Append(", "); }
-            tmp1470.Append("Key: ");
-            Key.ToString(tmp1470);
+            if(0 < tmp1531++) { tmp1530.Append(", "); }
+            tmp1530.Append("Key: ");
+            Key.ToString(tmp1530);
           }
           if(__isset.hidden)
           {
-            if(0 < tmp1471++) { tmp1470.Append(", "); }
-            tmp1470.Append("Hidden: ");
-            Hidden.ToString(tmp1470);
+            if(0 < tmp1531++) { tmp1530.Append(", "); }
+            tmp1530.Append("Hidden: ");
+            Hidden.ToString(tmp1530);
           }
           if(__isset.right)
           {
-            if(0 < tmp1471++) { tmp1470.Append(", "); }
-            tmp1470.Append("Right: ");
-            Right.ToString(tmp1470);
+            if(0 < tmp1531++) { tmp1530.Append(", "); }
+            tmp1530.Append("Right: ");
+            Right.ToString(tmp1530);
           }
-          tmp1470.Append(')');
-          return tmp1470.ToString();
+          tmp1530.Append(')');
+          return tmp1530.ToString();
         }
       }
 
@@ -16881,13 +18460,13 @@ namespace Yaskawa.Ext.API
 
         public hideChartKey_result DeepCopy()
         {
-          var tmp1472 = new hideChartKey_result();
+          var tmp1532 = new hideChartKey_result();
           if((E != null) && __isset.e)
           {
-            tmp1472.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1532.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1472.__isset.e = this.__isset.e;
-          return tmp1472;
+          tmp1532.__isset.e = this.__isset.e;
+          return tmp1532;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -16939,18 +18518,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1473 = new TStruct("hideChartKey_result");
-            await oprot.WriteStructBeginAsync(tmp1473, cancellationToken);
-            var tmp1474 = new TField();
+            var tmp1533 = new TStruct("hideChartKey_result");
+            await oprot.WriteStructBeginAsync(tmp1533, cancellationToken);
+            var tmp1534 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1474.Name = "E";
-                tmp1474.Type = TType.Struct;
-                tmp1474.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1474, cancellationToken);
+                tmp1534.Name = "E";
+                tmp1534.Type = TType.Struct;
+                tmp1534.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1534, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -16984,16 +18563,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1475 = new StringBuilder("hideChartKey_result(");
-          int tmp1476 = 0;
+          var tmp1535 = new StringBuilder("hideChartKey_result(");
+          int tmp1536 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1476++) { tmp1475.Append(", "); }
-            tmp1475.Append("E: ");
-            E.ToString(tmp1475);
+            if(0 < tmp1536++) { tmp1535.Append(", "); }
+            tmp1535.Append("E: ");
+            E.ToString(tmp1535);
           }
-          tmp1475.Append(')');
-          return tmp1475.ToString();
+          tmp1535.Append(')');
+          return tmp1535.ToString();
         }
       }
 
@@ -17088,33 +18667,33 @@ namespace Yaskawa.Ext.API
 
         public appendChartPoints_args DeepCopy()
         {
-          var tmp1477 = new appendChartPoints_args();
+          var tmp1537 = new appendChartPoints_args();
           if(__isset.p)
           {
-            tmp1477.P = this.P;
+            tmp1537.P = this.P;
           }
-          tmp1477.__isset.p = this.__isset.p;
+          tmp1537.__isset.p = this.__isset.p;
           if((ChartID != null) && __isset.chartID)
           {
-            tmp1477.ChartID = this.ChartID;
+            tmp1537.ChartID = this.ChartID;
           }
-          tmp1477.__isset.chartID = this.__isset.chartID;
+          tmp1537.__isset.chartID = this.__isset.chartID;
           if((Key != null) && __isset.key)
           {
-            tmp1477.Key = this.Key;
+            tmp1537.Key = this.Key;
           }
-          tmp1477.__isset.key = this.__isset.key;
+          tmp1537.__isset.key = this.__isset.key;
           if((Points != null) && __isset.points)
           {
-            tmp1477.Points = this.Points.DeepCopy();
+            tmp1537.Points = this.Points.DeepCopy();
           }
-          tmp1477.__isset.points = this.__isset.points;
+          tmp1537.__isset.points = this.__isset.points;
           if(__isset.right)
           {
-            tmp1477.Right = this.Right;
+            tmp1537.Right = this.Right;
           }
-          tmp1477.__isset.right = this.__isset.right;
-          return tmp1477;
+          tmp1537.__isset.right = this.__isset.right;
+          return tmp1537;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -17168,14 +18747,14 @@ namespace Yaskawa.Ext.API
                   if (field.Type == TType.List)
                   {
                     {
-                      var _list1478 = await iprot.ReadListBeginAsync(cancellationToken);
-                      Points = new List<global::Yaskawa.Ext.API.DataPoint>(_list1478.Count);
-                      for(int _i1479 = 0; _i1479 < _list1478.Count; ++_i1479)
+                      var _list1538 = await iprot.ReadListBeginAsync(cancellationToken);
+                      Points = new List<global::Yaskawa.Ext.API.DataPoint>(_list1538.Count);
+                      for(int _i1539 = 0; _i1539 < _list1538.Count; ++_i1539)
                       {
-                        global::Yaskawa.Ext.API.DataPoint _elem1480;
-                        _elem1480 = new global::Yaskawa.Ext.API.DataPoint();
-                        await _elem1480.ReadAsync(iprot, cancellationToken);
-                        Points.Add(_elem1480);
+                        global::Yaskawa.Ext.API.DataPoint _elem1540;
+                        _elem1540 = new global::Yaskawa.Ext.API.DataPoint();
+                        await _elem1540.ReadAsync(iprot, cancellationToken);
+                        Points.Add(_elem1540);
                       }
                       await iprot.ReadListEndAsync(cancellationToken);
                     }
@@ -17216,56 +18795,56 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1481 = new TStruct("appendChartPoints_args");
-            await oprot.WriteStructBeginAsync(tmp1481, cancellationToken);
-            var tmp1482 = new TField();
+            var tmp1541 = new TStruct("appendChartPoints_args");
+            await oprot.WriteStructBeginAsync(tmp1541, cancellationToken);
+            var tmp1542 = new TField();
             if(__isset.p)
             {
-              tmp1482.Name = "p";
-              tmp1482.Type = TType.I64;
-              tmp1482.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1482, cancellationToken);
+              tmp1542.Name = "p";
+              tmp1542.Type = TType.I64;
+              tmp1542.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1542, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ChartID != null) && __isset.chartID)
             {
-              tmp1482.Name = "chartID";
-              tmp1482.Type = TType.String;
-              tmp1482.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1482, cancellationToken);
+              tmp1542.Name = "chartID";
+              tmp1542.Type = TType.String;
+              tmp1542.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1542, cancellationToken);
               await oprot.WriteStringAsync(ChartID, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Key != null) && __isset.key)
             {
-              tmp1482.Name = "key";
-              tmp1482.Type = TType.String;
-              tmp1482.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1482, cancellationToken);
+              tmp1542.Name = "key";
+              tmp1542.Type = TType.String;
+              tmp1542.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1542, cancellationToken);
               await oprot.WriteStringAsync(Key, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Points != null) && __isset.points)
             {
-              tmp1482.Name = "points";
-              tmp1482.Type = TType.List;
-              tmp1482.ID = 4;
-              await oprot.WriteFieldBeginAsync(tmp1482, cancellationToken);
+              tmp1542.Name = "points";
+              tmp1542.Type = TType.List;
+              tmp1542.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1542, cancellationToken);
               await oprot.WriteListBeginAsync(new TList(TType.Struct, Points.Count), cancellationToken);
-              foreach (global::Yaskawa.Ext.API.DataPoint _iter1483 in Points)
+              foreach (global::Yaskawa.Ext.API.DataPoint _iter1543 in Points)
               {
-                await _iter1483.WriteAsync(oprot, cancellationToken);
+                await _iter1543.WriteAsync(oprot, cancellationToken);
               }
               await oprot.WriteListEndAsync(cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if(__isset.right)
             {
-              tmp1482.Name = "right";
-              tmp1482.Type = TType.Bool;
-              tmp1482.ID = 5;
-              await oprot.WriteFieldBeginAsync(tmp1482, cancellationToken);
+              tmp1542.Name = "right";
+              tmp1542.Type = TType.Bool;
+              tmp1542.ID = 5;
+              await oprot.WriteFieldBeginAsync(tmp1542, cancellationToken);
               await oprot.WriteBoolAsync(Right, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -17318,40 +18897,40 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1484 = new StringBuilder("appendChartPoints_args(");
-          int tmp1485 = 0;
+          var tmp1544 = new StringBuilder("appendChartPoints_args(");
+          int tmp1545 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1485++) { tmp1484.Append(", "); }
-            tmp1484.Append("P: ");
-            P.ToString(tmp1484);
+            if(0 < tmp1545++) { tmp1544.Append(", "); }
+            tmp1544.Append("P: ");
+            P.ToString(tmp1544);
           }
           if((ChartID != null) && __isset.chartID)
           {
-            if(0 < tmp1485++) { tmp1484.Append(", "); }
-            tmp1484.Append("ChartID: ");
-            ChartID.ToString(tmp1484);
+            if(0 < tmp1545++) { tmp1544.Append(", "); }
+            tmp1544.Append("ChartID: ");
+            ChartID.ToString(tmp1544);
           }
           if((Key != null) && __isset.key)
           {
-            if(0 < tmp1485++) { tmp1484.Append(", "); }
-            tmp1484.Append("Key: ");
-            Key.ToString(tmp1484);
+            if(0 < tmp1545++) { tmp1544.Append(", "); }
+            tmp1544.Append("Key: ");
+            Key.ToString(tmp1544);
           }
           if((Points != null) && __isset.points)
           {
-            if(0 < tmp1485++) { tmp1484.Append(", "); }
-            tmp1484.Append("Points: ");
-            Points.ToString(tmp1484);
+            if(0 < tmp1545++) { tmp1544.Append(", "); }
+            tmp1544.Append("Points: ");
+            Points.ToString(tmp1544);
           }
           if(__isset.right)
           {
-            if(0 < tmp1485++) { tmp1484.Append(", "); }
-            tmp1484.Append("Right: ");
-            Right.ToString(tmp1484);
+            if(0 < tmp1545++) { tmp1544.Append(", "); }
+            tmp1544.Append("Right: ");
+            Right.ToString(tmp1544);
           }
-          tmp1484.Append(')');
-          return tmp1484.ToString();
+          tmp1544.Append(')');
+          return tmp1544.ToString();
         }
       }
 
@@ -17431,28 +19010,28 @@ namespace Yaskawa.Ext.API
 
         public incrementChartKey_args DeepCopy()
         {
-          var tmp1486 = new incrementChartKey_args();
+          var tmp1546 = new incrementChartKey_args();
           if(__isset.p)
           {
-            tmp1486.P = this.P;
+            tmp1546.P = this.P;
           }
-          tmp1486.__isset.p = this.__isset.p;
+          tmp1546.__isset.p = this.__isset.p;
           if((ChartID != null) && __isset.chartID)
           {
-            tmp1486.ChartID = this.ChartID;
+            tmp1546.ChartID = this.ChartID;
           }
-          tmp1486.__isset.chartID = this.__isset.chartID;
+          tmp1546.__isset.chartID = this.__isset.chartID;
           if((Key != null) && __isset.key)
           {
-            tmp1486.Key = this.Key;
+            tmp1546.Key = this.Key;
           }
-          tmp1486.__isset.key = this.__isset.key;
+          tmp1546.__isset.key = this.__isset.key;
           if(__isset.val)
           {
-            tmp1486.Val = this.Val;
+            tmp1546.Val = this.Val;
           }
-          tmp1486.__isset.val = this.__isset.val;
-          return tmp1486;
+          tmp1546.__isset.val = this.__isset.val;
+          return tmp1546;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -17533,42 +19112,42 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1487 = new TStruct("incrementChartKey_args");
-            await oprot.WriteStructBeginAsync(tmp1487, cancellationToken);
-            var tmp1488 = new TField();
+            var tmp1547 = new TStruct("incrementChartKey_args");
+            await oprot.WriteStructBeginAsync(tmp1547, cancellationToken);
+            var tmp1548 = new TField();
             if(__isset.p)
             {
-              tmp1488.Name = "p";
-              tmp1488.Type = TType.I64;
-              tmp1488.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1488, cancellationToken);
+              tmp1548.Name = "p";
+              tmp1548.Type = TType.I64;
+              tmp1548.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1548, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ChartID != null) && __isset.chartID)
             {
-              tmp1488.Name = "chartID";
-              tmp1488.Type = TType.String;
-              tmp1488.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1488, cancellationToken);
+              tmp1548.Name = "chartID";
+              tmp1548.Type = TType.String;
+              tmp1548.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1548, cancellationToken);
               await oprot.WriteStringAsync(ChartID, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Key != null) && __isset.key)
             {
-              tmp1488.Name = "key";
-              tmp1488.Type = TType.String;
-              tmp1488.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1488, cancellationToken);
+              tmp1548.Name = "key";
+              tmp1548.Type = TType.String;
+              tmp1548.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1548, cancellationToken);
               await oprot.WriteStringAsync(Key, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if(__isset.val)
             {
-              tmp1488.Name = "val";
-              tmp1488.Type = TType.Double;
-              tmp1488.ID = 4;
-              await oprot.WriteFieldBeginAsync(tmp1488, cancellationToken);
+              tmp1548.Name = "val";
+              tmp1548.Type = TType.Double;
+              tmp1548.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1548, cancellationToken);
               await oprot.WriteDoubleAsync(Val, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -17616,34 +19195,34 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1489 = new StringBuilder("incrementChartKey_args(");
-          int tmp1490 = 0;
+          var tmp1549 = new StringBuilder("incrementChartKey_args(");
+          int tmp1550 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1490++) { tmp1489.Append(", "); }
-            tmp1489.Append("P: ");
-            P.ToString(tmp1489);
+            if(0 < tmp1550++) { tmp1549.Append(", "); }
+            tmp1549.Append("P: ");
+            P.ToString(tmp1549);
           }
           if((ChartID != null) && __isset.chartID)
           {
-            if(0 < tmp1490++) { tmp1489.Append(", "); }
-            tmp1489.Append("ChartID: ");
-            ChartID.ToString(tmp1489);
+            if(0 < tmp1550++) { tmp1549.Append(", "); }
+            tmp1549.Append("ChartID: ");
+            ChartID.ToString(tmp1549);
           }
           if((Key != null) && __isset.key)
           {
-            if(0 < tmp1490++) { tmp1489.Append(", "); }
-            tmp1489.Append("Key: ");
-            Key.ToString(tmp1489);
+            if(0 < tmp1550++) { tmp1549.Append(", "); }
+            tmp1549.Append("Key: ");
+            Key.ToString(tmp1549);
           }
           if(__isset.val)
           {
-            if(0 < tmp1490++) { tmp1489.Append(", "); }
-            tmp1489.Append("Val: ");
-            Val.ToString(tmp1489);
+            if(0 < tmp1550++) { tmp1549.Append(", "); }
+            tmp1549.Append("Val: ");
+            Val.ToString(tmp1549);
           }
-          tmp1489.Append(')');
-          return tmp1489.ToString();
+          tmp1549.Append(')');
+          return tmp1549.ToString();
         }
       }
 
@@ -17678,13 +19257,13 @@ namespace Yaskawa.Ext.API
 
         public incrementChartKey_result DeepCopy()
         {
-          var tmp1491 = new incrementChartKey_result();
+          var tmp1551 = new incrementChartKey_result();
           if((E != null) && __isset.e)
           {
-            tmp1491.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1551.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1491.__isset.e = this.__isset.e;
-          return tmp1491;
+          tmp1551.__isset.e = this.__isset.e;
+          return tmp1551;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -17736,18 +19315,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1492 = new TStruct("incrementChartKey_result");
-            await oprot.WriteStructBeginAsync(tmp1492, cancellationToken);
-            var tmp1493 = new TField();
+            var tmp1552 = new TStruct("incrementChartKey_result");
+            await oprot.WriteStructBeginAsync(tmp1552, cancellationToken);
+            var tmp1553 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1493.Name = "E";
-                tmp1493.Type = TType.Struct;
-                tmp1493.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1493, cancellationToken);
+                tmp1553.Name = "E";
+                tmp1553.Type = TType.Struct;
+                tmp1553.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1553, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -17781,16 +19360,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1494 = new StringBuilder("incrementChartKey_result(");
-          int tmp1495 = 0;
+          var tmp1554 = new StringBuilder("incrementChartKey_result(");
+          int tmp1555 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1495++) { tmp1494.Append(", "); }
-            tmp1494.Append("E: ");
-            E.ToString(tmp1494);
+            if(0 < tmp1555++) { tmp1554.Append(", "); }
+            tmp1554.Append("E: ");
+            E.ToString(tmp1554);
           }
-          tmp1494.Append(')');
-          return tmp1494.ToString();
+          tmp1554.Append(')');
+          return tmp1554.ToString();
         }
       }
 
@@ -17855,23 +19434,23 @@ namespace Yaskawa.Ext.API
 
         public exportChartImage_args DeepCopy()
         {
-          var tmp1496 = new exportChartImage_args();
+          var tmp1556 = new exportChartImage_args();
           if(__isset.p)
           {
-            tmp1496.P = this.P;
+            tmp1556.P = this.P;
           }
-          tmp1496.__isset.p = this.__isset.p;
+          tmp1556.__isset.p = this.__isset.p;
           if((ChartID != null) && __isset.chartID)
           {
-            tmp1496.ChartID = this.ChartID;
+            tmp1556.ChartID = this.ChartID;
           }
-          tmp1496.__isset.chartID = this.__isset.chartID;
+          tmp1556.__isset.chartID = this.__isset.chartID;
           if((ImageFileName != null) && __isset.imageFileName)
           {
-            tmp1496.ImageFileName = this.ImageFileName;
+            tmp1556.ImageFileName = this.ImageFileName;
           }
-          tmp1496.__isset.imageFileName = this.__isset.imageFileName;
-          return tmp1496;
+          tmp1556.__isset.imageFileName = this.__isset.imageFileName;
+          return tmp1556;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -17942,33 +19521,33 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1497 = new TStruct("exportChartImage_args");
-            await oprot.WriteStructBeginAsync(tmp1497, cancellationToken);
-            var tmp1498 = new TField();
+            var tmp1557 = new TStruct("exportChartImage_args");
+            await oprot.WriteStructBeginAsync(tmp1557, cancellationToken);
+            var tmp1558 = new TField();
             if(__isset.p)
             {
-              tmp1498.Name = "p";
-              tmp1498.Type = TType.I64;
-              tmp1498.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1498, cancellationToken);
+              tmp1558.Name = "p";
+              tmp1558.Type = TType.I64;
+              tmp1558.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1558, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ChartID != null) && __isset.chartID)
             {
-              tmp1498.Name = "chartID";
-              tmp1498.Type = TType.String;
-              tmp1498.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1498, cancellationToken);
+              tmp1558.Name = "chartID";
+              tmp1558.Type = TType.String;
+              tmp1558.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1558, cancellationToken);
               await oprot.WriteStringAsync(ChartID, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ImageFileName != null) && __isset.imageFileName)
             {
-              tmp1498.Name = "imageFileName";
-              tmp1498.Type = TType.String;
-              tmp1498.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1498, cancellationToken);
+              tmp1558.Name = "imageFileName";
+              tmp1558.Type = TType.String;
+              tmp1558.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1558, cancellationToken);
               await oprot.WriteStringAsync(ImageFileName, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -18011,28 +19590,28 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1499 = new StringBuilder("exportChartImage_args(");
-          int tmp1500 = 0;
+          var tmp1559 = new StringBuilder("exportChartImage_args(");
+          int tmp1560 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1500++) { tmp1499.Append(", "); }
-            tmp1499.Append("P: ");
-            P.ToString(tmp1499);
+            if(0 < tmp1560++) { tmp1559.Append(", "); }
+            tmp1559.Append("P: ");
+            P.ToString(tmp1559);
           }
           if((ChartID != null) && __isset.chartID)
           {
-            if(0 < tmp1500++) { tmp1499.Append(", "); }
-            tmp1499.Append("ChartID: ");
-            ChartID.ToString(tmp1499);
+            if(0 < tmp1560++) { tmp1559.Append(", "); }
+            tmp1559.Append("ChartID: ");
+            ChartID.ToString(tmp1559);
           }
           if((ImageFileName != null) && __isset.imageFileName)
           {
-            if(0 < tmp1500++) { tmp1499.Append(", "); }
-            tmp1499.Append("ImageFileName: ");
-            ImageFileName.ToString(tmp1499);
+            if(0 < tmp1560++) { tmp1559.Append(", "); }
+            tmp1559.Append("ImageFileName: ");
+            ImageFileName.ToString(tmp1559);
           }
-          tmp1499.Append(')');
-          return tmp1499.ToString();
+          tmp1559.Append(')');
+          return tmp1559.ToString();
         }
       }
 
@@ -18082,18 +19661,18 @@ namespace Yaskawa.Ext.API
 
         public exportChartImage_result DeepCopy()
         {
-          var tmp1501 = new exportChartImage_result();
+          var tmp1561 = new exportChartImage_result();
           if((Success != null) && __isset.success)
           {
-            tmp1501.Success = this.Success;
+            tmp1561.Success = this.Success;
           }
-          tmp1501.__isset.success = this.__isset.success;
+          tmp1561.__isset.success = this.__isset.success;
           if((E != null) && __isset.e)
           {
-            tmp1501.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1561.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1501.__isset.e = this.__isset.e;
-          return tmp1501;
+          tmp1561.__isset.e = this.__isset.e;
+          return tmp1561;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -18155,18 +19734,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1502 = new TStruct("exportChartImage_result");
-            await oprot.WriteStructBeginAsync(tmp1502, cancellationToken);
-            var tmp1503 = new TField();
+            var tmp1562 = new TStruct("exportChartImage_result");
+            await oprot.WriteStructBeginAsync(tmp1562, cancellationToken);
+            var tmp1563 = new TField();
 
             if(this.__isset.success)
             {
               if (Success != null)
               {
-                tmp1503.Name = "Success";
-                tmp1503.Type = TType.String;
-                tmp1503.ID = 0;
-                await oprot.WriteFieldBeginAsync(tmp1503, cancellationToken);
+                tmp1563.Name = "Success";
+                tmp1563.Type = TType.String;
+                tmp1563.ID = 0;
+                await oprot.WriteFieldBeginAsync(tmp1563, cancellationToken);
                 await oprot.WriteStringAsync(Success, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -18175,10 +19754,10 @@ namespace Yaskawa.Ext.API
             {
               if (E != null)
               {
-                tmp1503.Name = "E";
-                tmp1503.Type = TType.Struct;
-                tmp1503.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1503, cancellationToken);
+                tmp1563.Name = "E";
+                tmp1563.Type = TType.Struct;
+                tmp1563.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1563, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -18217,22 +19796,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1504 = new StringBuilder("exportChartImage_result(");
-          int tmp1505 = 0;
+          var tmp1564 = new StringBuilder("exportChartImage_result(");
+          int tmp1565 = 0;
           if((Success != null) && __isset.success)
           {
-            if(0 < tmp1505++) { tmp1504.Append(", "); }
-            tmp1504.Append("Success: ");
-            Success.ToString(tmp1504);
+            if(0 < tmp1565++) { tmp1564.Append(", "); }
+            tmp1564.Append("Success: ");
+            Success.ToString(tmp1564);
           }
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1505++) { tmp1504.Append(", "); }
-            tmp1504.Append("E: ");
-            E.ToString(tmp1504);
+            if(0 < tmp1565++) { tmp1564.Append(", "); }
+            tmp1564.Append("E: ");
+            E.ToString(tmp1564);
           }
-          tmp1504.Append(')');
-          return tmp1504.ToString();
+          tmp1564.Append(')');
+          return tmp1564.ToString();
         }
       }
 
@@ -18297,23 +19876,23 @@ namespace Yaskawa.Ext.API
 
         public exportChartImageData_args DeepCopy()
         {
-          var tmp1506 = new exportChartImageData_args();
+          var tmp1566 = new exportChartImageData_args();
           if(__isset.p)
           {
-            tmp1506.P = this.P;
+            tmp1566.P = this.P;
           }
-          tmp1506.__isset.p = this.__isset.p;
+          tmp1566.__isset.p = this.__isset.p;
           if((ChartID != null) && __isset.chartID)
           {
-            tmp1506.ChartID = this.ChartID;
+            tmp1566.ChartID = this.ChartID;
           }
-          tmp1506.__isset.chartID = this.__isset.chartID;
+          tmp1566.__isset.chartID = this.__isset.chartID;
           if((ImageFileName != null) && __isset.imageFileName)
           {
-            tmp1506.ImageFileName = this.ImageFileName;
+            tmp1566.ImageFileName = this.ImageFileName;
           }
-          tmp1506.__isset.imageFileName = this.__isset.imageFileName;
-          return tmp1506;
+          tmp1566.__isset.imageFileName = this.__isset.imageFileName;
+          return tmp1566;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -18384,33 +19963,33 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1507 = new TStruct("exportChartImageData_args");
-            await oprot.WriteStructBeginAsync(tmp1507, cancellationToken);
-            var tmp1508 = new TField();
+            var tmp1567 = new TStruct("exportChartImageData_args");
+            await oprot.WriteStructBeginAsync(tmp1567, cancellationToken);
+            var tmp1568 = new TField();
             if(__isset.p)
             {
-              tmp1508.Name = "p";
-              tmp1508.Type = TType.I64;
-              tmp1508.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1508, cancellationToken);
+              tmp1568.Name = "p";
+              tmp1568.Type = TType.I64;
+              tmp1568.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1568, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ChartID != null) && __isset.chartID)
             {
-              tmp1508.Name = "chartID";
-              tmp1508.Type = TType.String;
-              tmp1508.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1508, cancellationToken);
+              tmp1568.Name = "chartID";
+              tmp1568.Type = TType.String;
+              tmp1568.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1568, cancellationToken);
               await oprot.WriteStringAsync(ChartID, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((ImageFileName != null) && __isset.imageFileName)
             {
-              tmp1508.Name = "imageFileName";
-              tmp1508.Type = TType.String;
-              tmp1508.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1508, cancellationToken);
+              tmp1568.Name = "imageFileName";
+              tmp1568.Type = TType.String;
+              tmp1568.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1568, cancellationToken);
               await oprot.WriteStringAsync(ImageFileName, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -18453,28 +20032,28 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1509 = new StringBuilder("exportChartImageData_args(");
-          int tmp1510 = 0;
+          var tmp1569 = new StringBuilder("exportChartImageData_args(");
+          int tmp1570 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1510++) { tmp1509.Append(", "); }
-            tmp1509.Append("P: ");
-            P.ToString(tmp1509);
+            if(0 < tmp1570++) { tmp1569.Append(", "); }
+            tmp1569.Append("P: ");
+            P.ToString(tmp1569);
           }
           if((ChartID != null) && __isset.chartID)
           {
-            if(0 < tmp1510++) { tmp1509.Append(", "); }
-            tmp1509.Append("ChartID: ");
-            ChartID.ToString(tmp1509);
+            if(0 < tmp1570++) { tmp1569.Append(", "); }
+            tmp1569.Append("ChartID: ");
+            ChartID.ToString(tmp1569);
           }
           if((ImageFileName != null) && __isset.imageFileName)
           {
-            if(0 < tmp1510++) { tmp1509.Append(", "); }
-            tmp1509.Append("ImageFileName: ");
-            ImageFileName.ToString(tmp1509);
+            if(0 < tmp1570++) { tmp1569.Append(", "); }
+            tmp1569.Append("ImageFileName: ");
+            ImageFileName.ToString(tmp1569);
           }
-          tmp1509.Append(')');
-          return tmp1509.ToString();
+          tmp1569.Append(')');
+          return tmp1569.ToString();
         }
       }
 
@@ -18524,18 +20103,18 @@ namespace Yaskawa.Ext.API
 
         public exportChartImageData_result DeepCopy()
         {
-          var tmp1511 = new exportChartImageData_result();
+          var tmp1571 = new exportChartImageData_result();
           if((Success != null) && __isset.success)
           {
-            tmp1511.Success = this.Success.ToArray();
+            tmp1571.Success = this.Success.ToArray();
           }
-          tmp1511.__isset.success = this.__isset.success;
+          tmp1571.__isset.success = this.__isset.success;
           if((E != null) && __isset.e)
           {
-            tmp1511.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1571.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1511.__isset.e = this.__isset.e;
-          return tmp1511;
+          tmp1571.__isset.e = this.__isset.e;
+          return tmp1571;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -18597,18 +20176,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1512 = new TStruct("exportChartImageData_result");
-            await oprot.WriteStructBeginAsync(tmp1512, cancellationToken);
-            var tmp1513 = new TField();
+            var tmp1572 = new TStruct("exportChartImageData_result");
+            await oprot.WriteStructBeginAsync(tmp1572, cancellationToken);
+            var tmp1573 = new TField();
 
             if(this.__isset.success)
             {
               if (Success != null)
               {
-                tmp1513.Name = "Success";
-                tmp1513.Type = TType.String;
-                tmp1513.ID = 0;
-                await oprot.WriteFieldBeginAsync(tmp1513, cancellationToken);
+                tmp1573.Name = "Success";
+                tmp1573.Type = TType.String;
+                tmp1573.ID = 0;
+                await oprot.WriteFieldBeginAsync(tmp1573, cancellationToken);
                 await oprot.WriteBinaryAsync(Success, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -18617,10 +20196,10 @@ namespace Yaskawa.Ext.API
             {
               if (E != null)
               {
-                tmp1513.Name = "E";
-                tmp1513.Type = TType.Struct;
-                tmp1513.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1513, cancellationToken);
+                tmp1573.Name = "E";
+                tmp1573.Type = TType.Struct;
+                tmp1573.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1573, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -18659,22 +20238,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1514 = new StringBuilder("exportChartImageData_result(");
-          int tmp1515 = 0;
+          var tmp1574 = new StringBuilder("exportChartImageData_result(");
+          int tmp1575 = 0;
           if((Success != null) && __isset.success)
           {
-            if(0 < tmp1515++) { tmp1514.Append(", "); }
-            tmp1514.Append("Success: ");
-            Success.ToString(tmp1514);
+            if(0 < tmp1575++) { tmp1574.Append(", "); }
+            tmp1574.Append("Success: ");
+            Success.ToString(tmp1574);
           }
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1515++) { tmp1514.Append(", "); }
-            tmp1514.Append("E: ");
-            E.ToString(tmp1514);
+            if(0 < tmp1575++) { tmp1574.Append(", "); }
+            tmp1574.Append("E: ");
+            E.ToString(tmp1574);
           }
-          tmp1514.Append(')');
-          return tmp1514.ToString();
+          tmp1574.Append(')');
+          return tmp1574.ToString();
         }
       }
 
@@ -18754,28 +20333,28 @@ namespace Yaskawa.Ext.API
 
         public notice_args DeepCopy()
         {
-          var tmp1516 = new notice_args();
+          var tmp1576 = new notice_args();
           if(__isset.p)
           {
-            tmp1516.P = this.P;
+            tmp1576.P = this.P;
           }
-          tmp1516.__isset.p = this.__isset.p;
+          tmp1576.__isset.p = this.__isset.p;
           if((Title != null) && __isset.title)
           {
-            tmp1516.Title = this.Title;
+            tmp1576.Title = this.Title;
           }
-          tmp1516.__isset.title = this.__isset.title;
+          tmp1576.__isset.title = this.__isset.title;
           if((Message != null) && __isset.message)
           {
-            tmp1516.Message = this.Message;
+            tmp1576.Message = this.Message;
           }
-          tmp1516.__isset.message = this.__isset.message;
+          tmp1576.__isset.message = this.__isset.message;
           if((Log != null) && __isset.log)
           {
-            tmp1516.Log = this.Log;
+            tmp1576.Log = this.Log;
           }
-          tmp1516.__isset.log = this.__isset.log;
-          return tmp1516;
+          tmp1576.__isset.log = this.__isset.log;
+          return tmp1576;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -18856,42 +20435,42 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1517 = new TStruct("notice_args");
-            await oprot.WriteStructBeginAsync(tmp1517, cancellationToken);
-            var tmp1518 = new TField();
+            var tmp1577 = new TStruct("notice_args");
+            await oprot.WriteStructBeginAsync(tmp1577, cancellationToken);
+            var tmp1578 = new TField();
             if(__isset.p)
             {
-              tmp1518.Name = "p";
-              tmp1518.Type = TType.I64;
-              tmp1518.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1518, cancellationToken);
+              tmp1578.Name = "p";
+              tmp1578.Type = TType.I64;
+              tmp1578.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1578, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Title != null) && __isset.title)
             {
-              tmp1518.Name = "title";
-              tmp1518.Type = TType.String;
-              tmp1518.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1518, cancellationToken);
+              tmp1578.Name = "title";
+              tmp1578.Type = TType.String;
+              tmp1578.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1578, cancellationToken);
               await oprot.WriteStringAsync(Title, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Message != null) && __isset.message)
             {
-              tmp1518.Name = "message";
-              tmp1518.Type = TType.String;
-              tmp1518.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1518, cancellationToken);
+              tmp1578.Name = "message";
+              tmp1578.Type = TType.String;
+              tmp1578.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1578, cancellationToken);
               await oprot.WriteStringAsync(Message, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Log != null) && __isset.log)
             {
-              tmp1518.Name = "log";
-              tmp1518.Type = TType.String;
-              tmp1518.ID = 4;
-              await oprot.WriteFieldBeginAsync(tmp1518, cancellationToken);
+              tmp1578.Name = "log";
+              tmp1578.Type = TType.String;
+              tmp1578.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1578, cancellationToken);
               await oprot.WriteStringAsync(Log, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -18939,34 +20518,34 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1519 = new StringBuilder("notice_args(");
-          int tmp1520 = 0;
+          var tmp1579 = new StringBuilder("notice_args(");
+          int tmp1580 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1520++) { tmp1519.Append(", "); }
-            tmp1519.Append("P: ");
-            P.ToString(tmp1519);
+            if(0 < tmp1580++) { tmp1579.Append(", "); }
+            tmp1579.Append("P: ");
+            P.ToString(tmp1579);
           }
           if((Title != null) && __isset.title)
           {
-            if(0 < tmp1520++) { tmp1519.Append(", "); }
-            tmp1519.Append("Title: ");
-            Title.ToString(tmp1519);
+            if(0 < tmp1580++) { tmp1579.Append(", "); }
+            tmp1579.Append("Title: ");
+            Title.ToString(tmp1579);
           }
           if((Message != null) && __isset.message)
           {
-            if(0 < tmp1520++) { tmp1519.Append(", "); }
-            tmp1519.Append("Message: ");
-            Message.ToString(tmp1519);
+            if(0 < tmp1580++) { tmp1579.Append(", "); }
+            tmp1579.Append("Message: ");
+            Message.ToString(tmp1579);
           }
           if((Log != null) && __isset.log)
           {
-            if(0 < tmp1520++) { tmp1519.Append(", "); }
-            tmp1519.Append("Log: ");
-            Log.ToString(tmp1519);
+            if(0 < tmp1580++) { tmp1579.Append(", "); }
+            tmp1579.Append("Log: ");
+            Log.ToString(tmp1579);
           }
-          tmp1519.Append(')');
-          return tmp1519.ToString();
+          tmp1579.Append(')');
+          return tmp1579.ToString();
         }
       }
 
@@ -19065,33 +20644,33 @@ namespace Yaskawa.Ext.API
 
         public dispNotice_args DeepCopy()
         {
-          var tmp1521 = new dispNotice_args();
+          var tmp1581 = new dispNotice_args();
           if(__isset.p)
           {
-            tmp1521.P = this.P;
+            tmp1581.P = this.P;
           }
-          tmp1521.__isset.p = this.__isset.p;
+          tmp1581.__isset.p = this.__isset.p;
           if(__isset.disposition)
           {
-            tmp1521.Disposition = this.Disposition;
+            tmp1581.Disposition = this.Disposition;
           }
-          tmp1521.__isset.disposition = this.__isset.disposition;
+          tmp1581.__isset.disposition = this.__isset.disposition;
           if((Title != null) && __isset.title)
           {
-            tmp1521.Title = this.Title;
+            tmp1581.Title = this.Title;
           }
-          tmp1521.__isset.title = this.__isset.title;
+          tmp1581.__isset.title = this.__isset.title;
           if((Message != null) && __isset.message)
           {
-            tmp1521.Message = this.Message;
+            tmp1581.Message = this.Message;
           }
-          tmp1521.__isset.message = this.__isset.message;
+          tmp1581.__isset.message = this.__isset.message;
           if((Log != null) && __isset.log)
           {
-            tmp1521.Log = this.Log;
+            tmp1581.Log = this.Log;
           }
-          tmp1521.__isset.log = this.__isset.log;
-          return tmp1521;
+          tmp1581.__isset.log = this.__isset.log;
+          return tmp1581;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -19182,51 +20761,51 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1522 = new TStruct("dispNotice_args");
-            await oprot.WriteStructBeginAsync(tmp1522, cancellationToken);
-            var tmp1523 = new TField();
+            var tmp1582 = new TStruct("dispNotice_args");
+            await oprot.WriteStructBeginAsync(tmp1582, cancellationToken);
+            var tmp1583 = new TField();
             if(__isset.p)
             {
-              tmp1523.Name = "p";
-              tmp1523.Type = TType.I64;
-              tmp1523.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1523, cancellationToken);
+              tmp1583.Name = "p";
+              tmp1583.Type = TType.I64;
+              tmp1583.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1583, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if(__isset.disposition)
             {
-              tmp1523.Name = "disposition";
-              tmp1523.Type = TType.I32;
-              tmp1523.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1523, cancellationToken);
+              tmp1583.Name = "disposition";
+              tmp1583.Type = TType.I32;
+              tmp1583.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1583, cancellationToken);
               await oprot.WriteI32Async((int)Disposition, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Title != null) && __isset.title)
             {
-              tmp1523.Name = "title";
-              tmp1523.Type = TType.String;
-              tmp1523.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1523, cancellationToken);
+              tmp1583.Name = "title";
+              tmp1583.Type = TType.String;
+              tmp1583.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1583, cancellationToken);
               await oprot.WriteStringAsync(Title, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Message != null) && __isset.message)
             {
-              tmp1523.Name = "message";
-              tmp1523.Type = TType.String;
-              tmp1523.ID = 4;
-              await oprot.WriteFieldBeginAsync(tmp1523, cancellationToken);
+              tmp1583.Name = "message";
+              tmp1583.Type = TType.String;
+              tmp1583.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1583, cancellationToken);
               await oprot.WriteStringAsync(Message, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Log != null) && __isset.log)
             {
-              tmp1523.Name = "log";
-              tmp1523.Type = TType.String;
-              tmp1523.ID = 5;
-              await oprot.WriteFieldBeginAsync(tmp1523, cancellationToken);
+              tmp1583.Name = "log";
+              tmp1583.Type = TType.String;
+              tmp1583.ID = 5;
+              await oprot.WriteFieldBeginAsync(tmp1583, cancellationToken);
               await oprot.WriteStringAsync(Log, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -19279,40 +20858,40 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1524 = new StringBuilder("dispNotice_args(");
-          int tmp1525 = 0;
+          var tmp1584 = new StringBuilder("dispNotice_args(");
+          int tmp1585 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1525++) { tmp1524.Append(", "); }
-            tmp1524.Append("P: ");
-            P.ToString(tmp1524);
+            if(0 < tmp1585++) { tmp1584.Append(", "); }
+            tmp1584.Append("P: ");
+            P.ToString(tmp1584);
           }
           if(__isset.disposition)
           {
-            if(0 < tmp1525++) { tmp1524.Append(", "); }
-            tmp1524.Append("Disposition: ");
-            Disposition.ToString(tmp1524);
+            if(0 < tmp1585++) { tmp1584.Append(", "); }
+            tmp1584.Append("Disposition: ");
+            Disposition.ToString(tmp1584);
           }
           if((Title != null) && __isset.title)
           {
-            if(0 < tmp1525++) { tmp1524.Append(", "); }
-            tmp1524.Append("Title: ");
-            Title.ToString(tmp1524);
+            if(0 < tmp1585++) { tmp1584.Append(", "); }
+            tmp1584.Append("Title: ");
+            Title.ToString(tmp1584);
           }
           if((Message != null) && __isset.message)
           {
-            if(0 < tmp1525++) { tmp1524.Append(", "); }
-            tmp1524.Append("Message: ");
-            Message.ToString(tmp1524);
+            if(0 < tmp1585++) { tmp1584.Append(", "); }
+            tmp1584.Append("Message: ");
+            Message.ToString(tmp1584);
           }
           if((Log != null) && __isset.log)
           {
-            if(0 < tmp1525++) { tmp1524.Append(", "); }
-            tmp1524.Append("Log: ");
-            Log.ToString(tmp1524);
+            if(0 < tmp1585++) { tmp1584.Append(", "); }
+            tmp1584.Append("Log: ");
+            Log.ToString(tmp1584);
           }
-          tmp1524.Append(')');
-          return tmp1524.ToString();
+          tmp1584.Append(')');
+          return tmp1584.ToString();
         }
       }
 
@@ -19392,28 +20971,28 @@ namespace Yaskawa.Ext.API
 
         public error_args DeepCopy()
         {
-          var tmp1526 = new error_args();
+          var tmp1586 = new error_args();
           if(__isset.p)
           {
-            tmp1526.P = this.P;
+            tmp1586.P = this.P;
           }
-          tmp1526.__isset.p = this.__isset.p;
+          tmp1586.__isset.p = this.__isset.p;
           if((Title != null) && __isset.title)
           {
-            tmp1526.Title = this.Title;
+            tmp1586.Title = this.Title;
           }
-          tmp1526.__isset.title = this.__isset.title;
+          tmp1586.__isset.title = this.__isset.title;
           if((Message != null) && __isset.message)
           {
-            tmp1526.Message = this.Message;
+            tmp1586.Message = this.Message;
           }
-          tmp1526.__isset.message = this.__isset.message;
+          tmp1586.__isset.message = this.__isset.message;
           if((Log != null) && __isset.log)
           {
-            tmp1526.Log = this.Log;
+            tmp1586.Log = this.Log;
           }
-          tmp1526.__isset.log = this.__isset.log;
-          return tmp1526;
+          tmp1586.__isset.log = this.__isset.log;
+          return tmp1586;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -19494,42 +21073,42 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1527 = new TStruct("error_args");
-            await oprot.WriteStructBeginAsync(tmp1527, cancellationToken);
-            var tmp1528 = new TField();
+            var tmp1587 = new TStruct("error_args");
+            await oprot.WriteStructBeginAsync(tmp1587, cancellationToken);
+            var tmp1588 = new TField();
             if(__isset.p)
             {
-              tmp1528.Name = "p";
-              tmp1528.Type = TType.I64;
-              tmp1528.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1528, cancellationToken);
+              tmp1588.Name = "p";
+              tmp1588.Type = TType.I64;
+              tmp1588.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1588, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Title != null) && __isset.title)
             {
-              tmp1528.Name = "title";
-              tmp1528.Type = TType.String;
-              tmp1528.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1528, cancellationToken);
+              tmp1588.Name = "title";
+              tmp1588.Type = TType.String;
+              tmp1588.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1588, cancellationToken);
               await oprot.WriteStringAsync(Title, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Message != null) && __isset.message)
             {
-              tmp1528.Name = "message";
-              tmp1528.Type = TType.String;
-              tmp1528.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1528, cancellationToken);
+              tmp1588.Name = "message";
+              tmp1588.Type = TType.String;
+              tmp1588.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1588, cancellationToken);
               await oprot.WriteStringAsync(Message, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Log != null) && __isset.log)
             {
-              tmp1528.Name = "log";
-              tmp1528.Type = TType.String;
-              tmp1528.ID = 4;
-              await oprot.WriteFieldBeginAsync(tmp1528, cancellationToken);
+              tmp1588.Name = "log";
+              tmp1588.Type = TType.String;
+              tmp1588.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1588, cancellationToken);
               await oprot.WriteStringAsync(Log, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -19577,34 +21156,34 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1529 = new StringBuilder("error_args(");
-          int tmp1530 = 0;
+          var tmp1589 = new StringBuilder("error_args(");
+          int tmp1590 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1530++) { tmp1529.Append(", "); }
-            tmp1529.Append("P: ");
-            P.ToString(tmp1529);
+            if(0 < tmp1590++) { tmp1589.Append(", "); }
+            tmp1589.Append("P: ");
+            P.ToString(tmp1589);
           }
           if((Title != null) && __isset.title)
           {
-            if(0 < tmp1530++) { tmp1529.Append(", "); }
-            tmp1529.Append("Title: ");
-            Title.ToString(tmp1529);
+            if(0 < tmp1590++) { tmp1589.Append(", "); }
+            tmp1589.Append("Title: ");
+            Title.ToString(tmp1589);
           }
           if((Message != null) && __isset.message)
           {
-            if(0 < tmp1530++) { tmp1529.Append(", "); }
-            tmp1529.Append("Message: ");
-            Message.ToString(tmp1529);
+            if(0 < tmp1590++) { tmp1589.Append(", "); }
+            tmp1589.Append("Message: ");
+            Message.ToString(tmp1589);
           }
           if((Log != null) && __isset.log)
           {
-            if(0 < tmp1530++) { tmp1529.Append(", "); }
-            tmp1529.Append("Log: ");
-            Log.ToString(tmp1529);
+            if(0 < tmp1590++) { tmp1589.Append(", "); }
+            tmp1589.Append("Log: ");
+            Log.ToString(tmp1589);
           }
-          tmp1529.Append(')');
-          return tmp1529.ToString();
+          tmp1589.Append(')');
+          return tmp1589.ToString();
         }
       }
 
@@ -19714,38 +21293,38 @@ namespace Yaskawa.Ext.API
 
         public popupDialog_args DeepCopy()
         {
-          var tmp1531 = new popupDialog_args();
+          var tmp1591 = new popupDialog_args();
           if(__isset.p)
           {
-            tmp1531.P = this.P;
+            tmp1591.P = this.P;
           }
-          tmp1531.__isset.p = this.__isset.p;
+          tmp1591.__isset.p = this.__isset.p;
           if((Identifier != null) && __isset.identifier)
           {
-            tmp1531.Identifier = this.Identifier;
+            tmp1591.Identifier = this.Identifier;
           }
-          tmp1531.__isset.identifier = this.__isset.identifier;
+          tmp1591.__isset.identifier = this.__isset.identifier;
           if((Title != null) && __isset.title)
           {
-            tmp1531.Title = this.Title;
+            tmp1591.Title = this.Title;
           }
-          tmp1531.__isset.title = this.__isset.title;
+          tmp1591.__isset.title = this.__isset.title;
           if((Message != null) && __isset.message)
           {
-            tmp1531.Message = this.Message;
+            tmp1591.Message = this.Message;
           }
-          tmp1531.__isset.message = this.__isset.message;
+          tmp1591.__isset.message = this.__isset.message;
           if((PositiveOption != null) && __isset.positiveOption)
           {
-            tmp1531.PositiveOption = this.PositiveOption;
+            tmp1591.PositiveOption = this.PositiveOption;
           }
-          tmp1531.__isset.positiveOption = this.__isset.positiveOption;
+          tmp1591.__isset.positiveOption = this.__isset.positiveOption;
           if((NegativeOption != null) && __isset.negativeOption)
           {
-            tmp1531.NegativeOption = this.NegativeOption;
+            tmp1591.NegativeOption = this.NegativeOption;
           }
-          tmp1531.__isset.negativeOption = this.__isset.negativeOption;
-          return tmp1531;
+          tmp1591.__isset.negativeOption = this.__isset.negativeOption;
+          return tmp1591;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -19846,60 +21425,60 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1532 = new TStruct("popupDialog_args");
-            await oprot.WriteStructBeginAsync(tmp1532, cancellationToken);
-            var tmp1533 = new TField();
+            var tmp1592 = new TStruct("popupDialog_args");
+            await oprot.WriteStructBeginAsync(tmp1592, cancellationToken);
+            var tmp1593 = new TField();
             if(__isset.p)
             {
-              tmp1533.Name = "p";
-              tmp1533.Type = TType.I64;
-              tmp1533.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1533, cancellationToken);
+              tmp1593.Name = "p";
+              tmp1593.Type = TType.I64;
+              tmp1593.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1593, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Identifier != null) && __isset.identifier)
             {
-              tmp1533.Name = "identifier";
-              tmp1533.Type = TType.String;
-              tmp1533.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1533, cancellationToken);
+              tmp1593.Name = "identifier";
+              tmp1593.Type = TType.String;
+              tmp1593.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1593, cancellationToken);
               await oprot.WriteStringAsync(Identifier, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Title != null) && __isset.title)
             {
-              tmp1533.Name = "title";
-              tmp1533.Type = TType.String;
-              tmp1533.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1533, cancellationToken);
+              tmp1593.Name = "title";
+              tmp1593.Type = TType.String;
+              tmp1593.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1593, cancellationToken);
               await oprot.WriteStringAsync(Title, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Message != null) && __isset.message)
             {
-              tmp1533.Name = "message";
-              tmp1533.Type = TType.String;
-              tmp1533.ID = 4;
-              await oprot.WriteFieldBeginAsync(tmp1533, cancellationToken);
+              tmp1593.Name = "message";
+              tmp1593.Type = TType.String;
+              tmp1593.ID = 4;
+              await oprot.WriteFieldBeginAsync(tmp1593, cancellationToken);
               await oprot.WriteStringAsync(Message, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((PositiveOption != null) && __isset.positiveOption)
             {
-              tmp1533.Name = "positiveOption";
-              tmp1533.Type = TType.String;
-              tmp1533.ID = 5;
-              await oprot.WriteFieldBeginAsync(tmp1533, cancellationToken);
+              tmp1593.Name = "positiveOption";
+              tmp1593.Type = TType.String;
+              tmp1593.ID = 5;
+              await oprot.WriteFieldBeginAsync(tmp1593, cancellationToken);
               await oprot.WriteStringAsync(PositiveOption, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((NegativeOption != null) && __isset.negativeOption)
             {
-              tmp1533.Name = "negativeOption";
-              tmp1533.Type = TType.String;
-              tmp1533.ID = 6;
-              await oprot.WriteFieldBeginAsync(tmp1533, cancellationToken);
+              tmp1593.Name = "negativeOption";
+              tmp1593.Type = TType.String;
+              tmp1593.ID = 6;
+              await oprot.WriteFieldBeginAsync(tmp1593, cancellationToken);
               await oprot.WriteStringAsync(NegativeOption, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -19957,46 +21536,46 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1534 = new StringBuilder("popupDialog_args(");
-          int tmp1535 = 0;
+          var tmp1594 = new StringBuilder("popupDialog_args(");
+          int tmp1595 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1535++) { tmp1534.Append(", "); }
-            tmp1534.Append("P: ");
-            P.ToString(tmp1534);
+            if(0 < tmp1595++) { tmp1594.Append(", "); }
+            tmp1594.Append("P: ");
+            P.ToString(tmp1594);
           }
           if((Identifier != null) && __isset.identifier)
           {
-            if(0 < tmp1535++) { tmp1534.Append(", "); }
-            tmp1534.Append("Identifier: ");
-            Identifier.ToString(tmp1534);
+            if(0 < tmp1595++) { tmp1594.Append(", "); }
+            tmp1594.Append("Identifier: ");
+            Identifier.ToString(tmp1594);
           }
           if((Title != null) && __isset.title)
           {
-            if(0 < tmp1535++) { tmp1534.Append(", "); }
-            tmp1534.Append("Title: ");
-            Title.ToString(tmp1534);
+            if(0 < tmp1595++) { tmp1594.Append(", "); }
+            tmp1594.Append("Title: ");
+            Title.ToString(tmp1594);
           }
           if((Message != null) && __isset.message)
           {
-            if(0 < tmp1535++) { tmp1534.Append(", "); }
-            tmp1534.Append("Message: ");
-            Message.ToString(tmp1534);
+            if(0 < tmp1595++) { tmp1594.Append(", "); }
+            tmp1594.Append("Message: ");
+            Message.ToString(tmp1594);
           }
           if((PositiveOption != null) && __isset.positiveOption)
           {
-            if(0 < tmp1535++) { tmp1534.Append(", "); }
-            tmp1534.Append("PositiveOption: ");
-            PositiveOption.ToString(tmp1534);
+            if(0 < tmp1595++) { tmp1594.Append(", "); }
+            tmp1594.Append("PositiveOption: ");
+            PositiveOption.ToString(tmp1594);
           }
           if((NegativeOption != null) && __isset.negativeOption)
           {
-            if(0 < tmp1535++) { tmp1534.Append(", "); }
-            tmp1534.Append("NegativeOption: ");
-            NegativeOption.ToString(tmp1534);
+            if(0 < tmp1595++) { tmp1594.Append(", "); }
+            tmp1594.Append("NegativeOption: ");
+            NegativeOption.ToString(tmp1594);
           }
-          tmp1534.Append(')');
-          return tmp1534.ToString();
+          tmp1594.Append(')');
+          return tmp1594.ToString();
         }
       }
 
@@ -20031,13 +21610,13 @@ namespace Yaskawa.Ext.API
 
         public popupDialog_result DeepCopy()
         {
-          var tmp1536 = new popupDialog_result();
+          var tmp1596 = new popupDialog_result();
           if((E != null) && __isset.e)
           {
-            tmp1536.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
+            tmp1596.E = (global::Yaskawa.Ext.API.IllegalArgument)this.E.DeepCopy();
           }
-          tmp1536.__isset.e = this.__isset.e;
-          return tmp1536;
+          tmp1596.__isset.e = this.__isset.e;
+          return tmp1596;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -20089,18 +21668,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1537 = new TStruct("popupDialog_result");
-            await oprot.WriteStructBeginAsync(tmp1537, cancellationToken);
-            var tmp1538 = new TField();
+            var tmp1597 = new TStruct("popupDialog_result");
+            await oprot.WriteStructBeginAsync(tmp1597, cancellationToken);
+            var tmp1598 = new TField();
 
             if(this.__isset.e)
             {
               if (E != null)
               {
-                tmp1538.Name = "E";
-                tmp1538.Type = TType.Struct;
-                tmp1538.ID = 1;
-                await oprot.WriteFieldBeginAsync(tmp1538, cancellationToken);
+                tmp1598.Name = "E";
+                tmp1598.Type = TType.Struct;
+                tmp1598.ID = 1;
+                await oprot.WriteFieldBeginAsync(tmp1598, cancellationToken);
                 await E.WriteAsync(oprot, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -20134,16 +21713,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1539 = new StringBuilder("popupDialog_result(");
-          int tmp1540 = 0;
+          var tmp1599 = new StringBuilder("popupDialog_result(");
+          int tmp1600 = 0;
           if((E != null) && __isset.e)
           {
-            if(0 < tmp1540++) { tmp1539.Append(", "); }
-            tmp1539.Append("E: ");
-            E.ToString(tmp1539);
+            if(0 < tmp1600++) { tmp1599.Append(", "); }
+            tmp1599.Append("E: ");
+            E.ToString(tmp1599);
           }
-          tmp1539.Append(')');
-          return tmp1539.ToString();
+          tmp1599.Append(')');
+          return tmp1599.ToString();
         }
       }
 
@@ -20193,18 +21772,18 @@ namespace Yaskawa.Ext.API
 
         public cancelPopupDialog_args DeepCopy()
         {
-          var tmp1541 = new cancelPopupDialog_args();
+          var tmp1601 = new cancelPopupDialog_args();
           if(__isset.p)
           {
-            tmp1541.P = this.P;
+            tmp1601.P = this.P;
           }
-          tmp1541.__isset.p = this.__isset.p;
+          tmp1601.__isset.p = this.__isset.p;
           if((Identifier != null) && __isset.identifier)
           {
-            tmp1541.Identifier = this.Identifier;
+            tmp1601.Identifier = this.Identifier;
           }
-          tmp1541.__isset.identifier = this.__isset.identifier;
-          return tmp1541;
+          tmp1601.__isset.identifier = this.__isset.identifier;
+          return tmp1601;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -20265,24 +21844,24 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1542 = new TStruct("cancelPopupDialog_args");
-            await oprot.WriteStructBeginAsync(tmp1542, cancellationToken);
-            var tmp1543 = new TField();
+            var tmp1602 = new TStruct("cancelPopupDialog_args");
+            await oprot.WriteStructBeginAsync(tmp1602, cancellationToken);
+            var tmp1603 = new TField();
             if(__isset.p)
             {
-              tmp1543.Name = "p";
-              tmp1543.Type = TType.I64;
-              tmp1543.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1543, cancellationToken);
+              tmp1603.Name = "p";
+              tmp1603.Type = TType.I64;
+              tmp1603.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1603, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Identifier != null) && __isset.identifier)
             {
-              tmp1543.Name = "identifier";
-              tmp1543.Type = TType.String;
-              tmp1543.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1543, cancellationToken);
+              tmp1603.Name = "identifier";
+              tmp1603.Type = TType.String;
+              tmp1603.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1603, cancellationToken);
               await oprot.WriteStringAsync(Identifier, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -20320,22 +21899,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1544 = new StringBuilder("cancelPopupDialog_args(");
-          int tmp1545 = 0;
+          var tmp1604 = new StringBuilder("cancelPopupDialog_args(");
+          int tmp1605 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1545++) { tmp1544.Append(", "); }
-            tmp1544.Append("P: ");
-            P.ToString(tmp1544);
+            if(0 < tmp1605++) { tmp1604.Append(", "); }
+            tmp1604.Append("P: ");
+            P.ToString(tmp1604);
           }
           if((Identifier != null) && __isset.identifier)
           {
-            if(0 < tmp1545++) { tmp1544.Append(", "); }
-            tmp1544.Append("Identifier: ");
-            Identifier.ToString(tmp1544);
+            if(0 < tmp1605++) { tmp1604.Append(", "); }
+            tmp1604.Append("Identifier: ");
+            Identifier.ToString(tmp1604);
           }
-          tmp1544.Append(')');
-          return tmp1544.ToString();
+          tmp1604.Append(')');
+          return tmp1604.ToString();
         }
       }
 
@@ -20349,8 +21928,8 @@ namespace Yaskawa.Ext.API
 
         public cancelPopupDialog_result DeepCopy()
         {
-          var tmp1546 = new cancelPopupDialog_result();
-          return tmp1546;
+          var tmp1606 = new cancelPopupDialog_result();
+          return tmp1606;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -20391,8 +21970,8 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1547 = new TStruct("cancelPopupDialog_result");
-            await oprot.WriteStructBeginAsync(tmp1547, cancellationToken);
+            var tmp1607 = new TStruct("cancelPopupDialog_result");
+            await oprot.WriteStructBeginAsync(tmp1607, cancellationToken);
             await oprot.WriteFieldStopAsync(cancellationToken);
             await oprot.WriteStructEndAsync(cancellationToken);
           }
@@ -20418,9 +21997,9 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1548 = new StringBuilder("cancelPopupDialog_result(");
-          tmp1548.Append(')');
-          return tmp1548.ToString();
+          var tmp1608 = new StringBuilder("cancelPopupDialog_result(");
+          tmp1608.Append(')');
+          return tmp1608.ToString();
         }
       }
 
@@ -20470,18 +22049,18 @@ namespace Yaskawa.Ext.API
 
         public insertInstructionAtSelectedLine_args DeepCopy()
         {
-          var tmp1550 = new insertInstructionAtSelectedLine_args();
+          var tmp1610 = new insertInstructionAtSelectedLine_args();
           if(__isset.p)
           {
-            tmp1550.P = this.P;
+            tmp1610.P = this.P;
           }
-          tmp1550.__isset.p = this.__isset.p;
+          tmp1610.__isset.p = this.__isset.p;
           if((Instruction != null) && __isset.instruction)
           {
-            tmp1550.Instruction = this.Instruction;
+            tmp1610.Instruction = this.Instruction;
           }
-          tmp1550.__isset.instruction = this.__isset.instruction;
-          return tmp1550;
+          tmp1610.__isset.instruction = this.__isset.instruction;
+          return tmp1610;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -20542,24 +22121,24 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1551 = new TStruct("insertInstructionAtSelectedLine_args");
-            await oprot.WriteStructBeginAsync(tmp1551, cancellationToken);
-            var tmp1552 = new TField();
+            var tmp1611 = new TStruct("insertInstructionAtSelectedLine_args");
+            await oprot.WriteStructBeginAsync(tmp1611, cancellationToken);
+            var tmp1612 = new TField();
             if(__isset.p)
             {
-              tmp1552.Name = "p";
-              tmp1552.Type = TType.I64;
-              tmp1552.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1552, cancellationToken);
+              tmp1612.Name = "p";
+              tmp1612.Type = TType.I64;
+              tmp1612.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1612, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Instruction != null) && __isset.instruction)
             {
-              tmp1552.Name = "instruction";
-              tmp1552.Type = TType.String;
-              tmp1552.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1552, cancellationToken);
+              tmp1612.Name = "instruction";
+              tmp1612.Type = TType.String;
+              tmp1612.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1612, cancellationToken);
               await oprot.WriteStringAsync(Instruction, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -20597,22 +22176,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1553 = new StringBuilder("insertInstructionAtSelectedLine_args(");
-          int tmp1554 = 0;
+          var tmp1613 = new StringBuilder("insertInstructionAtSelectedLine_args(");
+          int tmp1614 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1554++) { tmp1553.Append(", "); }
-            tmp1553.Append("P: ");
-            P.ToString(tmp1553);
+            if(0 < tmp1614++) { tmp1613.Append(", "); }
+            tmp1613.Append("P: ");
+            P.ToString(tmp1613);
           }
           if((Instruction != null) && __isset.instruction)
           {
-            if(0 < tmp1554++) { tmp1553.Append(", "); }
-            tmp1553.Append("Instruction: ");
-            Instruction.ToString(tmp1553);
+            if(0 < tmp1614++) { tmp1613.Append(", "); }
+            tmp1613.Append("Instruction: ");
+            Instruction.ToString(tmp1613);
           }
-          tmp1553.Append(')');
-          return tmp1553.ToString();
+          tmp1613.Append(')');
+          return tmp1613.ToString();
         }
       }
 
@@ -20647,13 +22226,13 @@ namespace Yaskawa.Ext.API
 
         public insertInstructionAtSelectedLine_result DeepCopy()
         {
-          var tmp1555 = new insertInstructionAtSelectedLine_result();
+          var tmp1615 = new insertInstructionAtSelectedLine_result();
           if((Success != null) && __isset.success)
           {
-            tmp1555.Success = this.Success;
+            tmp1615.Success = this.Success;
           }
-          tmp1555.__isset.success = this.__isset.success;
-          return tmp1555;
+          tmp1615.__isset.success = this.__isset.success;
+          return tmp1615;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -20704,18 +22283,18 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1556 = new TStruct("insertInstructionAtSelectedLine_result");
-            await oprot.WriteStructBeginAsync(tmp1556, cancellationToken);
-            var tmp1557 = new TField();
+            var tmp1616 = new TStruct("insertInstructionAtSelectedLine_result");
+            await oprot.WriteStructBeginAsync(tmp1616, cancellationToken);
+            var tmp1617 = new TField();
 
             if(this.__isset.success)
             {
               if (Success != null)
               {
-                tmp1557.Name = "Success";
-                tmp1557.Type = TType.String;
-                tmp1557.ID = 0;
-                await oprot.WriteFieldBeginAsync(tmp1557, cancellationToken);
+                tmp1617.Name = "Success";
+                tmp1617.Type = TType.String;
+                tmp1617.ID = 0;
+                await oprot.WriteFieldBeginAsync(tmp1617, cancellationToken);
                 await oprot.WriteStringAsync(Success, cancellationToken);
                 await oprot.WriteFieldEndAsync(cancellationToken);
               }
@@ -20749,16 +22328,16 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1558 = new StringBuilder("insertInstructionAtSelectedLine_result(");
-          int tmp1559 = 0;
+          var tmp1618 = new StringBuilder("insertInstructionAtSelectedLine_result(");
+          int tmp1619 = 0;
           if((Success != null) && __isset.success)
           {
-            if(0 < tmp1559++) { tmp1558.Append(", "); }
-            tmp1558.Append("Success: ");
-            Success.ToString(tmp1558);
+            if(0 < tmp1619++) { tmp1618.Append(", "); }
+            tmp1618.Append("Success: ");
+            Success.ToString(tmp1618);
           }
-          tmp1558.Append(')');
-          return tmp1558.ToString();
+          tmp1618.Append(')');
+          return tmp1618.ToString();
         }
       }
 
@@ -20808,18 +22387,18 @@ namespace Yaskawa.Ext.API
 
         public displayScreen_args DeepCopy()
         {
-          var tmp1560 = new displayScreen_args();
+          var tmp1620 = new displayScreen_args();
           if(__isset.p)
           {
-            tmp1560.P = this.P;
+            tmp1620.P = this.P;
           }
-          tmp1560.__isset.p = this.__isset.p;
+          tmp1620.__isset.p = this.__isset.p;
           if((Identifier != null) && __isset.identifier)
           {
-            tmp1560.Identifier = this.Identifier;
+            tmp1620.Identifier = this.Identifier;
           }
-          tmp1560.__isset.identifier = this.__isset.identifier;
-          return tmp1560;
+          tmp1620.__isset.identifier = this.__isset.identifier;
+          return tmp1620;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -20880,24 +22459,24 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1561 = new TStruct("displayScreen_args");
-            await oprot.WriteStructBeginAsync(tmp1561, cancellationToken);
-            var tmp1562 = new TField();
+            var tmp1621 = new TStruct("displayScreen_args");
+            await oprot.WriteStructBeginAsync(tmp1621, cancellationToken);
+            var tmp1622 = new TField();
             if(__isset.p)
             {
-              tmp1562.Name = "p";
-              tmp1562.Type = TType.I64;
-              tmp1562.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1562, cancellationToken);
+              tmp1622.Name = "p";
+              tmp1622.Type = TType.I64;
+              tmp1622.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1622, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Identifier != null) && __isset.identifier)
             {
-              tmp1562.Name = "identifier";
-              tmp1562.Type = TType.String;
-              tmp1562.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1562, cancellationToken);
+              tmp1622.Name = "identifier";
+              tmp1622.Type = TType.String;
+              tmp1622.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1622, cancellationToken);
               await oprot.WriteStringAsync(Identifier, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -20935,22 +22514,22 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1563 = new StringBuilder("displayScreen_args(");
-          int tmp1564 = 0;
+          var tmp1623 = new StringBuilder("displayScreen_args(");
+          int tmp1624 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1564++) { tmp1563.Append(", "); }
-            tmp1563.Append("P: ");
-            P.ToString(tmp1563);
+            if(0 < tmp1624++) { tmp1623.Append(", "); }
+            tmp1623.Append("P: ");
+            P.ToString(tmp1623);
           }
           if((Identifier != null) && __isset.identifier)
           {
-            if(0 < tmp1564++) { tmp1563.Append(", "); }
-            tmp1563.Append("Identifier: ");
-            Identifier.ToString(tmp1563);
+            if(0 < tmp1624++) { tmp1623.Append(", "); }
+            tmp1623.Append("Identifier: ");
+            Identifier.ToString(tmp1623);
           }
-          tmp1563.Append(')');
-          return tmp1563.ToString();
+          tmp1623.Append(')');
+          return tmp1623.ToString();
         }
       }
 
@@ -20964,8 +22543,8 @@ namespace Yaskawa.Ext.API
 
         public displayScreen_result DeepCopy()
         {
-          var tmp1565 = new displayScreen_result();
-          return tmp1565;
+          var tmp1625 = new displayScreen_result();
+          return tmp1625;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -21006,8 +22585,8 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1566 = new TStruct("displayScreen_result");
-            await oprot.WriteStructBeginAsync(tmp1566, cancellationToken);
+            var tmp1626 = new TStruct("displayScreen_result");
+            await oprot.WriteStructBeginAsync(tmp1626, cancellationToken);
             await oprot.WriteFieldStopAsync(cancellationToken);
             await oprot.WriteStructEndAsync(cancellationToken);
           }
@@ -21033,9 +22612,9 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1567 = new StringBuilder("displayScreen_result(");
-          tmp1567.Append(')');
-          return tmp1567.ToString();
+          var tmp1627 = new StringBuilder("displayScreen_result(");
+          tmp1627.Append(')');
+          return tmp1627.ToString();
         }
       }
 
@@ -21100,23 +22679,23 @@ namespace Yaskawa.Ext.API
 
         public displayHelp_args DeepCopy()
         {
-          var tmp1569 = new displayHelp_args();
+          var tmp1629 = new displayHelp_args();
           if(__isset.p)
           {
-            tmp1569.P = this.P;
+            tmp1629.P = this.P;
           }
-          tmp1569.__isset.p = this.__isset.p;
+          tmp1629.__isset.p = this.__isset.p;
           if((Title != null) && __isset.title)
           {
-            tmp1569.Title = this.Title;
+            tmp1629.Title = this.Title;
           }
-          tmp1569.__isset.title = this.__isset.title;
+          tmp1629.__isset.title = this.__isset.title;
           if((HtmlContentFile != null) && __isset.htmlContentFile)
           {
-            tmp1569.HtmlContentFile = this.HtmlContentFile;
+            tmp1629.HtmlContentFile = this.HtmlContentFile;
           }
-          tmp1569.__isset.htmlContentFile = this.__isset.htmlContentFile;
-          return tmp1569;
+          tmp1629.__isset.htmlContentFile = this.__isset.htmlContentFile;
+          return tmp1629;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -21187,33 +22766,33 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1570 = new TStruct("displayHelp_args");
-            await oprot.WriteStructBeginAsync(tmp1570, cancellationToken);
-            var tmp1571 = new TField();
+            var tmp1630 = new TStruct("displayHelp_args");
+            await oprot.WriteStructBeginAsync(tmp1630, cancellationToken);
+            var tmp1631 = new TField();
             if(__isset.p)
             {
-              tmp1571.Name = "p";
-              tmp1571.Type = TType.I64;
-              tmp1571.ID = 1;
-              await oprot.WriteFieldBeginAsync(tmp1571, cancellationToken);
+              tmp1631.Name = "p";
+              tmp1631.Type = TType.I64;
+              tmp1631.ID = 1;
+              await oprot.WriteFieldBeginAsync(tmp1631, cancellationToken);
               await oprot.WriteI64Async(P, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((Title != null) && __isset.title)
             {
-              tmp1571.Name = "title";
-              tmp1571.Type = TType.String;
-              tmp1571.ID = 2;
-              await oprot.WriteFieldBeginAsync(tmp1571, cancellationToken);
+              tmp1631.Name = "title";
+              tmp1631.Type = TType.String;
+              tmp1631.ID = 2;
+              await oprot.WriteFieldBeginAsync(tmp1631, cancellationToken);
               await oprot.WriteStringAsync(Title, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
             if((HtmlContentFile != null) && __isset.htmlContentFile)
             {
-              tmp1571.Name = "htmlContentFile";
-              tmp1571.Type = TType.String;
-              tmp1571.ID = 3;
-              await oprot.WriteFieldBeginAsync(tmp1571, cancellationToken);
+              tmp1631.Name = "htmlContentFile";
+              tmp1631.Type = TType.String;
+              tmp1631.ID = 3;
+              await oprot.WriteFieldBeginAsync(tmp1631, cancellationToken);
               await oprot.WriteStringAsync(HtmlContentFile, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
@@ -21256,28 +22835,28 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1572 = new StringBuilder("displayHelp_args(");
-          int tmp1573 = 0;
+          var tmp1632 = new StringBuilder("displayHelp_args(");
+          int tmp1633 = 0;
           if(__isset.p)
           {
-            if(0 < tmp1573++) { tmp1572.Append(", "); }
-            tmp1572.Append("P: ");
-            P.ToString(tmp1572);
+            if(0 < tmp1633++) { tmp1632.Append(", "); }
+            tmp1632.Append("P: ");
+            P.ToString(tmp1632);
           }
           if((Title != null) && __isset.title)
           {
-            if(0 < tmp1573++) { tmp1572.Append(", "); }
-            tmp1572.Append("Title: ");
-            Title.ToString(tmp1572);
+            if(0 < tmp1633++) { tmp1632.Append(", "); }
+            tmp1632.Append("Title: ");
+            Title.ToString(tmp1632);
           }
           if((HtmlContentFile != null) && __isset.htmlContentFile)
           {
-            if(0 < tmp1573++) { tmp1572.Append(", "); }
-            tmp1572.Append("HtmlContentFile: ");
-            HtmlContentFile.ToString(tmp1572);
+            if(0 < tmp1633++) { tmp1632.Append(", "); }
+            tmp1632.Append("HtmlContentFile: ");
+            HtmlContentFile.ToString(tmp1632);
           }
-          tmp1572.Append(')');
-          return tmp1572.ToString();
+          tmp1632.Append(')');
+          return tmp1632.ToString();
         }
       }
 
@@ -21291,8 +22870,8 @@ namespace Yaskawa.Ext.API
 
         public displayHelp_result DeepCopy()
         {
-          var tmp1574 = new displayHelp_result();
-          return tmp1574;
+          var tmp1634 = new displayHelp_result();
+          return tmp1634;
         }
 
         public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -21333,8 +22912,8 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1575 = new TStruct("displayHelp_result");
-            await oprot.WriteStructBeginAsync(tmp1575, cancellationToken);
+            var tmp1635 = new TStruct("displayHelp_result");
+            await oprot.WriteStructBeginAsync(tmp1635, cancellationToken);
             await oprot.WriteFieldStopAsync(cancellationToken);
             await oprot.WriteStructEndAsync(cancellationToken);
           }
@@ -21360,9 +22939,9 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1576 = new StringBuilder("displayHelp_result(");
-          tmp1576.Append(')');
-          return tmp1576.ToString();
+          var tmp1636 = new StringBuilder("displayHelp_result(");
+          tmp1636.Append(')');
+          return tmp1636.ToString();
         }
       }
 
