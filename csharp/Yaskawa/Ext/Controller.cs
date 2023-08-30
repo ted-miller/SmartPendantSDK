@@ -430,6 +430,10 @@ namespace Yaskawa.Ext
             lock (extension.SyncRoot)
                 client.setOutputAddress(id, address, value).Wait();
         }
+        public void setNetworkInputAddress(int address, bool value)
+        {
+            client.setNetworkInputAddress(id, address, value);
+        }
 
         public int mRegisterValue(int index){
             return client.mRegisterValue(id,index);
