@@ -232,12 +232,14 @@ namespace Yaskawa.Ext
         
         public void registerUtilityMenu(string menuName, string menuText, string menuIcon)
         {
-            client.registerUtilityMenu(id, menuName, menuText, menuIcon);
+            lock (extension.SyncRoot)
+                client.registerUtilityMenu(id, menuName, menuText, menuIcon).Wait();
         }
 
         public void unregisterUtilityMenu(string menuName)
         {
-            client.unregisterUtilityMenu(id, menuName);
+            lock (extension.SyncRoot)
+                client.unregisterUtilityMenu(id, menuName).Wait();
         }
 
         public void registerUtilityWindow(string identifier, string itemtype, string menuitemname, string windowtitle) 
@@ -248,7 +250,8 @@ namespace Yaskawa.Ext
 
         public void registerUtilityWindowWithMenu(string identifier, string itemtype, string menuitemname, string windowtitle, string menuName)
         {
-            client.registerUtilityWindowWithMenu(id, identifier, itemtype, menuitemname, windowtitle, menuName);
+            lock (extension.SyncRoot)
+                client.registerUtilityWindowWithMenu(id, identifier, itemtype, menuitemname, windowtitle, menuName).Wait();
         }
 
         public void unregisterUtilityWindow(String identifier)
