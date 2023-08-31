@@ -10,10 +10,10 @@ namespace Yaskawa.Ext
 {
     public class Controller
     {
-        internal Controller(Extension ext, TProtocol protocol, long id)
+        internal Controller(Extension ext, TProtocol protocol, TMultiplexedProtocol _robotProtocol, long id)
         {
             extension = ext;
-
+            robotProtocol = _robotProtocol;
             lock (extension.SyncRoot)
                 client = new API.Controller.Client(protocol);
             this.id = id;

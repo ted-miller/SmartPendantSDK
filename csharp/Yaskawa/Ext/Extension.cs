@@ -34,6 +34,7 @@ namespace Yaskawa.Ext
         protected TMultiplexedProtocol extensionProtocol;
         protected TMultiplexedProtocol controllerProtocol;
         protected TMultiplexedProtocol pendantProtocol;
+        protected TMultiplexedProtocol robotProtocol;
 
         protected Dictionary<long, Controller> controllerMap;
         protected Dictionary<long, Pendant> pendantMap;
@@ -101,6 +102,7 @@ namespace Yaskawa.Ext
             extensionProtocol = new TMultiplexedProtocol(protocol, "Extension");
             controllerProtocol = new TMultiplexedProtocol(protocol, "Controller");
             pendantProtocol = new TMultiplexedProtocol(protocol, "Pendant");
+            robotProtocol = new TMultiplexedProtocol(protocol, "Robot");
 
             lock (this.SyncRoot)
                 client = new API.Extension.Client(extensionProtocol);
@@ -161,7 +163,7 @@ namespace Yaskawa.Ext
             {
                 var cid = client.controller(id).Result;
                 if (!controllerMap.ContainsKey(cid))
-                    controllerMap[cid] = new Controller(this, controllerProtocol, cid);
+                    controllerMap[cid] = new Controller(this, controllerProtocol, robotProtocol, cid);
 
                 return controllerMap[cid];
             }
