@@ -442,6 +442,11 @@ enum Disposition {
     Positive = 2
 }
 
+enum DynamicInstructionType {
+    All = 0,
+    Welding = 1,
+}
+
 
 /** The Pendant API provides functions for interacting with and 
     integrating the main Smart Pendant user-interface.
@@ -553,6 +558,8 @@ service Pendant
     /** Expand previously registered Utility Window, if in collapsed state (and expandCollapseResize true) */
     void expandUtilityWindow(1:PendantID p, 2:string identifier);
 
+    /** Refresh the Inform grammar for instructions with the specified type **/
+    void refreshDynamicInstructions(1:PendantID p, 2:DynamicInstructionType instructionType);
 
     /** Register UI content at the specified integration point in the pendant UI.
         The itemType should reference a YML item previously registered via registerYML(). 
@@ -938,8 +945,19 @@ enum JogSpeed {
     Top    = 4
 }
 
-
-
+#----Internal Use Only (Issue #6309)----
+struct GaugeSensorSpec{
+    	1: i8 flag;
+        2: double gain;
+        3: double offset;
+        4: double currentPos;
+        5: double currentVolt;
+        6: double firstPos;
+        7: double firstVolt;
+        8: double secondPos;
+        9: double secondVolt;
+}
+#---------------------------------------
 
 
 /** Interface to Robot Controllers 
@@ -1367,7 +1385,15 @@ service Controller
                              3:i32 port,
                              4:string protocol) throws (1:IllegalArgument e);
     void removeNetworkService(1:ControllerID c, 2:i32 accessHandle) throws (1:IllegalArgument e);
+	
+    
+    #----Internal Use Only (Issue #6309)---
+    list<GaugeSensorSpec> getGaugeSensorSpec(1: ControllerID c);
+    
+    void gaugeSensorCalibration(1: ControllerID c, 2: i8 channel);
+    #--------------------------------------
 
+	
 
 }
 

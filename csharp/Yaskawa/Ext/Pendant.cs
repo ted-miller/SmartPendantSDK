@@ -282,9 +282,15 @@ namespace Yaskawa.Ext
 		{
             lock (extension.SyncRoot)
                 client.expandUtilityWindow(id, identifier).Wait();
-		}
+        }
+        
+        public void refreshDynamicInstructions(DynamicInstructionType instructionType)
+        {
+            lock (extension.SyncRoot)
+                client.refreshDynamicInstructions(id, instructionType).Wait();
+        }
 
-		public void registerIntegration(String identifier, IntegrationPoint integrationPoint, String itemType, String buttonLabel, String buttonImage) 
+        public void registerIntegration(String identifier, IntegrationPoint integrationPoint, String itemType, String buttonLabel, String buttonImage) 
 		{
             lock (extension.SyncRoot)
                 client.registerIntegration(id, identifier, integrationPoint, itemType, buttonLabel, buttonImage).Wait();
