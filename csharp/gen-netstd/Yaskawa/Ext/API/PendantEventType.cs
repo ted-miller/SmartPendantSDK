@@ -38,6 +38,8 @@ namespace Yaskawa.Ext.API
     JoggingPanelVisibilityChanged = 19,
     VisibleChanged = 20,
     IntegrationPointSwitchStateChanged = 21,
+    ValueChanged = 22,
+    UtilityCreated = 23,
     Other = 16384,
   }
 }

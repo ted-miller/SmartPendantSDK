@@ -49,10 +49,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3868 = new Dictionary<int, string>(source.Count);
+      var tmp3976 = new Dictionary<int, string>(source.Count);
       foreach (var pair in source)
-        tmp3868.Add(pair.Key, (pair.Value != null) ? pair.Value : null);
-      return tmp3868;
+        tmp3976.Add(pair.Key, (pair.Value != null) ? pair.Value : null);
+      return tmp3976;
     }
 
 
@@ -76,10 +76,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3869 = new Dictionary<string, global::Yaskawa.Ext.API.Any>(source.Count);
+      var tmp3977 = new Dictionary<string, global::Yaskawa.Ext.API.Any>(source.Count);
       foreach (var pair in source)
-        tmp3869.Add((pair.Key != null) ? pair.Key : null, (pair.Value != null) ? pair.Value.DeepCopy() : null);
-      return tmp3869;
+        tmp3977.Add((pair.Key != null) ? pair.Key : null, (pair.Value != null) ? pair.Value.DeepCopy() : null);
+      return tmp3977;
     }
 
 
@@ -103,10 +103,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3870 = new Dictionary<string, global::Yaskawa.Ext.API.Data>(source.Count);
+      var tmp3978 = new Dictionary<string, global::Yaskawa.Ext.API.Data>(source.Count);
       foreach (var pair in source)
-        tmp3870.Add((pair.Key != null) ? pair.Key : null, (pair.Value != null) ? pair.Value.DeepCopy() : null);
-      return tmp3870;
+        tmp3978.Add((pair.Key != null) ? pair.Key : null, (pair.Value != null) ? pair.Value.DeepCopy() : null);
+      return tmp3978;
     }
 
 
@@ -130,10 +130,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3871 = new HashSet<global::Yaskawa.Ext.API.ControllerEventType>(source.Count);
+      var tmp3979 = new HashSet<global::Yaskawa.Ext.API.ControllerEventType>(source.Count);
       foreach (var elem in source)
-        tmp3871.Add(elem);
-      return tmp3871;
+        tmp3979.Add(elem);
+      return tmp3979;
     }
 
 
@@ -157,10 +157,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3872 = new HashSet<global::Yaskawa.Ext.API.PendantEventType>(source.Count);
+      var tmp3980 = new HashSet<global::Yaskawa.Ext.API.PendantEventType>(source.Count);
       foreach (var elem in source)
-        tmp3872.Add(elem);
-      return tmp3872;
+        tmp3980.Add(elem);
+      return tmp3980;
     }
 
 
@@ -184,10 +184,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3873 = new HashSet<string>(source.Count);
+      var tmp3981 = new HashSet<string>(source.Count);
       foreach (var elem in source)
-        tmp3873.Add((elem != null) ? elem : null);
-      return tmp3873;
+        tmp3981.Add((elem != null) ? elem : null);
+      return tmp3981;
     }
 
 
@@ -211,10 +211,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3874 = new List<List<double>>(source.Count);
+      var tmp3982 = new List<List<double>>(source.Count);
       foreach (var elem in source)
-        tmp3874.Add((elem != null) ? elem.DeepCopy() : null);
-      return tmp3874;
+        tmp3982.Add((elem != null) ? elem.DeepCopy() : null);
+      return tmp3982;
     }
 
 
@@ -238,10 +238,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3875 = new List<double>(source.Count);
+      var tmp3983 = new List<double>(source.Count);
       foreach (var elem in source)
-        tmp3875.Add(elem);
-      return tmp3875;
+        tmp3983.Add(elem);
+      return tmp3983;
     }
 
 
@@ -265,10 +265,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3876 = new List<global::Yaskawa.Ext.API.Any>(source.Count);
+      var tmp3984 = new List<global::Yaskawa.Ext.API.Any>(source.Count);
       foreach (var elem in source)
-        tmp3876.Add((elem != null) ? elem.DeepCopy() : null);
-      return tmp3876;
+        tmp3984.Add((elem != null) ? elem.DeepCopy() : null);
+      return tmp3984;
     }
 
 
@@ -292,10 +292,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3877 = new List<global::Yaskawa.Ext.API.ControlGroup>(source.Count);
+      var tmp3985 = new List<global::Yaskawa.Ext.API.ControlGroup>(source.Count);
       foreach (var elem in source)
-        tmp3877.Add((elem != null) ? elem.DeepCopy() : null);
-      return tmp3877;
+        tmp3985.Add((elem != null) ? elem.DeepCopy() : null);
+      return tmp3985;
     }
 
 
@@ -319,10 +319,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3878 = new List<global::Yaskawa.Ext.API.ControllerEvent>(source.Count);
+      var tmp3986 = new List<global::Yaskawa.Ext.API.ControllerEvent>(source.Count);
       foreach (var elem in source)
-        tmp3878.Add((elem != null) ? elem.DeepCopy() : null);
-      return tmp3878;
+        tmp3986.Add((elem != null) ? elem.DeepCopy() : null);
+      return tmp3986;
     }
 
 
@@ -346,10 +346,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3879 = new List<global::Yaskawa.Ext.API.DataPoint>(source.Count);
+      var tmp3987 = new List<global::Yaskawa.Ext.API.DataPoint>(source.Count);
       foreach (var elem in source)
-        tmp3879.Add((elem != null) ? elem.DeepCopy() : null);
-      return tmp3879;
+        tmp3987.Add((elem != null) ? elem.DeepCopy() : null);
+      return tmp3987;
     }
 
 
@@ -373,10 +373,37 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3880 = new List<global::Yaskawa.Ext.API.GaugeSensorSpec>(source.Count);
+      var tmp3988 = new List<global::Yaskawa.Ext.API.GaugeSensorSpec>(source.Count);
       foreach (var elem in source)
-        tmp3880.Add((elem != null) ? elem.DeepCopy() : null);
-      return tmp3880;
+        tmp3988.Add((elem != null) ? elem.DeepCopy() : null);
+      return tmp3988;
+    }
+
+
+    public static bool Equals(this List<global::Yaskawa.Ext.API.JointType> instance, object that)
+    {
+      if (!(that is List<global::Yaskawa.Ext.API.JointType> other)) return false;
+      if (ReferenceEquals(instance, other)) return true;
+
+      return TCollections.Equals(instance, other);
+    }
+
+
+    public static int GetHashCode(this List<global::Yaskawa.Ext.API.JointType> instance)
+    {
+      return TCollections.GetHashCode(instance);
+    }
+
+
+    public static List<global::Yaskawa.Ext.API.JointType> DeepCopy(this List<global::Yaskawa.Ext.API.JointType> source)
+    {
+      if (source == null)
+        return null;
+
+      var tmp3989 = new List<global::Yaskawa.Ext.API.JointType>(source.Count);
+      foreach (var elem in source)
+        tmp3989.Add(elem);
+      return tmp3989;
     }
 
 
@@ -400,10 +427,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3881 = new List<global::Yaskawa.Ext.API.LoggingEvent>(source.Count);
+      var tmp3990 = new List<global::Yaskawa.Ext.API.LoggingEvent>(source.Count);
       foreach (var elem in source)
-        tmp3881.Add((elem != null) ? elem.DeepCopy() : null);
-      return tmp3881;
+        tmp3990.Add((elem != null) ? elem.DeepCopy() : null);
+      return tmp3990;
     }
 
 
@@ -427,10 +454,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3882 = new List<global::Yaskawa.Ext.API.PendantEvent>(source.Count);
+      var tmp3991 = new List<global::Yaskawa.Ext.API.PendantEvent>(source.Count);
       foreach (var elem in source)
-        tmp3882.Add((elem != null) ? elem.DeepCopy() : null);
-      return tmp3882;
+        tmp3991.Add((elem != null) ? elem.DeepCopy() : null);
+      return tmp3991;
     }
 
 
@@ -454,10 +481,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3883 = new List<global::Yaskawa.Ext.API.PropValues>(source.Count);
+      var tmp3992 = new List<global::Yaskawa.Ext.API.PropValues>(source.Count);
       foreach (var elem in source)
-        tmp3883.Add((elem != null) ? elem.DeepCopy() : null);
-      return tmp3883;
+        tmp3992.Add((elem != null) ? elem.DeepCopy() : null);
+      return tmp3992;
     }
 
 
@@ -481,10 +508,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3884 = new List<global::Yaskawa.Ext.API.SimpleControlGroup>(source.Count);
+      var tmp3993 = new List<global::Yaskawa.Ext.API.SimpleControlGroup>(source.Count);
       foreach (var elem in source)
-        tmp3884.Add((elem != null) ? elem.DeepCopy() : null);
-      return tmp3884;
+        tmp3993.Add((elem != null) ? elem.DeepCopy() : null);
+      return tmp3993;
     }
 
 
@@ -508,10 +535,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3885 = new List<global::Yaskawa.Ext.API.storageInfo>(source.Count);
+      var tmp3994 = new List<global::Yaskawa.Ext.API.storageInfo>(source.Count);
       foreach (var elem in source)
-        tmp3885.Add((elem != null) ? elem.DeepCopy() : null);
-      return tmp3885;
+        tmp3994.Add((elem != null) ? elem.DeepCopy() : null);
+      return tmp3994;
     }
 
 
@@ -535,10 +562,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3886 = new List<long>(source.Count);
+      var tmp3995 = new List<long>(source.Count);
       foreach (var elem in source)
-        tmp3886.Add(elem);
-      return tmp3886;
+        tmp3995.Add(elem);
+      return tmp3995;
     }
 
 
@@ -562,10 +589,10 @@ namespace Yaskawa.Ext.API
       if (source == null)
         return null;
 
-      var tmp3887 = new List<string>(source.Count);
+      var tmp3996 = new List<string>(source.Count);
       foreach (var elem in source)
-        tmp3887.Add((elem != null) ? elem : null);
-      return tmp3887;
+        tmp3996.Add((elem != null) ? elem : null);
+      return tmp3996;
     }
 
 

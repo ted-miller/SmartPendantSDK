@@ -175,48 +175,48 @@ namespace Yaskawa.Ext.API
 
     public Series DeepCopy()
     {
-      var tmp107 = new Series();
+      var tmp111 = new Series();
       if((X != null) && __isset.x)
       {
-        tmp107.X = this.X.DeepCopy();
+        tmp111.X = this.X.DeepCopy();
       }
-      tmp107.__isset.x = this.__isset.x;
+      tmp111.__isset.x = this.__isset.x;
       if((Y != null) && __isset.y)
       {
-        tmp107.Y = this.Y.DeepCopy();
+        tmp111.Y = this.Y.DeepCopy();
       }
-      tmp107.__isset.y = this.__isset.y;
+      tmp111.__isset.y = this.__isset.y;
       if((Z != null) && __isset.z)
       {
-        tmp107.Z = this.Z.DeepCopy();
+        tmp111.Z = this.Z.DeepCopy();
       }
-      tmp107.__isset.z = this.__isset.z;
+      tmp111.__isset.z = this.__isset.z;
       if((Color != null) && __isset.color)
       {
-        tmp107.Color = this.Color;
+        tmp111.Color = this.Color;
       }
-      tmp107.__isset.color = this.__isset.color;
+      tmp111.__isset.color = this.__isset.color;
       if((Vertex != null) && __isset.vertex)
       {
-        tmp107.Vertex = this.Vertex;
+        tmp111.Vertex = this.Vertex;
       }
-      tmp107.__isset.vertex = this.__isset.vertex;
+      tmp111.__isset.vertex = this.__isset.vertex;
       if((Style != null) && __isset.style)
       {
-        tmp107.Style = this.Style;
+        tmp111.Style = this.Style;
       }
-      tmp107.__isset.style = this.__isset.style;
+      tmp111.__isset.style = this.__isset.style;
       if(__isset.hidden)
       {
-        tmp107.Hidden = this.Hidden;
+        tmp111.Hidden = this.Hidden;
       }
-      tmp107.__isset.hidden = this.__isset.hidden;
+      tmp111.__isset.hidden = this.__isset.hidden;
       if(__isset.maxPts)
       {
-        tmp107.MaxPts = this.MaxPts;
+        tmp111.MaxPts = this.MaxPts;
       }
-      tmp107.__isset.maxPts = this.__isset.maxPts;
-      return tmp107;
+      tmp111.__isset.maxPts = this.__isset.maxPts;
+      return tmp111;
     }
 
     public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -240,13 +240,13 @@ namespace Yaskawa.Ext.API
               if (field.Type == TType.List)
               {
                 {
-                  var _list108 = await iprot.ReadListBeginAsync(cancellationToken);
-                  X = new List<double>(_list108.Count);
-                  for(int _i109 = 0; _i109 < _list108.Count; ++_i109)
+                  var _list112 = await iprot.ReadListBeginAsync(cancellationToken);
+                  X = new List<double>(_list112.Count);
+                  for(int _i113 = 0; _i113 < _list112.Count; ++_i113)
                   {
-                    double _elem110;
-                    _elem110 = await iprot.ReadDoubleAsync(cancellationToken);
-                    X.Add(_elem110);
+                    double _elem114;
+                    _elem114 = await iprot.ReadDoubleAsync(cancellationToken);
+                    X.Add(_elem114);
                   }
                   await iprot.ReadListEndAsync(cancellationToken);
                 }
@@ -260,13 +260,13 @@ namespace Yaskawa.Ext.API
               if (field.Type == TType.List)
               {
                 {
-                  var _list111 = await iprot.ReadListBeginAsync(cancellationToken);
-                  Y = new List<double>(_list111.Count);
-                  for(int _i112 = 0; _i112 < _list111.Count; ++_i112)
+                  var _list115 = await iprot.ReadListBeginAsync(cancellationToken);
+                  Y = new List<double>(_list115.Count);
+                  for(int _i116 = 0; _i116 < _list115.Count; ++_i116)
                   {
-                    double _elem113;
-                    _elem113 = await iprot.ReadDoubleAsync(cancellationToken);
-                    Y.Add(_elem113);
+                    double _elem117;
+                    _elem117 = await iprot.ReadDoubleAsync(cancellationToken);
+                    Y.Add(_elem117);
                   }
                   await iprot.ReadListEndAsync(cancellationToken);
                 }
@@ -280,13 +280,13 @@ namespace Yaskawa.Ext.API
               if (field.Type == TType.List)
               {
                 {
-                  var _list114 = await iprot.ReadListBeginAsync(cancellationToken);
-                  Z = new List<double>(_list114.Count);
-                  for(int _i115 = 0; _i115 < _list114.Count; ++_i115)
+                  var _list118 = await iprot.ReadListBeginAsync(cancellationToken);
+                  Z = new List<double>(_list118.Count);
+                  for(int _i119 = 0; _i119 < _list118.Count; ++_i119)
                   {
-                    double _elem116;
-                    _elem116 = await iprot.ReadDoubleAsync(cancellationToken);
-                    Z.Add(_elem116);
+                    double _elem120;
+                    _elem120 = await iprot.ReadDoubleAsync(cancellationToken);
+                    Z.Add(_elem120);
                   }
                   await iprot.ReadListEndAsync(cancellationToken);
                 }
@@ -367,93 +367,93 @@ namespace Yaskawa.Ext.API
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp117 = new TStruct("Series");
-        await oprot.WriteStructBeginAsync(tmp117, cancellationToken);
-        var tmp118 = new TField();
+        var tmp121 = new TStruct("Series");
+        await oprot.WriteStructBeginAsync(tmp121, cancellationToken);
+        var tmp122 = new TField();
         if((X != null) && __isset.x)
         {
-          tmp118.Name = "x";
-          tmp118.Type = TType.List;
-          tmp118.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp118, cancellationToken);
+          tmp122.Name = "x";
+          tmp122.Type = TType.List;
+          tmp122.ID = 1;
+          await oprot.WriteFieldBeginAsync(tmp122, cancellationToken);
           await oprot.WriteListBeginAsync(new TList(TType.Double, X.Count), cancellationToken);
-          foreach (double _iter119 in X)
+          foreach (double _iter123 in X)
           {
-            await oprot.WriteDoubleAsync(_iter119, cancellationToken);
+            await oprot.WriteDoubleAsync(_iter123, cancellationToken);
           }
           await oprot.WriteListEndAsync(cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Y != null) && __isset.y)
         {
-          tmp118.Name = "y";
-          tmp118.Type = TType.List;
-          tmp118.ID = 2;
-          await oprot.WriteFieldBeginAsync(tmp118, cancellationToken);
+          tmp122.Name = "y";
+          tmp122.Type = TType.List;
+          tmp122.ID = 2;
+          await oprot.WriteFieldBeginAsync(tmp122, cancellationToken);
           await oprot.WriteListBeginAsync(new TList(TType.Double, Y.Count), cancellationToken);
-          foreach (double _iter120 in Y)
+          foreach (double _iter124 in Y)
           {
-            await oprot.WriteDoubleAsync(_iter120, cancellationToken);
+            await oprot.WriteDoubleAsync(_iter124, cancellationToken);
           }
           await oprot.WriteListEndAsync(cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Z != null) && __isset.z)
         {
-          tmp118.Name = "z";
-          tmp118.Type = TType.List;
-          tmp118.ID = 3;
-          await oprot.WriteFieldBeginAsync(tmp118, cancellationToken);
+          tmp122.Name = "z";
+          tmp122.Type = TType.List;
+          tmp122.ID = 3;
+          await oprot.WriteFieldBeginAsync(tmp122, cancellationToken);
           await oprot.WriteListBeginAsync(new TList(TType.Double, Z.Count), cancellationToken);
-          foreach (double _iter121 in Z)
+          foreach (double _iter125 in Z)
           {
-            await oprot.WriteDoubleAsync(_iter121, cancellationToken);
+            await oprot.WriteDoubleAsync(_iter125, cancellationToken);
           }
           await oprot.WriteListEndAsync(cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Color != null) && __isset.color)
         {
-          tmp118.Name = "color";
-          tmp118.Type = TType.String;
-          tmp118.ID = 4;
-          await oprot.WriteFieldBeginAsync(tmp118, cancellationToken);
+          tmp122.Name = "color";
+          tmp122.Type = TType.String;
+          tmp122.ID = 4;
+          await oprot.WriteFieldBeginAsync(tmp122, cancellationToken);
           await oprot.WriteStringAsync(Color, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Vertex != null) && __isset.vertex)
         {
-          tmp118.Name = "vertex";
-          tmp118.Type = TType.String;
-          tmp118.ID = 5;
-          await oprot.WriteFieldBeginAsync(tmp118, cancellationToken);
+          tmp122.Name = "vertex";
+          tmp122.Type = TType.String;
+          tmp122.ID = 5;
+          await oprot.WriteFieldBeginAsync(tmp122, cancellationToken);
           await oprot.WriteStringAsync(Vertex, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Style != null) && __isset.style)
         {
-          tmp118.Name = "style";
-          tmp118.Type = TType.String;
-          tmp118.ID = 6;
-          await oprot.WriteFieldBeginAsync(tmp118, cancellationToken);
+          tmp122.Name = "style";
+          tmp122.Type = TType.String;
+          tmp122.ID = 6;
+          await oprot.WriteFieldBeginAsync(tmp122, cancellationToken);
           await oprot.WriteStringAsync(Style, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.hidden)
         {
-          tmp118.Name = "hidden";
-          tmp118.Type = TType.Bool;
-          tmp118.ID = 7;
-          await oprot.WriteFieldBeginAsync(tmp118, cancellationToken);
+          tmp122.Name = "hidden";
+          tmp122.Type = TType.Bool;
+          tmp122.ID = 7;
+          await oprot.WriteFieldBeginAsync(tmp122, cancellationToken);
           await oprot.WriteBoolAsync(Hidden, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.maxPts)
         {
-          tmp118.Name = "maxPts";
-          tmp118.Type = TType.I32;
-          tmp118.ID = 8;
-          await oprot.WriteFieldBeginAsync(tmp118, cancellationToken);
+          tmp122.Name = "maxPts";
+          tmp122.Type = TType.I32;
+          tmp122.ID = 8;
+          await oprot.WriteFieldBeginAsync(tmp122, cancellationToken);
           await oprot.WriteI32Async(MaxPts, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
@@ -521,58 +521,58 @@ namespace Yaskawa.Ext.API
 
     public override string ToString()
     {
-      var tmp122 = new StringBuilder("Series(");
-      int tmp123 = 0;
+      var tmp126 = new StringBuilder("Series(");
+      int tmp127 = 0;
       if((X != null) && __isset.x)
       {
-        if(0 < tmp123++) { tmp122.Append(", "); }
-        tmp122.Append("X: ");
-        X.ToString(tmp122);
+        if(0 < tmp127++) { tmp126.Append(", "); }
+        tmp126.Append("X: ");
+        X.ToString(tmp126);
       }
       if((Y != null) && __isset.y)
       {
-        if(0 < tmp123++) { tmp122.Append(", "); }
-        tmp122.Append("Y: ");
-        Y.ToString(tmp122);
+        if(0 < tmp127++) { tmp126.Append(", "); }
+        tmp126.Append("Y: ");
+        Y.ToString(tmp126);
       }
       if((Z != null) && __isset.z)
       {
-        if(0 < tmp123++) { tmp122.Append(", "); }
-        tmp122.Append("Z: ");
-        Z.ToString(tmp122);
+        if(0 < tmp127++) { tmp126.Append(", "); }
+        tmp126.Append("Z: ");
+        Z.ToString(tmp126);
       }
       if((Color != null) && __isset.color)
       {
-        if(0 < tmp123++) { tmp122.Append(", "); }
-        tmp122.Append("Color: ");
-        Color.ToString(tmp122);
+        if(0 < tmp127++) { tmp126.Append(", "); }
+        tmp126.Append("Color: ");
+        Color.ToString(tmp126);
       }
       if((Vertex != null) && __isset.vertex)
       {
-        if(0 < tmp123++) { tmp122.Append(", "); }
-        tmp122.Append("Vertex: ");
-        Vertex.ToString(tmp122);
+        if(0 < tmp127++) { tmp126.Append(", "); }
+        tmp126.Append("Vertex: ");
+        Vertex.ToString(tmp126);
       }
       if((Style != null) && __isset.style)
       {
-        if(0 < tmp123++) { tmp122.Append(", "); }
-        tmp122.Append("Style: ");
-        Style.ToString(tmp122);
+        if(0 < tmp127++) { tmp126.Append(", "); }
+        tmp126.Append("Style: ");
+        Style.ToString(tmp126);
       }
       if(__isset.hidden)
       {
-        if(0 < tmp123++) { tmp122.Append(", "); }
-        tmp122.Append("Hidden: ");
-        Hidden.ToString(tmp122);
+        if(0 < tmp127++) { tmp126.Append(", "); }
+        tmp126.Append("Hidden: ");
+        Hidden.ToString(tmp126);
       }
       if(__isset.maxPts)
       {
-        if(0 < tmp123++) { tmp122.Append(", "); }
-        tmp122.Append("MaxPts: ");
-        MaxPts.ToString(tmp122);
+        if(0 < tmp127++) { tmp126.Append(", "); }
+        tmp126.Append("MaxPts: ");
+        MaxPts.ToString(tmp126);
       }
-      tmp122.Append(')');
-      return tmp122.ToString();
+      tmp126.Append(')');
+      return tmp126.ToString();
     }
   }
 

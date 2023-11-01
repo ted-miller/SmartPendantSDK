@@ -75,14 +75,14 @@ namespace Yaskawa.Ext.API
 
     public ControllerEvent DeepCopy()
     {
-      var tmp164 = new ControllerEvent();
-      tmp164.EventType = this.EventType;
+      var tmp168 = new ControllerEvent();
+      tmp168.EventType = this.EventType;
       if((Props != null) && __isset.props)
       {
-        tmp164.Props = this.Props.DeepCopy();
+        tmp168.Props = this.Props.DeepCopy();
       }
-      tmp164.__isset.props = this.__isset.props;
-      return tmp164;
+      tmp168.__isset.props = this.__isset.props;
+      return tmp168;
     }
 
     public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -118,16 +118,16 @@ namespace Yaskawa.Ext.API
               if (field.Type == TType.Map)
               {
                 {
-                  var _map165 = await iprot.ReadMapBeginAsync(cancellationToken);
-                  Props = new Dictionary<string, global::Yaskawa.Ext.API.Any>(_map165.Count);
-                  for(int _i166 = 0; _i166 < _map165.Count; ++_i166)
+                  var _map169 = await iprot.ReadMapBeginAsync(cancellationToken);
+                  Props = new Dictionary<string, global::Yaskawa.Ext.API.Any>(_map169.Count);
+                  for(int _i170 = 0; _i170 < _map169.Count; ++_i170)
                   {
-                    string _key167;
-                    global::Yaskawa.Ext.API.Any _val168;
-                    _key167 = await iprot.ReadStringAsync(cancellationToken);
-                    _val168 = new global::Yaskawa.Ext.API.Any();
-                    await _val168.ReadAsync(iprot, cancellationToken);
-                    Props[_key167] = _val168;
+                    string _key171;
+                    global::Yaskawa.Ext.API.Any _val172;
+                    _key171 = await iprot.ReadStringAsync(cancellationToken);
+                    _val172 = new global::Yaskawa.Ext.API.Any();
+                    await _val172.ReadAsync(iprot, cancellationToken);
+                    Props[_key171] = _val172;
                   }
                   await iprot.ReadMapEndAsync(cancellationToken);
                 }
@@ -162,26 +162,26 @@ namespace Yaskawa.Ext.API
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp169 = new TStruct("ControllerEvent");
-        await oprot.WriteStructBeginAsync(tmp169, cancellationToken);
-        var tmp170 = new TField();
-        tmp170.Name = "eventType";
-        tmp170.Type = TType.I32;
-        tmp170.ID = 1;
-        await oprot.WriteFieldBeginAsync(tmp170, cancellationToken);
+        var tmp173 = new TStruct("ControllerEvent");
+        await oprot.WriteStructBeginAsync(tmp173, cancellationToken);
+        var tmp174 = new TField();
+        tmp174.Name = "eventType";
+        tmp174.Type = TType.I32;
+        tmp174.ID = 1;
+        await oprot.WriteFieldBeginAsync(tmp174, cancellationToken);
         await oprot.WriteI32Async((int)EventType, cancellationToken);
         await oprot.WriteFieldEndAsync(cancellationToken);
         if((Props != null) && __isset.props)
         {
-          tmp170.Name = "props";
-          tmp170.Type = TType.Map;
-          tmp170.ID = 2;
-          await oprot.WriteFieldBeginAsync(tmp170, cancellationToken);
+          tmp174.Name = "props";
+          tmp174.Type = TType.Map;
+          tmp174.ID = 2;
+          await oprot.WriteFieldBeginAsync(tmp174, cancellationToken);
           await oprot.WriteMapBeginAsync(new TMap(TType.String, TType.Struct, Props.Count), cancellationToken);
-          foreach (string _iter171 in Props.Keys)
+          foreach (string _iter175 in Props.Keys)
           {
-            await oprot.WriteStringAsync(_iter171, cancellationToken);
-            await Props[_iter171].WriteAsync(oprot, cancellationToken);
+            await oprot.WriteStringAsync(_iter175, cancellationToken);
+            await Props[_iter175].WriteAsync(oprot, cancellationToken);
           }
           await oprot.WriteMapEndAsync(cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
@@ -217,16 +217,16 @@ namespace Yaskawa.Ext.API
 
     public override string ToString()
     {
-      var tmp172 = new StringBuilder("ControllerEvent(");
-      tmp172.Append(", EventType: ");
-      EventType.ToString(tmp172);
+      var tmp176 = new StringBuilder("ControllerEvent(");
+      tmp176.Append(", EventType: ");
+      EventType.ToString(tmp176);
       if((Props != null) && __isset.props)
       {
-        tmp172.Append(", Props: ");
-        Props.ToString(tmp172);
+        tmp176.Append(", Props: ");
+        Props.ToString(tmp176);
       }
-      tmp172.Append(')');
-      return tmp172.ToString();
+      tmp176.Append(')');
+      return tmp176.ToString();
     }
   }
 

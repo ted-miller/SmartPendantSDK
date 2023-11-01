@@ -94,23 +94,23 @@ namespace Yaskawa.Ext.API
 
     public DataPoint DeepCopy()
     {
-      var tmp129 = new DataPoint();
+      var tmp133 = new DataPoint();
       if(__isset.x)
       {
-        tmp129.X = this.X;
+        tmp133.X = this.X;
       }
-      tmp129.__isset.x = this.__isset.x;
+      tmp133.__isset.x = this.__isset.x;
       if(__isset.y)
       {
-        tmp129.Y = this.Y;
+        tmp133.Y = this.Y;
       }
-      tmp129.__isset.y = this.__isset.y;
+      tmp133.__isset.y = this.__isset.y;
       if(__isset.z)
       {
-        tmp129.Z = this.Z;
+        tmp133.Z = this.Z;
       }
-      tmp129.__isset.z = this.__isset.z;
-      return tmp129;
+      tmp133.__isset.z = this.__isset.z;
+      return tmp133;
     }
 
     public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -181,33 +181,33 @@ namespace Yaskawa.Ext.API
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp130 = new TStruct("DataPoint");
-        await oprot.WriteStructBeginAsync(tmp130, cancellationToken);
-        var tmp131 = new TField();
+        var tmp134 = new TStruct("DataPoint");
+        await oprot.WriteStructBeginAsync(tmp134, cancellationToken);
+        var tmp135 = new TField();
         if(__isset.x)
         {
-          tmp131.Name = "x";
-          tmp131.Type = TType.Double;
-          tmp131.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp131, cancellationToken);
+          tmp135.Name = "x";
+          tmp135.Type = TType.Double;
+          tmp135.ID = 1;
+          await oprot.WriteFieldBeginAsync(tmp135, cancellationToken);
           await oprot.WriteDoubleAsync(X, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.y)
         {
-          tmp131.Name = "y";
-          tmp131.Type = TType.Double;
-          tmp131.ID = 2;
-          await oprot.WriteFieldBeginAsync(tmp131, cancellationToken);
+          tmp135.Name = "y";
+          tmp135.Type = TType.Double;
+          tmp135.ID = 2;
+          await oprot.WriteFieldBeginAsync(tmp135, cancellationToken);
           await oprot.WriteDoubleAsync(Y, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.z)
         {
-          tmp131.Name = "z";
-          tmp131.Type = TType.Double;
-          tmp131.ID = 3;
-          await oprot.WriteFieldBeginAsync(tmp131, cancellationToken);
+          tmp135.Name = "z";
+          tmp135.Type = TType.Double;
+          tmp135.ID = 3;
+          await oprot.WriteFieldBeginAsync(tmp135, cancellationToken);
           await oprot.WriteDoubleAsync(Z, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
@@ -250,28 +250,28 @@ namespace Yaskawa.Ext.API
 
     public override string ToString()
     {
-      var tmp132 = new StringBuilder("DataPoint(");
-      int tmp133 = 0;
+      var tmp136 = new StringBuilder("DataPoint(");
+      int tmp137 = 0;
       if(__isset.x)
       {
-        if(0 < tmp133++) { tmp132.Append(", "); }
-        tmp132.Append("X: ");
-        X.ToString(tmp132);
+        if(0 < tmp137++) { tmp136.Append(", "); }
+        tmp136.Append("X: ");
+        X.ToString(tmp136);
       }
       if(__isset.y)
       {
-        if(0 < tmp133++) { tmp132.Append(", "); }
-        tmp132.Append("Y: ");
-        Y.ToString(tmp132);
+        if(0 < tmp137++) { tmp136.Append(", "); }
+        tmp136.Append("Y: ");
+        Y.ToString(tmp136);
       }
       if(__isset.z)
       {
-        if(0 < tmp133++) { tmp132.Append(", "); }
-        tmp132.Append("Z: ");
-        Z.ToString(tmp132);
+        if(0 < tmp137++) { tmp136.Append(", "); }
+        tmp136.Append("Z: ");
+        Z.ToString(tmp136);
       }
-      tmp132.Append(')');
-      return tmp132.ToString();
+      tmp136.Append(')');
+      return tmp136.ToString();
     }
   }
 

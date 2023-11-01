@@ -113,28 +113,28 @@ namespace Yaskawa.Ext.API
 
     public LoggingEvent DeepCopy()
     {
-      var tmp102 = new LoggingEvent();
+      var tmp106 = new LoggingEvent();
       if(__isset.timestamp)
       {
-        tmp102.Timestamp = this.Timestamp;
+        tmp106.Timestamp = this.Timestamp;
       }
-      tmp102.__isset.timestamp = this.__isset.timestamp;
+      tmp106.__isset.timestamp = this.__isset.timestamp;
       if((Datetime != null) && __isset.datetime)
       {
-        tmp102.Datetime = this.Datetime;
+        tmp106.Datetime = this.Datetime;
       }
-      tmp102.__isset.datetime = this.__isset.datetime;
+      tmp106.__isset.datetime = this.__isset.datetime;
       if(__isset.level)
       {
-        tmp102.Level = this.Level;
+        tmp106.Level = this.Level;
       }
-      tmp102.__isset.level = this.__isset.level;
+      tmp106.__isset.level = this.__isset.level;
       if((Entry != null) && __isset.entry)
       {
-        tmp102.Entry = this.Entry;
+        tmp106.Entry = this.Entry;
       }
-      tmp102.__isset.entry = this.__isset.entry;
-      return tmp102;
+      tmp106.__isset.entry = this.__isset.entry;
+      return tmp106;
     }
 
     public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -215,42 +215,42 @@ namespace Yaskawa.Ext.API
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp103 = new TStruct("LoggingEvent");
-        await oprot.WriteStructBeginAsync(tmp103, cancellationToken);
-        var tmp104 = new TField();
+        var tmp107 = new TStruct("LoggingEvent");
+        await oprot.WriteStructBeginAsync(tmp107, cancellationToken);
+        var tmp108 = new TField();
         if(__isset.timestamp)
         {
-          tmp104.Name = "timestamp";
-          tmp104.Type = TType.I64;
-          tmp104.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp104, cancellationToken);
+          tmp108.Name = "timestamp";
+          tmp108.Type = TType.I64;
+          tmp108.ID = 1;
+          await oprot.WriteFieldBeginAsync(tmp108, cancellationToken);
           await oprot.WriteI64Async(Timestamp, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Datetime != null) && __isset.datetime)
         {
-          tmp104.Name = "datetime";
-          tmp104.Type = TType.String;
-          tmp104.ID = 2;
-          await oprot.WriteFieldBeginAsync(tmp104, cancellationToken);
+          tmp108.Name = "datetime";
+          tmp108.Type = TType.String;
+          tmp108.ID = 2;
+          await oprot.WriteFieldBeginAsync(tmp108, cancellationToken);
           await oprot.WriteStringAsync(Datetime, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.level)
         {
-          tmp104.Name = "level";
-          tmp104.Type = TType.I32;
-          tmp104.ID = 3;
-          await oprot.WriteFieldBeginAsync(tmp104, cancellationToken);
+          tmp108.Name = "level";
+          tmp108.Type = TType.I32;
+          tmp108.ID = 3;
+          await oprot.WriteFieldBeginAsync(tmp108, cancellationToken);
           await oprot.WriteI32Async((int)Level, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Entry != null) && __isset.entry)
         {
-          tmp104.Name = "entry";
-          tmp104.Type = TType.String;
-          tmp104.ID = 4;
-          await oprot.WriteFieldBeginAsync(tmp104, cancellationToken);
+          tmp108.Name = "entry";
+          tmp108.Type = TType.String;
+          tmp108.ID = 4;
+          await oprot.WriteFieldBeginAsync(tmp108, cancellationToken);
           await oprot.WriteStringAsync(Entry, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
@@ -298,34 +298,34 @@ namespace Yaskawa.Ext.API
 
     public override string ToString()
     {
-      var tmp105 = new StringBuilder("LoggingEvent(");
-      int tmp106 = 0;
+      var tmp109 = new StringBuilder("LoggingEvent(");
+      int tmp110 = 0;
       if(__isset.timestamp)
       {
-        if(0 < tmp106++) { tmp105.Append(", "); }
-        tmp105.Append("Timestamp: ");
-        Timestamp.ToString(tmp105);
+        if(0 < tmp110++) { tmp109.Append(", "); }
+        tmp109.Append("Timestamp: ");
+        Timestamp.ToString(tmp109);
       }
       if((Datetime != null) && __isset.datetime)
       {
-        if(0 < tmp106++) { tmp105.Append(", "); }
-        tmp105.Append("Datetime: ");
-        Datetime.ToString(tmp105);
+        if(0 < tmp110++) { tmp109.Append(", "); }
+        tmp109.Append("Datetime: ");
+        Datetime.ToString(tmp109);
       }
       if(__isset.level)
       {
-        if(0 < tmp106++) { tmp105.Append(", "); }
-        tmp105.Append("Level: ");
-        Level.ToString(tmp105);
+        if(0 < tmp110++) { tmp109.Append(", "); }
+        tmp109.Append("Level: ");
+        Level.ToString(tmp109);
       }
       if((Entry != null) && __isset.entry)
       {
-        if(0 < tmp106++) { tmp105.Append(", "); }
-        tmp105.Append("Entry: ");
-        Entry.ToString(tmp105);
+        if(0 < tmp110++) { tmp109.Append(", "); }
+        tmp109.Append("Entry: ");
+        Entry.ToString(tmp109);
       }
-      tmp105.Append(')');
-      return tmp105.ToString();
+      tmp109.Append(')');
+      return tmp109.ToString();
     }
   }
 

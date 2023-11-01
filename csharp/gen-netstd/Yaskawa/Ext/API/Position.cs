@@ -43,6 +43,7 @@ namespace Yaskawa.Ext.API
     private global::Yaskawa.Ext.API.Orient _orient;
     private List<double> _joints;
     private List<long> _closure;
+    private List<double> _redundancy;
 
     public global::Yaskawa.Ext.API.CoordinateFrame Frame
     {
@@ -143,6 +144,19 @@ namespace Yaskawa.Ext.API
       }
     }
 
+    public List<double> Redundancy
+    {
+      get
+      {
+        return _redundancy;
+      }
+      set
+      {
+        __isset.redundancy = true;
+        this._redundancy = value;
+      }
+    }
+
 
     public Isset __isset;
     public struct Isset
@@ -154,6 +168,7 @@ namespace Yaskawa.Ext.API
       public bool orient;
       public bool joints;
       public bool closure;
+      public bool redundancy;
     }
 
     public Position()
@@ -198,6 +213,11 @@ namespace Yaskawa.Ext.API
         tmp67.Closure = this.Closure.DeepCopy();
       }
       tmp67.__isset.closure = this.__isset.closure;
+      if((Redundancy != null) && __isset.redundancy)
+      {
+        tmp67.Redundancy = this.Redundancy.DeepCopy();
+      }
+      tmp67.__isset.redundancy = this.__isset.redundancy;
       return tmp67;
     }
 
@@ -320,6 +340,26 @@ namespace Yaskawa.Ext.API
                 await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
               }
               break;
+            case 8:
+              if (field.Type == TType.List)
+              {
+                {
+                  var _list77 = await iprot.ReadListBeginAsync(cancellationToken);
+                  Redundancy = new List<double>(_list77.Count);
+                  for(int _i78 = 0; _i78 < _list77.Count; ++_i78)
+                  {
+                    double _elem79;
+                    _elem79 = await iprot.ReadDoubleAsync(cancellationToken);
+                    Redundancy.Add(_elem79);
+                  }
+                  await iprot.ReadListEndAsync(cancellationToken);
+                }
+              }
+              else
+              {
+                await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+              }
+              break;
             default: 
               await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
               break;
@@ -341,83 +381,97 @@ namespace Yaskawa.Ext.API
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp77 = new TStruct("Position");
-        await oprot.WriteStructBeginAsync(tmp77, cancellationToken);
-        var tmp78 = new TField();
+        var tmp80 = new TStruct("Position");
+        await oprot.WriteStructBeginAsync(tmp80, cancellationToken);
+        var tmp81 = new TField();
         if((Frame != null) && __isset.frame)
         {
-          tmp78.Name = "frame";
-          tmp78.Type = TType.Struct;
-          tmp78.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp78, cancellationToken);
+          tmp81.Name = "frame";
+          tmp81.Type = TType.Struct;
+          tmp81.ID = 1;
+          await oprot.WriteFieldBeginAsync(tmp81, cancellationToken);
           await Frame.WriteAsync(oprot, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.distUnit)
         {
-          tmp78.Name = "distUnit";
-          tmp78.Type = TType.I32;
-          tmp78.ID = 2;
-          await oprot.WriteFieldBeginAsync(tmp78, cancellationToken);
+          tmp81.Name = "distUnit";
+          tmp81.Type = TType.I32;
+          tmp81.ID = 2;
+          await oprot.WriteFieldBeginAsync(tmp81, cancellationToken);
           await oprot.WriteI32Async((int)DistUnit, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.orientUnit)
         {
-          tmp78.Name = "orientUnit";
-          tmp78.Type = TType.I32;
-          tmp78.ID = 3;
-          await oprot.WriteFieldBeginAsync(tmp78, cancellationToken);
+          tmp81.Name = "orientUnit";
+          tmp81.Type = TType.I32;
+          tmp81.ID = 3;
+          await oprot.WriteFieldBeginAsync(tmp81, cancellationToken);
           await oprot.WriteI32Async((int)OrientUnit, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Pos != null) && __isset.pos)
         {
-          tmp78.Name = "pos";
-          tmp78.Type = TType.List;
-          tmp78.ID = 4;
-          await oprot.WriteFieldBeginAsync(tmp78, cancellationToken);
+          tmp81.Name = "pos";
+          tmp81.Type = TType.List;
+          tmp81.ID = 4;
+          await oprot.WriteFieldBeginAsync(tmp81, cancellationToken);
           await oprot.WriteListBeginAsync(new TList(TType.Double, Pos.Count), cancellationToken);
-          foreach (double _iter79 in Pos)
+          foreach (double _iter82 in Pos)
           {
-            await oprot.WriteDoubleAsync(_iter79, cancellationToken);
+            await oprot.WriteDoubleAsync(_iter82, cancellationToken);
           }
           await oprot.WriteListEndAsync(cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Orient != null) && __isset.orient)
         {
-          tmp78.Name = "orient";
-          tmp78.Type = TType.Struct;
-          tmp78.ID = 5;
-          await oprot.WriteFieldBeginAsync(tmp78, cancellationToken);
+          tmp81.Name = "orient";
+          tmp81.Type = TType.Struct;
+          tmp81.ID = 5;
+          await oprot.WriteFieldBeginAsync(tmp81, cancellationToken);
           await Orient.WriteAsync(oprot, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Joints != null) && __isset.joints)
         {
-          tmp78.Name = "joints";
-          tmp78.Type = TType.List;
-          tmp78.ID = 6;
-          await oprot.WriteFieldBeginAsync(tmp78, cancellationToken);
+          tmp81.Name = "joints";
+          tmp81.Type = TType.List;
+          tmp81.ID = 6;
+          await oprot.WriteFieldBeginAsync(tmp81, cancellationToken);
           await oprot.WriteListBeginAsync(new TList(TType.Double, Joints.Count), cancellationToken);
-          foreach (double _iter80 in Joints)
+          foreach (double _iter83 in Joints)
           {
-            await oprot.WriteDoubleAsync(_iter80, cancellationToken);
+            await oprot.WriteDoubleAsync(_iter83, cancellationToken);
           }
           await oprot.WriteListEndAsync(cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Closure != null) && __isset.closure)
         {
-          tmp78.Name = "closure";
-          tmp78.Type = TType.List;
-          tmp78.ID = 7;
-          await oprot.WriteFieldBeginAsync(tmp78, cancellationToken);
+          tmp81.Name = "closure";
+          tmp81.Type = TType.List;
+          tmp81.ID = 7;
+          await oprot.WriteFieldBeginAsync(tmp81, cancellationToken);
           await oprot.WriteListBeginAsync(new TList(TType.I64, Closure.Count), cancellationToken);
-          foreach (long _iter81 in Closure)
+          foreach (long _iter84 in Closure)
           {
-            await oprot.WriteI64Async(_iter81, cancellationToken);
+            await oprot.WriteI64Async(_iter84, cancellationToken);
+          }
+          await oprot.WriteListEndAsync(cancellationToken);
+          await oprot.WriteFieldEndAsync(cancellationToken);
+        }
+        if((Redundancy != null) && __isset.redundancy)
+        {
+          tmp81.Name = "redundancy";
+          tmp81.Type = TType.List;
+          tmp81.ID = 8;
+          await oprot.WriteFieldBeginAsync(tmp81, cancellationToken);
+          await oprot.WriteListBeginAsync(new TList(TType.Double, Redundancy.Count), cancellationToken);
+          foreach (double _iter85 in Redundancy)
+          {
+            await oprot.WriteDoubleAsync(_iter85, cancellationToken);
           }
           await oprot.WriteListEndAsync(cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
@@ -441,7 +495,8 @@ namespace Yaskawa.Ext.API
         && ((__isset.pos == other.__isset.pos) && ((!__isset.pos) || (global::System.Object.Equals(Pos, other.Pos))))
         && ((__isset.orient == other.__isset.orient) && ((!__isset.orient) || (global::System.Object.Equals(Orient, other.Orient))))
         && ((__isset.joints == other.__isset.joints) && ((!__isset.joints) || (global::System.Object.Equals(Joints, other.Joints))))
-        && ((__isset.closure == other.__isset.closure) && ((!__isset.closure) || (global::System.Object.Equals(Closure, other.Closure))));
+        && ((__isset.closure == other.__isset.closure) && ((!__isset.closure) || (global::System.Object.Equals(Closure, other.Closure))))
+        && ((__isset.redundancy == other.__isset.redundancy) && ((!__isset.redundancy) || (global::System.Object.Equals(Redundancy, other.Redundancy))));
     }
 
     public override int GetHashCode() {
@@ -475,58 +530,68 @@ namespace Yaskawa.Ext.API
         {
           hashcode = (hashcode * 397) + Closure.GetHashCode();
         }
+        if((Redundancy != null) && __isset.redundancy)
+        {
+          hashcode = (hashcode * 397) + Redundancy.GetHashCode();
+        }
       }
       return hashcode;
     }
 
     public override string ToString()
     {
-      var tmp82 = new StringBuilder("Position(");
-      int tmp83 = 0;
+      var tmp86 = new StringBuilder("Position(");
+      int tmp87 = 0;
       if((Frame != null) && __isset.frame)
       {
-        if(0 < tmp83++) { tmp82.Append(", "); }
-        tmp82.Append("Frame: ");
-        Frame.ToString(tmp82);
+        if(0 < tmp87++) { tmp86.Append(", "); }
+        tmp86.Append("Frame: ");
+        Frame.ToString(tmp86);
       }
       if(__isset.distUnit)
       {
-        if(0 < tmp83++) { tmp82.Append(", "); }
-        tmp82.Append("DistUnit: ");
-        DistUnit.ToString(tmp82);
+        if(0 < tmp87++) { tmp86.Append(", "); }
+        tmp86.Append("DistUnit: ");
+        DistUnit.ToString(tmp86);
       }
       if(__isset.orientUnit)
       {
-        if(0 < tmp83++) { tmp82.Append(", "); }
-        tmp82.Append("OrientUnit: ");
-        OrientUnit.ToString(tmp82);
+        if(0 < tmp87++) { tmp86.Append(", "); }
+        tmp86.Append("OrientUnit: ");
+        OrientUnit.ToString(tmp86);
       }
       if((Pos != null) && __isset.pos)
       {
-        if(0 < tmp83++) { tmp82.Append(", "); }
-        tmp82.Append("Pos: ");
-        Pos.ToString(tmp82);
+        if(0 < tmp87++) { tmp86.Append(", "); }
+        tmp86.Append("Pos: ");
+        Pos.ToString(tmp86);
       }
       if((Orient != null) && __isset.orient)
       {
-        if(0 < tmp83++) { tmp82.Append(", "); }
-        tmp82.Append("Orient: ");
-        Orient.ToString(tmp82);
+        if(0 < tmp87++) { tmp86.Append(", "); }
+        tmp86.Append("Orient: ");
+        Orient.ToString(tmp86);
       }
       if((Joints != null) && __isset.joints)
       {
-        if(0 < tmp83++) { tmp82.Append(", "); }
-        tmp82.Append("Joints: ");
-        Joints.ToString(tmp82);
+        if(0 < tmp87++) { tmp86.Append(", "); }
+        tmp86.Append("Joints: ");
+        Joints.ToString(tmp86);
       }
       if((Closure != null) && __isset.closure)
       {
-        if(0 < tmp83++) { tmp82.Append(", "); }
-        tmp82.Append("Closure: ");
-        Closure.ToString(tmp82);
+        if(0 < tmp87++) { tmp86.Append(", "); }
+        tmp86.Append("Closure: ");
+        Closure.ToString(tmp86);
       }
-      tmp82.Append(')');
-      return tmp82.ToString();
+      if((Redundancy != null) && __isset.redundancy)
+      {
+        if(0 < tmp87++) { tmp86.Append(", "); }
+        tmp86.Append("Redundancy: ");
+        Redundancy.ToString(tmp86);
+      }
+      tmp86.Append(')');
+      return tmp86.ToString();
     }
   }
 

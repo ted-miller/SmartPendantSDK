@@ -53,16 +53,16 @@ namespace Yaskawa.Ext.API
 
     public PropValues DeepCopy()
     {
-      var tmp154 = new PropValues();
+      var tmp158 = new PropValues();
       if((ItemID != null))
       {
-        tmp154.ItemID = this.ItemID;
+        tmp158.ItemID = this.ItemID;
       }
       if((Props != null))
       {
-        tmp154.Props = this.Props.DeepCopy();
+        tmp158.Props = this.Props.DeepCopy();
       }
-      return tmp154;
+      return tmp158;
     }
 
     public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -99,16 +99,16 @@ namespace Yaskawa.Ext.API
               if (field.Type == TType.Map)
               {
                 {
-                  var _map155 = await iprot.ReadMapBeginAsync(cancellationToken);
-                  Props = new Dictionary<string, global::Yaskawa.Ext.API.Any>(_map155.Count);
-                  for(int _i156 = 0; _i156 < _map155.Count; ++_i156)
+                  var _map159 = await iprot.ReadMapBeginAsync(cancellationToken);
+                  Props = new Dictionary<string, global::Yaskawa.Ext.API.Any>(_map159.Count);
+                  for(int _i160 = 0; _i160 < _map159.Count; ++_i160)
                   {
-                    string _key157;
-                    global::Yaskawa.Ext.API.Any _val158;
-                    _key157 = await iprot.ReadStringAsync(cancellationToken);
-                    _val158 = new global::Yaskawa.Ext.API.Any();
-                    await _val158.ReadAsync(iprot, cancellationToken);
-                    Props[_key157] = _val158;
+                    string _key161;
+                    global::Yaskawa.Ext.API.Any _val162;
+                    _key161 = await iprot.ReadStringAsync(cancellationToken);
+                    _val162 = new global::Yaskawa.Ext.API.Any();
+                    await _val162.ReadAsync(iprot, cancellationToken);
+                    Props[_key161] = _val162;
                   }
                   await iprot.ReadMapEndAsync(cancellationToken);
                 }
@@ -148,29 +148,29 @@ namespace Yaskawa.Ext.API
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp159 = new TStruct("PropValues");
-        await oprot.WriteStructBeginAsync(tmp159, cancellationToken);
-        var tmp160 = new TField();
+        var tmp163 = new TStruct("PropValues");
+        await oprot.WriteStructBeginAsync(tmp163, cancellationToken);
+        var tmp164 = new TField();
         if((ItemID != null))
         {
-          tmp160.Name = "itemID";
-          tmp160.Type = TType.String;
-          tmp160.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp160, cancellationToken);
+          tmp164.Name = "itemID";
+          tmp164.Type = TType.String;
+          tmp164.ID = 1;
+          await oprot.WriteFieldBeginAsync(tmp164, cancellationToken);
           await oprot.WriteStringAsync(ItemID, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Props != null))
         {
-          tmp160.Name = "props";
-          tmp160.Type = TType.Map;
-          tmp160.ID = 2;
-          await oprot.WriteFieldBeginAsync(tmp160, cancellationToken);
+          tmp164.Name = "props";
+          tmp164.Type = TType.Map;
+          tmp164.ID = 2;
+          await oprot.WriteFieldBeginAsync(tmp164, cancellationToken);
           await oprot.WriteMapBeginAsync(new TMap(TType.String, TType.Struct, Props.Count), cancellationToken);
-          foreach (string _iter161 in Props.Keys)
+          foreach (string _iter165 in Props.Keys)
           {
-            await oprot.WriteStringAsync(_iter161, cancellationToken);
-            await Props[_iter161].WriteAsync(oprot, cancellationToken);
+            await oprot.WriteStringAsync(_iter165, cancellationToken);
+            await Props[_iter165].WriteAsync(oprot, cancellationToken);
           }
           await oprot.WriteMapEndAsync(cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
@@ -209,19 +209,19 @@ namespace Yaskawa.Ext.API
 
     public override string ToString()
     {
-      var tmp162 = new StringBuilder("PropValues(");
+      var tmp166 = new StringBuilder("PropValues(");
       if((ItemID != null))
       {
-        tmp162.Append(", ItemID: ");
-        ItemID.ToString(tmp162);
+        tmp166.Append(", ItemID: ");
+        ItemID.ToString(tmp166);
       }
       if((Props != null))
       {
-        tmp162.Append(", Props: ");
-        Props.ToString(tmp162);
+        tmp166.Append(", Props: ");
+        Props.ToString(tmp166);
       }
-      tmp162.Append(')');
-      return tmp162.ToString();
+      tmp166.Append(')');
+      return tmp166.ToString();
     }
   }
 

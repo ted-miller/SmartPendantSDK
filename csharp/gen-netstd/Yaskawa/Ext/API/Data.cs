@@ -79,18 +79,18 @@ namespace Yaskawa.Ext.API
 
     public Data DeepCopy()
     {
-      var tmp134 = new Data();
+      var tmp138 = new Data();
       if((SData != null) && __isset.sData)
       {
-        tmp134.SData = (global::Yaskawa.Ext.API.Series)this.SData.DeepCopy();
+        tmp138.SData = (global::Yaskawa.Ext.API.Series)this.SData.DeepCopy();
       }
-      tmp134.__isset.sData = this.__isset.sData;
+      tmp138.__isset.sData = this.__isset.sData;
       if((CData != null) && __isset.cData)
       {
-        tmp134.CData = (global::Yaskawa.Ext.API.Category)this.CData.DeepCopy();
+        tmp138.CData = (global::Yaskawa.Ext.API.Category)this.CData.DeepCopy();
       }
-      tmp134.__isset.cData = this.__isset.cData;
-      return tmp134;
+      tmp138.__isset.cData = this.__isset.cData;
+      return tmp138;
     }
 
     public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -153,24 +153,24 @@ namespace Yaskawa.Ext.API
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp135 = new TStruct("Data");
-        await oprot.WriteStructBeginAsync(tmp135, cancellationToken);
-        var tmp136 = new TField();
+        var tmp139 = new TStruct("Data");
+        await oprot.WriteStructBeginAsync(tmp139, cancellationToken);
+        var tmp140 = new TField();
         if((SData != null) && __isset.sData)
         {
-          tmp136.Name = "sData";
-          tmp136.Type = TType.Struct;
-          tmp136.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp136, cancellationToken);
+          tmp140.Name = "sData";
+          tmp140.Type = TType.Struct;
+          tmp140.ID = 1;
+          await oprot.WriteFieldBeginAsync(tmp140, cancellationToken);
           await SData.WriteAsync(oprot, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((CData != null) && __isset.cData)
         {
-          tmp136.Name = "cData";
-          tmp136.Type = TType.Struct;
-          tmp136.ID = 2;
-          await oprot.WriteFieldBeginAsync(tmp136, cancellationToken);
+          tmp140.Name = "cData";
+          tmp140.Type = TType.Struct;
+          tmp140.ID = 2;
+          await oprot.WriteFieldBeginAsync(tmp140, cancellationToken);
           await CData.WriteAsync(oprot, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
@@ -208,22 +208,22 @@ namespace Yaskawa.Ext.API
 
     public override string ToString()
     {
-      var tmp137 = new StringBuilder("Data(");
-      int tmp138 = 0;
+      var tmp141 = new StringBuilder("Data(");
+      int tmp142 = 0;
       if((SData != null) && __isset.sData)
       {
-        if(0 < tmp138++) { tmp137.Append(", "); }
-        tmp137.Append("SData: ");
-        SData.ToString(tmp137);
+        if(0 < tmp142++) { tmp141.Append(", "); }
+        tmp141.Append("SData: ");
+        SData.ToString(tmp141);
       }
       if((CData != null) && __isset.cData)
       {
-        if(0 < tmp138++) { tmp137.Append(", "); }
-        tmp137.Append("CData: ");
-        CData.ToString(tmp137);
+        if(0 < tmp142++) { tmp141.Append(", "); }
+        tmp141.Append("CData: ");
+        CData.ToString(tmp141);
       }
-      tmp137.Append(')');
-      return tmp137.ToString();
+      tmp141.Append(')');
+      return tmp141.ToString();
     }
   }
 

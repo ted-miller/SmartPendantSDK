@@ -94,23 +94,23 @@ namespace Yaskawa.Ext.API
 
     public Category DeepCopy()
     {
-      var tmp124 = new Category();
+      var tmp128 = new Category();
       if(__isset.v)
       {
-        tmp124.V = this.V;
+        tmp128.V = this.V;
       }
-      tmp124.__isset.v = this.__isset.v;
+      tmp128.__isset.v = this.__isset.v;
       if((Color != null) && __isset.color)
       {
-        tmp124.Color = this.Color;
+        tmp128.Color = this.Color;
       }
-      tmp124.__isset.color = this.__isset.color;
+      tmp128.__isset.color = this.__isset.color;
       if(__isset.hidden)
       {
-        tmp124.Hidden = this.Hidden;
+        tmp128.Hidden = this.Hidden;
       }
-      tmp124.__isset.hidden = this.__isset.hidden;
-      return tmp124;
+      tmp128.__isset.hidden = this.__isset.hidden;
+      return tmp128;
     }
 
     public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -181,33 +181,33 @@ namespace Yaskawa.Ext.API
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp125 = new TStruct("Category");
-        await oprot.WriteStructBeginAsync(tmp125, cancellationToken);
-        var tmp126 = new TField();
+        var tmp129 = new TStruct("Category");
+        await oprot.WriteStructBeginAsync(tmp129, cancellationToken);
+        var tmp130 = new TField();
         if(__isset.v)
         {
-          tmp126.Name = "v";
-          tmp126.Type = TType.Double;
-          tmp126.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp126, cancellationToken);
+          tmp130.Name = "v";
+          tmp130.Type = TType.Double;
+          tmp130.ID = 1;
+          await oprot.WriteFieldBeginAsync(tmp130, cancellationToken);
           await oprot.WriteDoubleAsync(V, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Color != null) && __isset.color)
         {
-          tmp126.Name = "color";
-          tmp126.Type = TType.String;
-          tmp126.ID = 2;
-          await oprot.WriteFieldBeginAsync(tmp126, cancellationToken);
+          tmp130.Name = "color";
+          tmp130.Type = TType.String;
+          tmp130.ID = 2;
+          await oprot.WriteFieldBeginAsync(tmp130, cancellationToken);
           await oprot.WriteStringAsync(Color, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.hidden)
         {
-          tmp126.Name = "hidden";
-          tmp126.Type = TType.Bool;
-          tmp126.ID = 3;
-          await oprot.WriteFieldBeginAsync(tmp126, cancellationToken);
+          tmp130.Name = "hidden";
+          tmp130.Type = TType.Bool;
+          tmp130.ID = 3;
+          await oprot.WriteFieldBeginAsync(tmp130, cancellationToken);
           await oprot.WriteBoolAsync(Hidden, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
@@ -250,28 +250,28 @@ namespace Yaskawa.Ext.API
 
     public override string ToString()
     {
-      var tmp127 = new StringBuilder("Category(");
-      int tmp128 = 0;
+      var tmp131 = new StringBuilder("Category(");
+      int tmp132 = 0;
       if(__isset.v)
       {
-        if(0 < tmp128++) { tmp127.Append(", "); }
-        tmp127.Append("V: ");
-        V.ToString(tmp127);
+        if(0 < tmp132++) { tmp131.Append(", "); }
+        tmp131.Append("V: ");
+        V.ToString(tmp131);
       }
       if((Color != null) && __isset.color)
       {
-        if(0 < tmp128++) { tmp127.Append(", "); }
-        tmp127.Append("Color: ");
-        Color.ToString(tmp127);
+        if(0 < tmp132++) { tmp131.Append(", "); }
+        tmp131.Append("Color: ");
+        Color.ToString(tmp131);
       }
       if(__isset.hidden)
       {
-        if(0 < tmp128++) { tmp127.Append(", "); }
-        tmp127.Append("Hidden: ");
-        Hidden.ToString(tmp127);
+        if(0 < tmp132++) { tmp131.Append(", "); }
+        tmp131.Append("Hidden: ");
+        Hidden.ToString(tmp131);
       }
-      tmp127.Append(')');
-      return tmp127.ToString();
+      tmp131.Append(')');
+      return tmp131.ToString();
     }
   }
 

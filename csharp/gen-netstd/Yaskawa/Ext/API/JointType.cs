@@ -15,12 +15,11 @@
 namespace Yaskawa.Ext.API
 {
   /// <summary>
-  /// Automatic - Play
-  /// Manual - Teach
+  /// Represents the joint type for a robot's axis (API Version 3.1 or Later)
   /// </summary>
-  public enum OperationMode
+  public enum JointType
   {
-    Automatic = 0,
-    Manual = 1,
+    Rotary = 0,
+    Linear = 1,
   }
 }

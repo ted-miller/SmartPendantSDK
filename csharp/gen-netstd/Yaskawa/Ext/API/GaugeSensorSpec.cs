@@ -184,53 +184,53 @@ namespace Yaskawa.Ext.API
 
     public GaugeSensorSpec DeepCopy()
     {
-      var tmp225 = new GaugeSensorSpec();
+      var tmp229 = new GaugeSensorSpec();
       if(__isset.flag)
       {
-        tmp225.Flag = this.Flag;
+        tmp229.Flag = this.Flag;
       }
-      tmp225.__isset.flag = this.__isset.flag;
+      tmp229.__isset.flag = this.__isset.flag;
       if(__isset.gain)
       {
-        tmp225.Gain = this.Gain;
+        tmp229.Gain = this.Gain;
       }
-      tmp225.__isset.gain = this.__isset.gain;
+      tmp229.__isset.gain = this.__isset.gain;
       if(__isset.offset)
       {
-        tmp225.Offset = this.Offset;
+        tmp229.Offset = this.Offset;
       }
-      tmp225.__isset.offset = this.__isset.offset;
+      tmp229.__isset.offset = this.__isset.offset;
       if(__isset.currentPos)
       {
-        tmp225.CurrentPos = this.CurrentPos;
+        tmp229.CurrentPos = this.CurrentPos;
       }
-      tmp225.__isset.currentPos = this.__isset.currentPos;
+      tmp229.__isset.currentPos = this.__isset.currentPos;
       if(__isset.currentVolt)
       {
-        tmp225.CurrentVolt = this.CurrentVolt;
+        tmp229.CurrentVolt = this.CurrentVolt;
       }
-      tmp225.__isset.currentVolt = this.__isset.currentVolt;
+      tmp229.__isset.currentVolt = this.__isset.currentVolt;
       if(__isset.firstPos)
       {
-        tmp225.FirstPos = this.FirstPos;
+        tmp229.FirstPos = this.FirstPos;
       }
-      tmp225.__isset.firstPos = this.__isset.firstPos;
+      tmp229.__isset.firstPos = this.__isset.firstPos;
       if(__isset.firstVolt)
       {
-        tmp225.FirstVolt = this.FirstVolt;
+        tmp229.FirstVolt = this.FirstVolt;
       }
-      tmp225.__isset.firstVolt = this.__isset.firstVolt;
+      tmp229.__isset.firstVolt = this.__isset.firstVolt;
       if(__isset.secondPos)
       {
-        tmp225.SecondPos = this.SecondPos;
+        tmp229.SecondPos = this.SecondPos;
       }
-      tmp225.__isset.secondPos = this.__isset.secondPos;
+      tmp229.__isset.secondPos = this.__isset.secondPos;
       if(__isset.secondVolt)
       {
-        tmp225.SecondVolt = this.SecondVolt;
+        tmp229.SecondVolt = this.SecondVolt;
       }
-      tmp225.__isset.secondVolt = this.__isset.secondVolt;
-      return tmp225;
+      tmp229.__isset.secondVolt = this.__isset.secondVolt;
+      return tmp229;
     }
 
     public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -361,87 +361,87 @@ namespace Yaskawa.Ext.API
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp226 = new TStruct("GaugeSensorSpec");
-        await oprot.WriteStructBeginAsync(tmp226, cancellationToken);
-        var tmp227 = new TField();
+        var tmp230 = new TStruct("GaugeSensorSpec");
+        await oprot.WriteStructBeginAsync(tmp230, cancellationToken);
+        var tmp231 = new TField();
         if(__isset.flag)
         {
-          tmp227.Name = "flag";
-          tmp227.Type = TType.Byte;
-          tmp227.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp227, cancellationToken);
+          tmp231.Name = "flag";
+          tmp231.Type = TType.Byte;
+          tmp231.ID = 1;
+          await oprot.WriteFieldBeginAsync(tmp231, cancellationToken);
           await oprot.WriteByteAsync(Flag, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.gain)
         {
-          tmp227.Name = "gain";
-          tmp227.Type = TType.Double;
-          tmp227.ID = 2;
-          await oprot.WriteFieldBeginAsync(tmp227, cancellationToken);
+          tmp231.Name = "gain";
+          tmp231.Type = TType.Double;
+          tmp231.ID = 2;
+          await oprot.WriteFieldBeginAsync(tmp231, cancellationToken);
           await oprot.WriteDoubleAsync(Gain, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.offset)
         {
-          tmp227.Name = "offset";
-          tmp227.Type = TType.Double;
-          tmp227.ID = 3;
-          await oprot.WriteFieldBeginAsync(tmp227, cancellationToken);
+          tmp231.Name = "offset";
+          tmp231.Type = TType.Double;
+          tmp231.ID = 3;
+          await oprot.WriteFieldBeginAsync(tmp231, cancellationToken);
           await oprot.WriteDoubleAsync(Offset, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.currentPos)
         {
-          tmp227.Name = "currentPos";
-          tmp227.Type = TType.Double;
-          tmp227.ID = 4;
-          await oprot.WriteFieldBeginAsync(tmp227, cancellationToken);
+          tmp231.Name = "currentPos";
+          tmp231.Type = TType.Double;
+          tmp231.ID = 4;
+          await oprot.WriteFieldBeginAsync(tmp231, cancellationToken);
           await oprot.WriteDoubleAsync(CurrentPos, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.currentVolt)
         {
-          tmp227.Name = "currentVolt";
-          tmp227.Type = TType.Double;
-          tmp227.ID = 5;
-          await oprot.WriteFieldBeginAsync(tmp227, cancellationToken);
+          tmp231.Name = "currentVolt";
+          tmp231.Type = TType.Double;
+          tmp231.ID = 5;
+          await oprot.WriteFieldBeginAsync(tmp231, cancellationToken);
           await oprot.WriteDoubleAsync(CurrentVolt, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.firstPos)
         {
-          tmp227.Name = "firstPos";
-          tmp227.Type = TType.Double;
-          tmp227.ID = 6;
-          await oprot.WriteFieldBeginAsync(tmp227, cancellationToken);
+          tmp231.Name = "firstPos";
+          tmp231.Type = TType.Double;
+          tmp231.ID = 6;
+          await oprot.WriteFieldBeginAsync(tmp231, cancellationToken);
           await oprot.WriteDoubleAsync(FirstPos, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.firstVolt)
         {
-          tmp227.Name = "firstVolt";
-          tmp227.Type = TType.Double;
-          tmp227.ID = 7;
-          await oprot.WriteFieldBeginAsync(tmp227, cancellationToken);
+          tmp231.Name = "firstVolt";
+          tmp231.Type = TType.Double;
+          tmp231.ID = 7;
+          await oprot.WriteFieldBeginAsync(tmp231, cancellationToken);
           await oprot.WriteDoubleAsync(FirstVolt, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.secondPos)
         {
-          tmp227.Name = "secondPos";
-          tmp227.Type = TType.Double;
-          tmp227.ID = 8;
-          await oprot.WriteFieldBeginAsync(tmp227, cancellationToken);
+          tmp231.Name = "secondPos";
+          tmp231.Type = TType.Double;
+          tmp231.ID = 8;
+          await oprot.WriteFieldBeginAsync(tmp231, cancellationToken);
           await oprot.WriteDoubleAsync(SecondPos, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.secondVolt)
         {
-          tmp227.Name = "secondVolt";
-          tmp227.Type = TType.Double;
-          tmp227.ID = 9;
-          await oprot.WriteFieldBeginAsync(tmp227, cancellationToken);
+          tmp231.Name = "secondVolt";
+          tmp231.Type = TType.Double;
+          tmp231.ID = 9;
+          await oprot.WriteFieldBeginAsync(tmp231, cancellationToken);
           await oprot.WriteDoubleAsync(SecondVolt, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
@@ -514,64 +514,64 @@ namespace Yaskawa.Ext.API
 
     public override string ToString()
     {
-      var tmp228 = new StringBuilder("GaugeSensorSpec(");
-      int tmp229 = 0;
+      var tmp232 = new StringBuilder("GaugeSensorSpec(");
+      int tmp233 = 0;
       if(__isset.flag)
       {
-        if(0 < tmp229++) { tmp228.Append(", "); }
-        tmp228.Append("Flag: ");
-        Flag.ToString(tmp228);
+        if(0 < tmp233++) { tmp232.Append(", "); }
+        tmp232.Append("Flag: ");
+        Flag.ToString(tmp232);
       }
       if(__isset.gain)
       {
-        if(0 < tmp229++) { tmp228.Append(", "); }
-        tmp228.Append("Gain: ");
-        Gain.ToString(tmp228);
+        if(0 < tmp233++) { tmp232.Append(", "); }
+        tmp232.Append("Gain: ");
+        Gain.ToString(tmp232);
       }
       if(__isset.offset)
       {
-        if(0 < tmp229++) { tmp228.Append(", "); }
-        tmp228.Append("Offset: ");
-        Offset.ToString(tmp228);
+        if(0 < tmp233++) { tmp232.Append(", "); }
+        tmp232.Append("Offset: ");
+        Offset.ToString(tmp232);
       }
       if(__isset.currentPos)
       {
-        if(0 < tmp229++) { tmp228.Append(", "); }
-        tmp228.Append("CurrentPos: ");
-        CurrentPos.ToString(tmp228);
+        if(0 < tmp233++) { tmp232.Append(", "); }
+        tmp232.Append("CurrentPos: ");
+        CurrentPos.ToString(tmp232);
       }
       if(__isset.currentVolt)
       {
-        if(0 < tmp229++) { tmp228.Append(", "); }
-        tmp228.Append("CurrentVolt: ");
-        CurrentVolt.ToString(tmp228);
+        if(0 < tmp233++) { tmp232.Append(", "); }
+        tmp232.Append("CurrentVolt: ");
+        CurrentVolt.ToString(tmp232);
       }
       if(__isset.firstPos)
       {
-        if(0 < tmp229++) { tmp228.Append(", "); }
-        tmp228.Append("FirstPos: ");
-        FirstPos.ToString(tmp228);
+        if(0 < tmp233++) { tmp232.Append(", "); }
+        tmp232.Append("FirstPos: ");
+        FirstPos.ToString(tmp232);
       }
       if(__isset.firstVolt)
       {
-        if(0 < tmp229++) { tmp228.Append(", "); }
-        tmp228.Append("FirstVolt: ");
-        FirstVolt.ToString(tmp228);
+        if(0 < tmp233++) { tmp232.Append(", "); }
+        tmp232.Append("FirstVolt: ");
+        FirstVolt.ToString(tmp232);
       }
       if(__isset.secondPos)
       {
-        if(0 < tmp229++) { tmp228.Append(", "); }
-        tmp228.Append("SecondPos: ");
-        SecondPos.ToString(tmp228);
+        if(0 < tmp233++) { tmp232.Append(", "); }
+        tmp232.Append("SecondPos: ");
+        SecondPos.ToString(tmp232);
       }
       if(__isset.secondVolt)
       {
-        if(0 < tmp229++) { tmp228.Append(", "); }
-        tmp228.Append("SecondVolt: ");
-        SecondVolt.ToString(tmp228);
+        if(0 < tmp233++) { tmp232.Append(", "); }
+        tmp232.Append("SecondVolt: ");
+        SecondVolt.ToString(tmp232);
       }
-      tmp228.Append(')');
-      return tmp228.ToString();
+      tmp232.Append(')');
+      return tmp232.ToString();
     }
   }
 

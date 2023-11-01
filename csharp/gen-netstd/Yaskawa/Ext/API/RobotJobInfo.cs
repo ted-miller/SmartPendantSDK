@@ -184,53 +184,53 @@ namespace Yaskawa.Ext.API
 
     public RobotJobInfo DeepCopy()
     {
-      var tmp193 = new RobotJobInfo();
+      var tmp197 = new RobotJobInfo();
       if((Name != null) && __isset.name)
       {
-        tmp193.Name = this.Name;
+        tmp197.Name = this.Name;
       }
-      tmp193.__isset.name = this.__isset.name;
+      tmp197.__isset.name = this.__isset.name;
       if((ProgrammingLanguage != null) && __isset.programmingLanguage)
       {
-        tmp193.ProgrammingLanguage = this.ProgrammingLanguage;
+        tmp197.ProgrammingLanguage = this.ProgrammingLanguage;
       }
-      tmp193.__isset.programmingLanguage = this.__isset.programmingLanguage;
+      tmp197.__isset.programmingLanguage = this.__isset.programmingLanguage;
       if((JobType != null) && __isset.jobType)
       {
-        tmp193.JobType = this.JobType;
+        tmp197.JobType = this.JobType;
       }
-      tmp193.__isset.jobType = this.__isset.jobType;
+      tmp197.__isset.jobType = this.__isset.jobType;
       if(__isset.editable)
       {
-        tmp193.Editable = this.Editable;
+        tmp197.Editable = this.Editable;
       }
-      tmp193.__isset.editable = this.__isset.editable;
+      tmp197.__isset.editable = this.__isset.editable;
       if(__isset.timestamp)
       {
-        tmp193.Timestamp = this.Timestamp;
+        tmp197.Timestamp = this.Timestamp;
       }
-      tmp193.__isset.timestamp = this.__isset.timestamp;
+      tmp197.__isset.timestamp = this.__isset.timestamp;
       if((Datetime != null) && __isset.datetime)
       {
-        tmp193.Datetime = this.Datetime;
+        tmp197.Datetime = this.Datetime;
       }
-      tmp193.__isset.datetime = this.__isset.datetime;
+      tmp197.__isset.datetime = this.__isset.datetime;
       if((Comment != null) && __isset.comment)
       {
-        tmp193.Comment = this.Comment;
+        tmp197.Comment = this.Comment;
       }
-      tmp193.__isset.comment = this.__isset.comment;
+      tmp197.__isset.comment = this.__isset.comment;
       if((Frame != null) && __isset.frame)
       {
-        tmp193.Frame = (global::Yaskawa.Ext.API.CoordinateFrame)this.Frame.DeepCopy();
+        tmp197.Frame = (global::Yaskawa.Ext.API.CoordinateFrame)this.Frame.DeepCopy();
       }
-      tmp193.__isset.frame = this.__isset.frame;
+      tmp197.__isset.frame = this.__isset.frame;
       if((Controlling != null) && __isset.controlling)
       {
-        tmp193.Controlling = (global::Yaskawa.Ext.API.ControlGroup)this.Controlling.DeepCopy();
+        tmp197.Controlling = (global::Yaskawa.Ext.API.ControlGroup)this.Controlling.DeepCopy();
       }
-      tmp193.__isset.controlling = this.__isset.controlling;
-      return tmp193;
+      tmp197.__isset.controlling = this.__isset.controlling;
+      return tmp197;
     }
 
     public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -363,87 +363,87 @@ namespace Yaskawa.Ext.API
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp194 = new TStruct("RobotJobInfo");
-        await oprot.WriteStructBeginAsync(tmp194, cancellationToken);
-        var tmp195 = new TField();
+        var tmp198 = new TStruct("RobotJobInfo");
+        await oprot.WriteStructBeginAsync(tmp198, cancellationToken);
+        var tmp199 = new TField();
         if((Name != null) && __isset.name)
         {
-          tmp195.Name = "name";
-          tmp195.Type = TType.String;
-          tmp195.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp195, cancellationToken);
+          tmp199.Name = "name";
+          tmp199.Type = TType.String;
+          tmp199.ID = 1;
+          await oprot.WriteFieldBeginAsync(tmp199, cancellationToken);
           await oprot.WriteStringAsync(Name, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((ProgrammingLanguage != null) && __isset.programmingLanguage)
         {
-          tmp195.Name = "programmingLanguage";
-          tmp195.Type = TType.String;
-          tmp195.ID = 2;
-          await oprot.WriteFieldBeginAsync(tmp195, cancellationToken);
+          tmp199.Name = "programmingLanguage";
+          tmp199.Type = TType.String;
+          tmp199.ID = 2;
+          await oprot.WriteFieldBeginAsync(tmp199, cancellationToken);
           await oprot.WriteStringAsync(ProgrammingLanguage, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((JobType != null) && __isset.jobType)
         {
-          tmp195.Name = "jobType";
-          tmp195.Type = TType.String;
-          tmp195.ID = 3;
-          await oprot.WriteFieldBeginAsync(tmp195, cancellationToken);
+          tmp199.Name = "jobType";
+          tmp199.Type = TType.String;
+          tmp199.ID = 3;
+          await oprot.WriteFieldBeginAsync(tmp199, cancellationToken);
           await oprot.WriteStringAsync(JobType, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.editable)
         {
-          tmp195.Name = "editable";
-          tmp195.Type = TType.Bool;
-          tmp195.ID = 4;
-          await oprot.WriteFieldBeginAsync(tmp195, cancellationToken);
+          tmp199.Name = "editable";
+          tmp199.Type = TType.Bool;
+          tmp199.ID = 4;
+          await oprot.WriteFieldBeginAsync(tmp199, cancellationToken);
           await oprot.WriteBoolAsync(Editable, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.timestamp)
         {
-          tmp195.Name = "timestamp";
-          tmp195.Type = TType.I64;
-          tmp195.ID = 5;
-          await oprot.WriteFieldBeginAsync(tmp195, cancellationToken);
+          tmp199.Name = "timestamp";
+          tmp199.Type = TType.I64;
+          tmp199.ID = 5;
+          await oprot.WriteFieldBeginAsync(tmp199, cancellationToken);
           await oprot.WriteI64Async(Timestamp, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Datetime != null) && __isset.datetime)
         {
-          tmp195.Name = "datetime";
-          tmp195.Type = TType.String;
-          tmp195.ID = 6;
-          await oprot.WriteFieldBeginAsync(tmp195, cancellationToken);
+          tmp199.Name = "datetime";
+          tmp199.Type = TType.String;
+          tmp199.ID = 6;
+          await oprot.WriteFieldBeginAsync(tmp199, cancellationToken);
           await oprot.WriteStringAsync(Datetime, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Comment != null) && __isset.comment)
         {
-          tmp195.Name = "comment";
-          tmp195.Type = TType.String;
-          tmp195.ID = 7;
-          await oprot.WriteFieldBeginAsync(tmp195, cancellationToken);
+          tmp199.Name = "comment";
+          tmp199.Type = TType.String;
+          tmp199.ID = 7;
+          await oprot.WriteFieldBeginAsync(tmp199, cancellationToken);
           await oprot.WriteStringAsync(Comment, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Frame != null) && __isset.frame)
         {
-          tmp195.Name = "frame";
-          tmp195.Type = TType.Struct;
-          tmp195.ID = 8;
-          await oprot.WriteFieldBeginAsync(tmp195, cancellationToken);
+          tmp199.Name = "frame";
+          tmp199.Type = TType.Struct;
+          tmp199.ID = 8;
+          await oprot.WriteFieldBeginAsync(tmp199, cancellationToken);
           await Frame.WriteAsync(oprot, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Controlling != null) && __isset.controlling)
         {
-          tmp195.Name = "controlling";
-          tmp195.Type = TType.Struct;
-          tmp195.ID = 9;
-          await oprot.WriteFieldBeginAsync(tmp195, cancellationToken);
+          tmp199.Name = "controlling";
+          tmp199.Type = TType.Struct;
+          tmp199.ID = 9;
+          await oprot.WriteFieldBeginAsync(tmp199, cancellationToken);
           await Controlling.WriteAsync(oprot, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
@@ -516,64 +516,64 @@ namespace Yaskawa.Ext.API
 
     public override string ToString()
     {
-      var tmp196 = new StringBuilder("RobotJobInfo(");
-      int tmp197 = 0;
+      var tmp200 = new StringBuilder("RobotJobInfo(");
+      int tmp201 = 0;
       if((Name != null) && __isset.name)
       {
-        if(0 < tmp197++) { tmp196.Append(", "); }
-        tmp196.Append("Name: ");
-        Name.ToString(tmp196);
+        if(0 < tmp201++) { tmp200.Append(", "); }
+        tmp200.Append("Name: ");
+        Name.ToString(tmp200);
       }
       if((ProgrammingLanguage != null) && __isset.programmingLanguage)
       {
-        if(0 < tmp197++) { tmp196.Append(", "); }
-        tmp196.Append("ProgrammingLanguage: ");
-        ProgrammingLanguage.ToString(tmp196);
+        if(0 < tmp201++) { tmp200.Append(", "); }
+        tmp200.Append("ProgrammingLanguage: ");
+        ProgrammingLanguage.ToString(tmp200);
       }
       if((JobType != null) && __isset.jobType)
       {
-        if(0 < tmp197++) { tmp196.Append(", "); }
-        tmp196.Append("JobType: ");
-        JobType.ToString(tmp196);
+        if(0 < tmp201++) { tmp200.Append(", "); }
+        tmp200.Append("JobType: ");
+        JobType.ToString(tmp200);
       }
       if(__isset.editable)
       {
-        if(0 < tmp197++) { tmp196.Append(", "); }
-        tmp196.Append("Editable: ");
-        Editable.ToString(tmp196);
+        if(0 < tmp201++) { tmp200.Append(", "); }
+        tmp200.Append("Editable: ");
+        Editable.ToString(tmp200);
       }
       if(__isset.timestamp)
       {
-        if(0 < tmp197++) { tmp196.Append(", "); }
-        tmp196.Append("Timestamp: ");
-        Timestamp.ToString(tmp196);
+        if(0 < tmp201++) { tmp200.Append(", "); }
+        tmp200.Append("Timestamp: ");
+        Timestamp.ToString(tmp200);
       }
       if((Datetime != null) && __isset.datetime)
       {
-        if(0 < tmp197++) { tmp196.Append(", "); }
-        tmp196.Append("Datetime: ");
-        Datetime.ToString(tmp196);
+        if(0 < tmp201++) { tmp200.Append(", "); }
+        tmp200.Append("Datetime: ");
+        Datetime.ToString(tmp200);
       }
       if((Comment != null) && __isset.comment)
       {
-        if(0 < tmp197++) { tmp196.Append(", "); }
-        tmp196.Append("Comment: ");
-        Comment.ToString(tmp196);
+        if(0 < tmp201++) { tmp200.Append(", "); }
+        tmp200.Append("Comment: ");
+        Comment.ToString(tmp200);
       }
       if((Frame != null) && __isset.frame)
       {
-        if(0 < tmp197++) { tmp196.Append(", "); }
-        tmp196.Append("Frame: ");
-        Frame.ToString(tmp196);
+        if(0 < tmp201++) { tmp200.Append(", "); }
+        tmp200.Append("Frame: ");
+        Frame.ToString(tmp200);
       }
       if((Controlling != null) && __isset.controlling)
       {
-        if(0 < tmp197++) { tmp196.Append(", "); }
-        tmp196.Append("Controlling: ");
-        Controlling.ToString(tmp196);
+        if(0 < tmp201++) { tmp200.Append(", "); }
+        tmp200.Append("Controlling: ");
+        Controlling.ToString(tmp200);
       }
-      tmp196.Append(')');
-      return tmp196.ToString();
+      tmp200.Append(')');
+      return tmp200.ToString();
     }
   }
 

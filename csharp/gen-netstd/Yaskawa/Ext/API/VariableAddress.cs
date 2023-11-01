@@ -109,23 +109,23 @@ namespace Yaskawa.Ext.API
 
     public VariableAddress DeepCopy()
     {
-      var tmp215 = new VariableAddress();
+      var tmp219 = new VariableAddress();
       if(__isset.scope)
       {
-        tmp215.Scope = this.Scope;
+        tmp219.Scope = this.Scope;
       }
-      tmp215.__isset.scope = this.__isset.scope;
+      tmp219.__isset.scope = this.__isset.scope;
       if(__isset.aspace)
       {
-        tmp215.Aspace = this.Aspace;
+        tmp219.Aspace = this.Aspace;
       }
-      tmp215.__isset.aspace = this.__isset.aspace;
+      tmp219.__isset.aspace = this.__isset.aspace;
       if(__isset.address)
       {
-        tmp215.Address = this.Address;
+        tmp219.Address = this.Address;
       }
-      tmp215.__isset.address = this.__isset.address;
-      return tmp215;
+      tmp219.__isset.address = this.__isset.address;
+      return tmp219;
     }
 
     public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -196,33 +196,33 @@ namespace Yaskawa.Ext.API
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp216 = new TStruct("VariableAddress");
-        await oprot.WriteStructBeginAsync(tmp216, cancellationToken);
-        var tmp217 = new TField();
+        var tmp220 = new TStruct("VariableAddress");
+        await oprot.WriteStructBeginAsync(tmp220, cancellationToken);
+        var tmp221 = new TField();
         if(__isset.scope)
         {
-          tmp217.Name = "scope";
-          tmp217.Type = TType.I32;
-          tmp217.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp217, cancellationToken);
+          tmp221.Name = "scope";
+          tmp221.Type = TType.I32;
+          tmp221.ID = 1;
+          await oprot.WriteFieldBeginAsync(tmp221, cancellationToken);
           await oprot.WriteI32Async((int)Scope, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.aspace)
         {
-          tmp217.Name = "aspace";
-          tmp217.Type = TType.I32;
-          tmp217.ID = 2;
-          await oprot.WriteFieldBeginAsync(tmp217, cancellationToken);
+          tmp221.Name = "aspace";
+          tmp221.Type = TType.I32;
+          tmp221.ID = 2;
+          await oprot.WriteFieldBeginAsync(tmp221, cancellationToken);
           await oprot.WriteI32Async((int)Aspace, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.address)
         {
-          tmp217.Name = "address";
-          tmp217.Type = TType.I64;
-          tmp217.ID = 3;
-          await oprot.WriteFieldBeginAsync(tmp217, cancellationToken);
+          tmp221.Name = "address";
+          tmp221.Type = TType.I64;
+          tmp221.ID = 3;
+          await oprot.WriteFieldBeginAsync(tmp221, cancellationToken);
           await oprot.WriteI64Async(Address, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
@@ -265,28 +265,28 @@ namespace Yaskawa.Ext.API
 
     public override string ToString()
     {
-      var tmp218 = new StringBuilder("VariableAddress(");
-      int tmp219 = 0;
+      var tmp222 = new StringBuilder("VariableAddress(");
+      int tmp223 = 0;
       if(__isset.scope)
       {
-        if(0 < tmp219++) { tmp218.Append(", "); }
-        tmp218.Append("Scope: ");
-        Scope.ToString(tmp218);
+        if(0 < tmp223++) { tmp222.Append(", "); }
+        tmp222.Append("Scope: ");
+        Scope.ToString(tmp222);
       }
       if(__isset.aspace)
       {
-        if(0 < tmp219++) { tmp218.Append(", "); }
-        tmp218.Append("Aspace: ");
-        Aspace.ToString(tmp218);
+        if(0 < tmp223++) { tmp222.Append(", "); }
+        tmp222.Append("Aspace: ");
+        Aspace.ToString(tmp222);
       }
       if(__isset.address)
       {
-        if(0 < tmp219++) { tmp218.Append(", "); }
-        tmp218.Append("Address: ");
-        Address.ToString(tmp218);
+        if(0 < tmp223++) { tmp222.Append(", "); }
+        tmp222.Append("Address: ");
+        Address.ToString(tmp222);
       }
-      tmp218.Append(')');
-      return tmp218.ToString();
+      tmp222.Append(')');
+      return tmp222.ToString();
     }
   }
 

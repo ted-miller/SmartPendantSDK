@@ -120,28 +120,28 @@ namespace Yaskawa.Ext.API
 
     public ControlGroup DeepCopy()
     {
-      var tmp188 = new ControlGroup();
+      var tmp192 = new ControlGroup();
       if(__isset.type)
       {
-        tmp188.Type = this.Type;
+        tmp192.Type = this.Type;
       }
-      tmp188.__isset.type = this.__isset.type;
+      tmp192.__isset.type = this.__isset.type;
       if(__isset.number)
       {
-        tmp188.Number = this.Number;
+        tmp192.Number = this.Number;
       }
-      tmp188.__isset.number = this.__isset.number;
+      tmp192.__isset.number = this.__isset.number;
       if((Sgroup != null) && __isset.sgroup)
       {
-        tmp188.Sgroup = (global::Yaskawa.Ext.API.SimpleControlGroup)this.Sgroup.DeepCopy();
+        tmp192.Sgroup = (global::Yaskawa.Ext.API.SimpleControlGroup)this.Sgroup.DeepCopy();
       }
-      tmp188.__isset.sgroup = this.__isset.sgroup;
+      tmp192.__isset.sgroup = this.__isset.sgroup;
       if((Cgroup != null) && __isset.cgroup)
       {
-        tmp188.Cgroup = (global::Yaskawa.Ext.API.CombinedControlGroup)this.Cgroup.DeepCopy();
+        tmp192.Cgroup = (global::Yaskawa.Ext.API.CombinedControlGroup)this.Cgroup.DeepCopy();
       }
-      tmp188.__isset.cgroup = this.__isset.cgroup;
-      return tmp188;
+      tmp192.__isset.cgroup = this.__isset.cgroup;
+      return tmp192;
     }
 
     public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -224,42 +224,42 @@ namespace Yaskawa.Ext.API
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp189 = new TStruct("ControlGroup");
-        await oprot.WriteStructBeginAsync(tmp189, cancellationToken);
-        var tmp190 = new TField();
+        var tmp193 = new TStruct("ControlGroup");
+        await oprot.WriteStructBeginAsync(tmp193, cancellationToken);
+        var tmp194 = new TField();
         if(__isset.type)
         {
-          tmp190.Name = "type";
-          tmp190.Type = TType.I32;
-          tmp190.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp190, cancellationToken);
+          tmp194.Name = "type";
+          tmp194.Type = TType.I32;
+          tmp194.ID = 1;
+          await oprot.WriteFieldBeginAsync(tmp194, cancellationToken);
           await oprot.WriteI32Async((int)Type, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if(__isset.number)
         {
-          tmp190.Name = "number";
-          tmp190.Type = TType.Byte;
-          tmp190.ID = 2;
-          await oprot.WriteFieldBeginAsync(tmp190, cancellationToken);
+          tmp194.Name = "number";
+          tmp194.Type = TType.Byte;
+          tmp194.ID = 2;
+          await oprot.WriteFieldBeginAsync(tmp194, cancellationToken);
           await oprot.WriteByteAsync(Number, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Sgroup != null) && __isset.sgroup)
         {
-          tmp190.Name = "sgroup";
-          tmp190.Type = TType.Struct;
-          tmp190.ID = 3;
-          await oprot.WriteFieldBeginAsync(tmp190, cancellationToken);
+          tmp194.Name = "sgroup";
+          tmp194.Type = TType.Struct;
+          tmp194.ID = 3;
+          await oprot.WriteFieldBeginAsync(tmp194, cancellationToken);
           await Sgroup.WriteAsync(oprot, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Cgroup != null) && __isset.cgroup)
         {
-          tmp190.Name = "cgroup";
-          tmp190.Type = TType.Struct;
-          tmp190.ID = 4;
-          await oprot.WriteFieldBeginAsync(tmp190, cancellationToken);
+          tmp194.Name = "cgroup";
+          tmp194.Type = TType.Struct;
+          tmp194.ID = 4;
+          await oprot.WriteFieldBeginAsync(tmp194, cancellationToken);
           await Cgroup.WriteAsync(oprot, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
@@ -307,34 +307,34 @@ namespace Yaskawa.Ext.API
 
     public override string ToString()
     {
-      var tmp191 = new StringBuilder("ControlGroup(");
-      int tmp192 = 0;
+      var tmp195 = new StringBuilder("ControlGroup(");
+      int tmp196 = 0;
       if(__isset.type)
       {
-        if(0 < tmp192++) { tmp191.Append(", "); }
-        tmp191.Append("Type: ");
-        Type.ToString(tmp191);
+        if(0 < tmp196++) { tmp195.Append(", "); }
+        tmp195.Append("Type: ");
+        Type.ToString(tmp195);
       }
       if(__isset.number)
       {
-        if(0 < tmp192++) { tmp191.Append(", "); }
-        tmp191.Append("Number: ");
-        Number.ToString(tmp191);
+        if(0 < tmp196++) { tmp195.Append(", "); }
+        tmp195.Append("Number: ");
+        Number.ToString(tmp195);
       }
       if((Sgroup != null) && __isset.sgroup)
       {
-        if(0 < tmp192++) { tmp191.Append(", "); }
-        tmp191.Append("Sgroup: ");
-        Sgroup.ToString(tmp191);
+        if(0 < tmp196++) { tmp195.Append(", "); }
+        tmp195.Append("Sgroup: ");
+        Sgroup.ToString(tmp195);
       }
       if((Cgroup != null) && __isset.cgroup)
       {
-        if(0 < tmp192++) { tmp191.Append(", "); }
-        tmp191.Append("Cgroup: ");
-        Cgroup.ToString(tmp191);
+        if(0 < tmp196++) { tmp195.Append(", "); }
+        tmp195.Append("Cgroup: ");
+        Cgroup.ToString(tmp195);
       }
-      tmp191.Append(')');
-      return tmp191.ToString();
+      tmp195.Append(')');
+      return tmp195.ToString();
     }
   }
 

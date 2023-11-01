@@ -98,23 +98,23 @@ namespace Yaskawa.Ext.API
 
     public storageInfo DeepCopy()
     {
-      var tmp139 = new storageInfo();
+      var tmp143 = new storageInfo();
       if((Path != null) && __isset.path)
       {
-        tmp139.Path = this.Path;
+        tmp143.Path = this.Path;
       }
-      tmp139.__isset.path = this.__isset.path;
+      tmp143.__isset.path = this.__isset.path;
       if((Volname != null) && __isset.volname)
       {
-        tmp139.Volname = this.Volname;
+        tmp143.Volname = this.Volname;
       }
-      tmp139.__isset.volname = this.__isset.volname;
+      tmp143.__isset.volname = this.__isset.volname;
       if((Volsize != null) && __isset.volsize)
       {
-        tmp139.Volsize = this.Volsize;
+        tmp143.Volsize = this.Volsize;
       }
-      tmp139.__isset.volsize = this.__isset.volsize;
-      return tmp139;
+      tmp143.__isset.volsize = this.__isset.volsize;
+      return tmp143;
     }
 
     public async global::System.Threading.Tasks.Task ReadAsync(TProtocol iprot, CancellationToken cancellationToken)
@@ -185,33 +185,33 @@ namespace Yaskawa.Ext.API
       oprot.IncrementRecursionDepth();
       try
       {
-        var tmp140 = new TStruct("storageInfo");
-        await oprot.WriteStructBeginAsync(tmp140, cancellationToken);
-        var tmp141 = new TField();
+        var tmp144 = new TStruct("storageInfo");
+        await oprot.WriteStructBeginAsync(tmp144, cancellationToken);
+        var tmp145 = new TField();
         if((Path != null) && __isset.path)
         {
-          tmp141.Name = "path";
-          tmp141.Type = TType.String;
-          tmp141.ID = 1;
-          await oprot.WriteFieldBeginAsync(tmp141, cancellationToken);
+          tmp145.Name = "path";
+          tmp145.Type = TType.String;
+          tmp145.ID = 1;
+          await oprot.WriteFieldBeginAsync(tmp145, cancellationToken);
           await oprot.WriteStringAsync(Path, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Volname != null) && __isset.volname)
         {
-          tmp141.Name = "volname";
-          tmp141.Type = TType.String;
-          tmp141.ID = 2;
-          await oprot.WriteFieldBeginAsync(tmp141, cancellationToken);
+          tmp145.Name = "volname";
+          tmp145.Type = TType.String;
+          tmp145.ID = 2;
+          await oprot.WriteFieldBeginAsync(tmp145, cancellationToken);
           await oprot.WriteStringAsync(Volname, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
         if((Volsize != null) && __isset.volsize)
         {
-          tmp141.Name = "volsize";
-          tmp141.Type = TType.String;
-          tmp141.ID = 3;
-          await oprot.WriteFieldBeginAsync(tmp141, cancellationToken);
+          tmp145.Name = "volsize";
+          tmp145.Type = TType.String;
+          tmp145.ID = 3;
+          await oprot.WriteFieldBeginAsync(tmp145, cancellationToken);
           await oprot.WriteStringAsync(Volsize, cancellationToken);
           await oprot.WriteFieldEndAsync(cancellationToken);
         }
@@ -254,28 +254,28 @@ namespace Yaskawa.Ext.API
 
     public override string ToString()
     {
-      var tmp142 = new StringBuilder("storageInfo(");
-      int tmp143 = 0;
+      var tmp146 = new StringBuilder("storageInfo(");
+      int tmp147 = 0;
       if((Path != null) && __isset.path)
       {
-        if(0 < tmp143++) { tmp142.Append(", "); }
-        tmp142.Append("Path: ");
-        Path.ToString(tmp142);
+        if(0 < tmp147++) { tmp146.Append(", "); }
+        tmp146.Append("Path: ");
+        Path.ToString(tmp146);
       }
       if((Volname != null) && __isset.volname)
       {
-        if(0 < tmp143++) { tmp142.Append(", "); }
-        tmp142.Append("Volname: ");
-        Volname.ToString(tmp142);
+        if(0 < tmp147++) { tmp146.Append(", "); }
+        tmp146.Append("Volname: ");
+        Volname.ToString(tmp146);
       }
       if((Volsize != null) && __isset.volsize)
       {
-        if(0 < tmp143++) { tmp142.Append(", "); }
-        tmp142.Append("Volsize: ");
-        Volsize.ToString(tmp142);
+        if(0 < tmp147++) { tmp146.Append(", "); }
+        tmp146.Append("Volsize: ");
+        Volsize.ToString(tmp146);
       }
-      tmp142.Append(')');
-      return tmp142.ToString();
+      tmp146.Append(')');
+      return tmp146.ToString();
     }
   }
 
