@@ -308,6 +308,18 @@ namespace Yaskawa.Ext
                 client.registerSwitch(id, identifier, integrationPoint, switchLabel, offPositionLabel, onPositionLabel, defaultState).Wait();
         }
 
+        public void registerDirectOpenForInstr(string identifier, string instruction, List<string> instrTags)
+        {
+            lock (extension.SyncRoot)
+                client.registerDirectOpenForInstr(id, identifier, instruction, instrTags).Wait();
+        }
+
+        public void unregisterDirectOpenForInstr(string identifier, string instruction)
+        {
+            lock (extension.SyncRoot)
+                client.unregisterDirectOpenForInstr(id, identifier, instruction).Wait();
+        }
+
         public Any property(string itemID, string name)
         {
             //Console.WriteLine(client.property(id, itemID, name).SValue);
