@@ -40,6 +40,7 @@ namespace Yaskawa.Ext.API
     IntegrationPointSwitchStateChanged = 21,
     ValueChanged = 22,
     UtilityCreated = 23,
+    UtilityDirectOpened = 24,
     Other = 16384,
   }
 }
