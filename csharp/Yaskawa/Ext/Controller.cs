@@ -222,6 +222,32 @@ namespace Yaskawa.Ext
                 client.storeJobSource(id, name, programmingLanguage, sourceCode).Wait();
         }
 
+        //System Files
+
+        public bool storeSystemFileContents(String name, String contents)
+        {
+            lock (extension.SyncRoot)
+                return client.storeSystemFileContents(id, name, contents).Result;
+        }
+
+        public bool storeSystemFile(String name)
+        {
+            lock (extension.SyncRoot)
+                return client.storeSystemFile(id, name).Result;
+        }
+
+        public String retrieveSystemFileContents(String name)
+        {
+            lock (extension.SyncRoot)
+                return client.retrieveSystemFileContents(id, name).Result;
+        }
+
+        public void retrieveSystemFile(String name)
+        {
+            lock (extension.SyncRoot)
+                client.retrieveSystemFile(id, name).Wait();
+        }
+
 
         // Tools
 
