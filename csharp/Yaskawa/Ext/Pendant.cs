@@ -783,6 +783,30 @@ namespace Yaskawa.Ext
                 client.displayHelp(id, title, htmlContentFile).Wait();
         }
 
+        public void appendYmlRowToContainer(string containerID, Dictionary<string, Any> ymlProperties)
+        {
+            lock (extension.SyncRoot)
+                client.appendRow(id, containerID, ymlProperties).Wait();
+        }
+
+        public void insertYmlRowInContainer(string containerID, int rowIndex, Dictionary<string, Any> ymlProperties)
+        {
+            lock (extension.SyncRoot)
+                client.insertRow(id, containerID, rowIndex, ymlProperties).Wait();
+        }
+
+        public void deleteYmlRowFromContainer(string containerID, int rowIndex)
+        {
+            lock (extension.SyncRoot)
+                client.deleteRow(id, containerID, rowIndex).Wait();
+        }
+
+        public void clearAllYmlRowsFromContainer(string containerID)
+        {
+            lock (extension.SyncRoot)
+                client.clearRows(id, containerID).Wait();
+        }
+
 
         protected Extension extension;
         protected API.Pendant.Client client;
