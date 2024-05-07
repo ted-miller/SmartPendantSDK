@@ -96,6 +96,33 @@ namespace Yaskawa.Ext
             lock (extension.SyncRoot)
                 return client.currentScreenName(id).Result;
         }
+
+        public AccessLevel currenAccessLevel()
+        {
+            lock (extension.SyncRoot)
+            {
+                switch (client.accessLevel(id).Result)
+                {
+                    case "Operate":
+                        return AccessLevel.Operation;
+
+                    case "Edit":
+                        return AccessLevel.Editing;
+
+                    case "Management":
+                        return AccessLevel.Management;
+
+                    case "Safety":
+                        return AccessLevel.Safety;
+
+                    case "Yaskawa":
+                        return AccessLevel.Maker;
+
+                    default:
+                        return AccessLevel.Operation;
+                }
+            }
+        }
  
 		public List<string> registerYML(string ymlSource)
 		{
@@ -807,6 +834,15 @@ namespace Yaskawa.Ext
                 client.clearRows(id, containerID).Wait();
         }
 
+        public enum AccessLevel
+        {
+            Operation = 0,
+            Editing,
+            Management,
+            Safety,
+            OneTime,
+            Maker
+        }
 
         protected Extension extension;
         protected API.Pendant.Client client;
