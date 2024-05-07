@@ -97,29 +97,29 @@ namespace Yaskawa.Ext
                 return client.currentScreenName(id).Result;
         }
 
-        public AccessLevel currenAccessLevel()
+        public AccessLevel currentAccessLevel()
         {
             lock (extension.SyncRoot)
             {
                 switch (client.accessLevel(id).Result)
                 {
                     case "Operate":
-                        return AccessLevel.Operation;
+                        return AccessLevel.Operating;
 
                     case "Edit":
                         return AccessLevel.Editing;
 
                     case "Management":
-                        return AccessLevel.Management;
+                        return AccessLevel.Managing;
 
                     case "Safety":
-                        return AccessLevel.Safety;
+                        return AccessLevel.ManagingSafety;
 
                     case "Yaskawa":
-                        return AccessLevel.Maker;
+                        return AccessLevel.Administering;
 
                     default:
-                        return AccessLevel.Operation;
+                        return AccessLevel.Operating;
                 }
             }
         }
@@ -836,13 +836,14 @@ namespace Yaskawa.Ext
 
         public enum AccessLevel
         {
-            Operation = 0,
+            Monitoring = 0,
+            Operating,
             Editing,
-            Management,
-            Safety,
-            OneTime,
-            Maker
-        }
+            Managing,
+            ManagingSafety,
+            Support,
+            Administering
+        };
 
         protected Extension extension;
         protected API.Pendant.Client client;
