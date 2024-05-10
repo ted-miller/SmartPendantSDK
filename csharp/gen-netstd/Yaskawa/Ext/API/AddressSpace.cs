@@ -26,5 +26,7 @@ namespace Yaskawa.Ext.API
     Real = 4,
     String = 5,
     Position = 6,
+    BasePosition = 7,
+    StationPosition = 8,
   }
 }

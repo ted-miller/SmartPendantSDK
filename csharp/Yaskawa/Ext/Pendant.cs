@@ -115,10 +115,10 @@ namespace Yaskawa.Ext
                     case "Safety":
                         return AccessLevel.ManagingSafety;
 
-                    case "One-time Management":
+                    case "Support":
                         return AccessLevel.Support;
 
-                    case "Yaskawa":
+                    case "Admin":
                         return AccessLevel.Administering;
 
                     default:

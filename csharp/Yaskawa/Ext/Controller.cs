@@ -161,6 +161,12 @@ namespace Yaskawa.Ext
                 return client.currentJob(id).Result;
         }
 
+        public int currentJobLine(int taskNo)
+        {
+            lock (extension.SyncRoot)
+                return client.currentJobLine(id, taskNo).Result;
+        }
+
         public void setCurrentJob(String name, int line)
         {
             lock (extension.SyncRoot)

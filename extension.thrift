@@ -49,6 +49,7 @@ struct Orient {
     3: optional Matrix m;
 }
 
+
 struct VectorOrient {
     1: Vector v;
     2: Orient o;
@@ -450,7 +451,6 @@ enum DynamicInstructionType {
     Welding = 1,
 }
 
-
 /** The Pendant API provides functions for interacting with and 
     integrating the main Smart Pendant user-interface.
 
@@ -530,7 +530,6 @@ service Pendant
     /** Unregisters a user added menu - All Utilities within the menu must be unregistered with 'unregisterUtilityWindow' first*/ 
     void unregisterUtilityMenu(1:PendantID p, 2:string menuName)
                         throws (1:IllegalArgument e);
-
     /** Register a Utility window with the UI.  
         The itemType references a previously registered YML item instantiated for the window
         UI content.
@@ -541,6 +540,7 @@ service Pendant
                                3:string itemType,
                                4:string menuItemName, 5:string windowTitle)
                           throws (1:IllegalArgument e);
+
     void registerUtilityWindowWithMenu(1:PendantID p, 2:string identifier, 
                                3:string itemType,
                                4:string menuItemName, 5:string windowTitle, 6:string menuName)
@@ -548,7 +548,7 @@ service Pendant
 
     void unregisterUtilityWindow(1:PendantID p, 2:string identifier)
                           throws (1:IllegalArgument e);
-    
+
     /** Open (make visible) previously registered Utility Window */
     void openUtilityWindow(1:PendantID p, 2:string identifier);
 
@@ -930,7 +930,9 @@ enum AddressSpace {
     DoubleInt,
     Real,
     String,
-    Position
+    Position,
+    BasePosition,
+    StationPosition
 }
 
 /** Variable address (scope, address-space & address/index) */
@@ -993,6 +995,19 @@ enum JogSpeed {
     Medium = 2,  
     High   = 3,  
     Top    = 4
+}
+
+/** Available motion types available when using GoToPositionButton 
+    * DefaultInterpolation - uses joint interpolation to move to joint coordinate position, and linear interpolation to move to Cartesian coordinate position.
+    * JointInterpolation - uses joint interpolation (regardless of position coordinate system)
+    * LinearInterpolation - uses linear interpolation (regardless of position coordinate system)
+    (API version 3.1 and later)
+*/
+enum MotionTypes
+{
+    DefaultInterpolation = -1,
+    JointInterpolation  = 0,
+    LinearInterpolation = 1  
 }
 
 #----Internal Use Only (Issue #6309)----
@@ -1157,6 +1172,9 @@ service Controller
     /** Set the current job. 'jobcontrol' permission required. Pass line=1 for start of job, line=0 for default/no-change. */
     void setCurrentJob(1:ControllerID c, 2:string name, 3:i32 line) throws (1:IllegalArgument e);
 
+    /** Current job line */
+    i32 currentJobLine(1:ControllerID c, 2:i32 taskNo);
+
     /** Name of the default (aka master) job.  Empty if no default job designated */
     string defaultJob(1:ControllerID c);
 
@@ -1186,8 +1204,6 @@ service Controller
         Will thow if syntax errors in source.
     */
     void storeJobSource(1:ControllerID c, 2:string name, 3:string programmingLanguage, 4:string sourceCode) throws (1:IllegalArgument e);
-
-
 
     //
     // File Management
