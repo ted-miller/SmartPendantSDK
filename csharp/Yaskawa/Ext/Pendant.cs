@@ -148,18 +148,18 @@ namespace Yaskawa.Ext
 
 		public void registerImageFile(String imageFileName)
 		{
-			try 
-			{
-                lock (extension.SyncRoot)
-                    client.registerImageFile(id, imageFileName).Wait();
-			} 
-			catch (Exception e1)
-			{
+			//try 
+			//{
+   //             lock (extension.SyncRoot)
+   //                 client.registerImageFile(id, imageFileName).Wait();
+			//} 
+			//catch (Exception e1)
+			//{
 				// something went wrong - possible file isn't accessible from service end, so send data over API
 				Console.WriteLine("[" + imageFileName + "] isn't accessible by the remote device. Opening the file locally and sending data.");
 
-				try
-				{
+				//try
+				//{
 					var imageBytes = File.ReadAllBytes(Path.GetFullPath(imageFileName));
 					MemoryStream stream = new MemoryStream();
 					using (BinaryWriter writer = new BinaryWriter(stream))
@@ -170,12 +170,12 @@ namespace Yaskawa.Ext
 					byte[] bytes = stream.ToArray();
                     lock (extension.SyncRoot)
                         client.registerImageData(id, bytes, imageFileName).Wait();
-				}
-				catch (Exception)
-				{
-					throw e1; //backup attempt didn't work. raise the original exception
-				}
-			}
+			//	}
+			//	catch (Exception e2)
+			//	{
+			//		throw e2; //backup attempt didn't work. raise the original exception
+			//	}
+			//}
 		}
 
         public void registerImageData(byte[] imageData, String imageName)
@@ -817,6 +817,12 @@ namespace Yaskawa.Ext
         {
             lock (extension.SyncRoot)
                 client.appendRow(id, containerID, ymlProperties).Wait();
+        }
+
+        public void appendMultipleYmlRowsToContainer(string containerID, List<Any> ymlRowMaps)
+        {
+            lock (extension.SyncRoot)
+                client.appendRows(id, containerID, ymlRowMaps).Wait();
         }
 
         public void insertYmlRowInContainer(string containerID, int rowIndex, Dictionary<string, Any> ymlProperties)
