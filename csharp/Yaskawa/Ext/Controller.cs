@@ -167,10 +167,15 @@ namespace Yaskawa.Ext
                 return client.currentJobLine(id, taskNo).Result;
         }
 
-        public void setCurrentJob(String name, int line)
+        public void setCurrentJob(String name)
+        {
+            setCurrentJob(name, 0);
+        }
+
+        public void setCurrentJob(String name, int line_zerobased)
         {
             lock (extension.SyncRoot)
-                client.setCurrentJob(id, name, line).Wait();
+                client.setCurrentJob(id, name, line_zerobased + 1).Wait(); // ISSUE: The +1 is due to what I consider a bug in SP. See https://dev.yaskawa.io/pendant-dev/globalpendant/-/issues/6312
         }
 
         public String defaultJob()
