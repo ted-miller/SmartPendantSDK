@@ -655,6 +655,23 @@ public void setVariable(String name, Any value)
                 client.setVariableName(id, addr, name).Wait();
         }
 
+        public Position transformPositionToFrame(Position pos, CoordinateFrame newFrame, int kinematicTool)
+        {
+            lock (extension.SyncRoot)
+                return client.transformPositionToFrame(id, pos, newFrame, kinematicTool).Result;
+        }
+
+        public Position transformPositionToFrame(Position pos, CoordinateFrame newFrame)
+        {
+            return transformPositionToFrame(pos, newFrame, 0);
+        }
+
+        public Position convertPositionUnits(Position pos, DistanceUnit newDistUnit, OrientationUnit newOrientUnit)
+        {
+            lock (extension.SyncRoot)
+                return client.convertPositionUnits(id, pos, newDistUnit, newOrientUnit).Result;
+        }
+
         public Zone zone(int index)
         {
             lock (extension.SyncRoot)
