@@ -731,12 +731,17 @@ namespace Yaskawa.Ext.API
       /// Transform a Position coordinate values into another coordinate frame (not all conversion are supported or make sense)
       /// Also supports transformation between Joint frame and Cartesian frames of the TCP (Tool Center Point) position (implicitly).
       /// In this case the specific tool that determines the kinematic structure of the robot must be supplied (via the kinematicTool parameter).
+      /// Additionally, since Cartesian IK may not be unique, you can select between matching the closure of another provided refPosition (Closure ikScheme)
+      /// or minimizing the joint angle coordinate difference to the additionally provided refPosition (Delta ikScheme).  Pass ikScheme None if not applicable.
+      /// These parameters will be ignored when not relevant.
       /// </summary>
       /// <param name="c"></param>
       /// <param name="pos"></param>
       /// <param name="newFrame"></param>
       /// <param name="kinematicTool"></param>
-      global::System.Threading.Tasks.Task<global::Yaskawa.Ext.API.Position> transformPositionToFrame(long c, global::Yaskawa.Ext.API.Position pos, global::Yaskawa.Ext.API.CoordinateFrame newFrame, int kinematicTool, CancellationToken cancellationToken = default);
+      /// <param name="ikScheme"></param>
+      /// <param name="refPosition"></param>
+      global::System.Threading.Tasks.Task<global::Yaskawa.Ext.API.Position> transformPositionToFrame(long c, global::Yaskawa.Ext.API.Position pos, global::Yaskawa.Ext.API.CoordinateFrame newFrame, int kinematicTool, global::Yaskawa.Ext.API.InverseKinematicsScheme ikScheme, global::Yaskawa.Ext.API.Position refPosition, CancellationToken cancellationToken = default);
 
       /// <summary>
       /// Convert coordinate values for length and/or angles in pos to the specified units, as appropriate (pass unit None for no-change or if irrelevant)
@@ -4446,13 +4451,13 @@ namespace Yaskawa.Ext.API
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "variableRange failed: unknown result");
       }
 
-      public async global::System.Threading.Tasks.Task<global::Yaskawa.Ext.API.Position> transformPositionToFrame(long c, global::Yaskawa.Ext.API.Position pos, global::Yaskawa.Ext.API.CoordinateFrame newFrame, int kinematicTool, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<global::Yaskawa.Ext.API.Position> transformPositionToFrame(long c, global::Yaskawa.Ext.API.Position pos, global::Yaskawa.Ext.API.CoordinateFrame newFrame, int kinematicTool, global::Yaskawa.Ext.API.InverseKinematicsScheme ikScheme, global::Yaskawa.Ext.API.Position refPosition, CancellationToken cancellationToken = default)
       {
-        await send_transformPositionToFrame(c, pos, newFrame, kinematicTool, cancellationToken);
+        await send_transformPositionToFrame(c, pos, newFrame, kinematicTool, ikScheme, refPosition, cancellationToken);
         return await recv_transformPositionToFrame(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task send_transformPositionToFrame(long c, global::Yaskawa.Ext.API.Position pos, global::Yaskawa.Ext.API.CoordinateFrame newFrame, int kinematicTool, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task send_transformPositionToFrame(long c, global::Yaskawa.Ext.API.Position pos, global::Yaskawa.Ext.API.CoordinateFrame newFrame, int kinematicTool, global::Yaskawa.Ext.API.InverseKinematicsScheme ikScheme, global::Yaskawa.Ext.API.Position refPosition, CancellationToken cancellationToken = default)
       {
         await OutputProtocol.WriteMessageBeginAsync(new TMessage("transformPositionToFrame", TMessageType.Call, SeqId), cancellationToken);
         
@@ -4461,6 +4466,8 @@ namespace Yaskawa.Ext.API
           Pos = pos,
           NewFrame = newFrame,
           KinematicTool = kinematicTool,
+          IkScheme = ikScheme,
+          RefPosition = refPosition,
         };
         
         await tmp2185.WriteAsync(OutputProtocol, cancellationToken);
@@ -8381,7 +8388,7 @@ namespace Yaskawa.Ext.API
         {
           try
           {
-            tmp2741.Success = await _iAsync.transformPositionToFrame(tmp2740.C, tmp2740.Pos, tmp2740.NewFrame, tmp2740.KinematicTool, cancellationToken);
+            tmp2741.Success = await _iAsync.transformPositionToFrame(tmp2740.C, tmp2740.Pos, tmp2740.NewFrame, tmp2740.KinematicTool, tmp2740.IkScheme, tmp2740.RefPosition, cancellationToken);
           }
           catch (global::Yaskawa.Ext.API.IllegalArgument tmp2742)
           {
@@ -39399,6 +39406,8 @@ namespace Yaskawa.Ext.API
         private global::Yaskawa.Ext.API.Position _pos;
         private global::Yaskawa.Ext.API.CoordinateFrame _newFrame;
         private int _kinematicTool;
+        private global::Yaskawa.Ext.API.InverseKinematicsScheme _ikScheme;
+        private global::Yaskawa.Ext.API.Position _refPosition;
 
         public long C
         {
@@ -39452,6 +39461,36 @@ namespace Yaskawa.Ext.API
           }
         }
 
+        /// <summary>
+        /// 
+        /// <seealso cref="global::Yaskawa.Ext.API.InverseKinematicsScheme"/>
+        /// </summary>
+        public global::Yaskawa.Ext.API.InverseKinematicsScheme IkScheme
+        {
+          get
+          {
+            return _ikScheme;
+          }
+          set
+          {
+            __isset.ikScheme = true;
+            this._ikScheme = value;
+          }
+        }
+
+        public global::Yaskawa.Ext.API.Position RefPosition
+        {
+          get
+          {
+            return _refPosition;
+          }
+          set
+          {
+            __isset.refPosition = true;
+            this._refPosition = value;
+          }
+        }
+
 
         public Isset __isset;
         public struct Isset
@@ -39460,6 +39499,8 @@ namespace Yaskawa.Ext.API
           public bool pos;
           public bool newFrame;
           public bool kinematicTool;
+          public bool ikScheme;
+          public bool refPosition;
         }
 
         public transformPositionToFrame_args()
@@ -39489,6 +39530,16 @@ namespace Yaskawa.Ext.API
             tmp3723.KinematicTool = this.KinematicTool;
           }
           tmp3723.__isset.kinematicTool = this.__isset.kinematicTool;
+          if(__isset.ikScheme)
+          {
+            tmp3723.IkScheme = this.IkScheme;
+          }
+          tmp3723.__isset.ikScheme = this.__isset.ikScheme;
+          if((RefPosition != null) && __isset.refPosition)
+          {
+            tmp3723.RefPosition = (global::Yaskawa.Ext.API.Position)this.RefPosition.DeepCopy();
+          }
+          tmp3723.__isset.refPosition = this.__isset.refPosition;
           return tmp3723;
         }
 
@@ -39545,6 +39596,27 @@ namespace Yaskawa.Ext.API
                   if (field.Type == TType.I32)
                   {
                     KinematicTool = await iprot.ReadI32Async(cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                case 5:
+                  if (field.Type == TType.I32)
+                  {
+                    IkScheme = (global::Yaskawa.Ext.API.InverseKinematicsScheme)await iprot.ReadI32Async(cancellationToken);
+                  }
+                  else
+                  {
+                    await TProtocolUtil.SkipAsync(iprot, field.Type, cancellationToken);
+                  }
+                  break;
+                case 6:
+                  if (field.Type == TType.Struct)
+                  {
+                    RefPosition = new global::Yaskawa.Ext.API.Position();
+                    await RefPosition.ReadAsync(iprot, cancellationToken);
                   }
                   else
                   {
@@ -39611,6 +39683,24 @@ namespace Yaskawa.Ext.API
               await oprot.WriteI32Async(KinematicTool, cancellationToken);
               await oprot.WriteFieldEndAsync(cancellationToken);
             }
+            if(__isset.ikScheme)
+            {
+              tmp3725.Name = "ikScheme";
+              tmp3725.Type = TType.I32;
+              tmp3725.ID = 5;
+              await oprot.WriteFieldBeginAsync(tmp3725, cancellationToken);
+              await oprot.WriteI32Async((int)IkScheme, cancellationToken);
+              await oprot.WriteFieldEndAsync(cancellationToken);
+            }
+            if((RefPosition != null) && __isset.refPosition)
+            {
+              tmp3725.Name = "refPosition";
+              tmp3725.Type = TType.Struct;
+              tmp3725.ID = 6;
+              await oprot.WriteFieldBeginAsync(tmp3725, cancellationToken);
+              await RefPosition.WriteAsync(oprot, cancellationToken);
+              await oprot.WriteFieldEndAsync(cancellationToken);
+            }
             await oprot.WriteFieldStopAsync(cancellationToken);
             await oprot.WriteStructEndAsync(cancellationToken);
           }
@@ -39627,7 +39717,9 @@ namespace Yaskawa.Ext.API
           return ((__isset.c == other.__isset.c) && ((!__isset.c) || (global::System.Object.Equals(C, other.C))))
             && ((__isset.pos == other.__isset.pos) && ((!__isset.pos) || (global::System.Object.Equals(Pos, other.Pos))))
             && ((__isset.newFrame == other.__isset.newFrame) && ((!__isset.newFrame) || (global::System.Object.Equals(NewFrame, other.NewFrame))))
-            && ((__isset.kinematicTool == other.__isset.kinematicTool) && ((!__isset.kinematicTool) || (global::System.Object.Equals(KinematicTool, other.KinematicTool))));
+            && ((__isset.kinematicTool == other.__isset.kinematicTool) && ((!__isset.kinematicTool) || (global::System.Object.Equals(KinematicTool, other.KinematicTool))))
+            && ((__isset.ikScheme == other.__isset.ikScheme) && ((!__isset.ikScheme) || (global::System.Object.Equals(IkScheme, other.IkScheme))))
+            && ((__isset.refPosition == other.__isset.refPosition) && ((!__isset.refPosition) || (global::System.Object.Equals(RefPosition, other.RefPosition))));
         }
 
         public override int GetHashCode() {
@@ -39648,6 +39740,14 @@ namespace Yaskawa.Ext.API
             if(__isset.kinematicTool)
             {
               hashcode = (hashcode * 397) + KinematicTool.GetHashCode();
+            }
+            if(__isset.ikScheme)
+            {
+              hashcode = (hashcode * 397) + IkScheme.GetHashCode();
+            }
+            if((RefPosition != null) && __isset.refPosition)
+            {
+              hashcode = (hashcode * 397) + RefPosition.GetHashCode();
             }
           }
           return hashcode;
@@ -39680,6 +39780,18 @@ namespace Yaskawa.Ext.API
             if(0 < tmp3727++) { tmp3726.Append(", "); }
             tmp3726.Append("KinematicTool: ");
             KinematicTool.ToString(tmp3726);
+          }
+          if(__isset.ikScheme)
+          {
+            if(0 < tmp3727++) { tmp3726.Append(", "); }
+            tmp3726.Append("IkScheme: ");
+            IkScheme.ToString(tmp3726);
+          }
+          if((RefPosition != null) && __isset.refPosition)
+          {
+            if(0 < tmp3727++) { tmp3726.Append(", "); }
+            tmp3726.Append("RefPosition: ");
+            RefPosition.ToString(tmp3726);
           }
           tmp3726.Append(')');
           return tmp3726.ToString();

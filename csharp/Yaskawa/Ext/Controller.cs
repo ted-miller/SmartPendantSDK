@@ -655,10 +655,16 @@ public void setVariable(String name, Any value)
                 client.setVariableName(id, addr, name).Wait();
         }
 
+        public Position transformPositionToFrame(Position pos, CoordinateFrame newFrame, int kinematicTool, InverseKinematicsScheme ikScheme, Position refPosition)
+        {
+            lock (extension.SyncRoot)
+                return client.transformPositionToFrame(id, pos, newFrame, kinematicTool, ikScheme, refPosition).Result;
+        }
+
         public Position transformPositionToFrame(Position pos, CoordinateFrame newFrame, int kinematicTool)
         {
             lock (extension.SyncRoot)
-                return client.transformPositionToFrame(id, pos, newFrame, kinematicTool).Result;
+                return client.transformPositionToFrame(id, pos, newFrame, kinematicTool, InverseKinematicsScheme.None, new Position()).Result;
         }
 
         public Position transformPositionToFrame(Position pos, CoordinateFrame newFrame)
