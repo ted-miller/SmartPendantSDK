@@ -735,6 +735,18 @@ namespace Yaskawa.Ext
                 return client.insertInstructionAtSelectedLine(id, instruction).Result;
         }
 
+        public String modifyInstructionAtSelectedLine(String instruction)
+        {
+            lock (extension.SyncRoot)
+                return client.modifyInstructionAtSelectedLine(id, instruction).Result;
+        }
+
+        public String deleteInstructionAtSelectedLine()
+        {
+            lock (extension.SyncRoot)
+                return client.deleteInstructionAtSelectedLine(id).Result;
+        }
+
         // event consumer functions
         public void addEventConsumer(PendantEventType eventType, Action<PendantEvent> c)
         {
