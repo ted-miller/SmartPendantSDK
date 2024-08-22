@@ -735,10 +735,10 @@ namespace Yaskawa.Ext
                 return client.insertInstructionAtSelectedLine(id, instruction).Result;
         }
 
-        public String modifyInstructionAtSelectedLine(String instruction)
+        public String replaceInstructionAtSelectedLine(String instruction)
         {
             lock (extension.SyncRoot)
-                return client.modifyInstructionAtSelectedLine(id, instruction).Result;
+                return client.replaceInstructionAtSelectedLine(id, instruction).Result;
         }
 
         public String deleteInstructionAtSelectedLine()

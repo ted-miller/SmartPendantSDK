@@ -492,7 +492,7 @@ namespace Yaskawa.Ext.API
       /// <param name="instruction"></param>
       global::System.Threading.Tasks.Task<string> insertInstructionAtSelectedLine(long p, string instruction, CancellationToken cancellationToken = default);
 
-      global::System.Threading.Tasks.Task<string> modifyInstructionAtSelectedLine(long p, string instruction, CancellationToken cancellationToken = default);
+      global::System.Threading.Tasks.Task<string> replaceInstructionAtSelectedLine(long p, string instruction, CancellationToken cancellationToken = default);
 
       global::System.Threading.Tasks.Task<string> deleteInstructionAtSelectedLine(long p, CancellationToken cancellationToken = default);
 
@@ -2588,17 +2588,17 @@ namespace Yaskawa.Ext.API
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "insertInstructionAtSelectedLine failed: unknown result");
       }
 
-      public async global::System.Threading.Tasks.Task<string> modifyInstructionAtSelectedLine(long p, string instruction, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<string> replaceInstructionAtSelectedLine(long p, string instruction, CancellationToken cancellationToken = default)
       {
-        await send_modifyInstructionAtSelectedLine(p, instruction, cancellationToken);
-        return await recv_modifyInstructionAtSelectedLine(cancellationToken);
+        await send_replaceInstructionAtSelectedLine(p, instruction, cancellationToken);
+        return await recv_replaceInstructionAtSelectedLine(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task send_modifyInstructionAtSelectedLine(long p, string instruction, CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task send_replaceInstructionAtSelectedLine(long p, string instruction, CancellationToken cancellationToken = default)
       {
-        await OutputProtocol.WriteMessageBeginAsync(new TMessage("modifyInstructionAtSelectedLine", TMessageType.Call, SeqId), cancellationToken);
+        await OutputProtocol.WriteMessageBeginAsync(new TMessage("replaceInstructionAtSelectedLine", TMessageType.Call, SeqId), cancellationToken);
         
-        var tmp860 = new InternalStructs.modifyInstructionAtSelectedLine_args() {
+        var tmp860 = new InternalStructs.replaceInstructionAtSelectedLine_args() {
           P = p,
           Instruction = instruction,
         };
@@ -2608,7 +2608,7 @@ namespace Yaskawa.Ext.API
         await OutputProtocol.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task<string> recv_modifyInstructionAtSelectedLine(CancellationToken cancellationToken = default)
+      public async global::System.Threading.Tasks.Task<string> recv_replaceInstructionAtSelectedLine(CancellationToken cancellationToken = default)
       {
         
         var tmp861 = await InputProtocol.ReadMessageBeginAsync(cancellationToken);
@@ -2619,14 +2619,14 @@ namespace Yaskawa.Ext.API
           throw tmp862;
         }
 
-        var tmp863 = new InternalStructs.modifyInstructionAtSelectedLine_result();
+        var tmp863 = new InternalStructs.replaceInstructionAtSelectedLine_result();
         await tmp863.ReadAsync(InputProtocol, cancellationToken);
         await InputProtocol.ReadMessageEndAsync(cancellationToken);
         if (tmp863.__isset.success)
         {
           return tmp863.Success;
         }
-        throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "modifyInstructionAtSelectedLine failed: unknown result");
+        throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "replaceInstructionAtSelectedLine failed: unknown result");
       }
 
       public async global::System.Threading.Tasks.Task<string> deleteInstructionAtSelectedLine(long p, CancellationToken cancellationToken = default)
@@ -3070,7 +3070,7 @@ namespace Yaskawa.Ext.API
         processMap_["popupDialog"] = popupDialog_ProcessAsync;
         processMap_["cancelPopupDialog"] = cancelPopupDialog_ProcessAsync;
         processMap_["insertInstructionAtSelectedLine"] = insertInstructionAtSelectedLine_ProcessAsync;
-        processMap_["modifyInstructionAtSelectedLine"] = modifyInstructionAtSelectedLine_ProcessAsync;
+        processMap_["replaceInstructionAtSelectedLine"] = replaceInstructionAtSelectedLine_ProcessAsync;
         processMap_["deleteInstructionAtSelectedLine"] = deleteInstructionAtSelectedLine_ProcessAsync;
         processMap_["displayScreen"] = displayScreen_ProcessAsync;
         processMap_["displayHelp"] = displayHelp_ProcessAsync;
@@ -4866,16 +4866,16 @@ namespace Yaskawa.Ext.API
         await oprot.Transport.FlushAsync(cancellationToken);
       }
 
-      public async global::System.Threading.Tasks.Task modifyInstructionAtSelectedLine_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
+      public async global::System.Threading.Tasks.Task replaceInstructionAtSelectedLine_ProcessAsync(int seqid, TProtocol iprot, TProtocol oprot, CancellationToken cancellationToken)
       {
-        var tmp1183 = new InternalStructs.modifyInstructionAtSelectedLine_args();
+        var tmp1183 = new InternalStructs.replaceInstructionAtSelectedLine_args();
         await tmp1183.ReadAsync(iprot, cancellationToken);
         await iprot.ReadMessageEndAsync(cancellationToken);
-        var tmp1184 = new InternalStructs.modifyInstructionAtSelectedLine_result();
+        var tmp1184 = new InternalStructs.replaceInstructionAtSelectedLine_result();
         try
         {
-          tmp1184.Success = await _iAsync.modifyInstructionAtSelectedLine(tmp1183.P, tmp1183.Instruction, cancellationToken);
-          await oprot.WriteMessageBeginAsync(new TMessage("modifyInstructionAtSelectedLine", TMessageType.Reply, seqid), cancellationToken); 
+          tmp1184.Success = await _iAsync.replaceInstructionAtSelectedLine(tmp1183.P, tmp1183.Instruction, cancellationToken);
+          await oprot.WriteMessageBeginAsync(new TMessage("replaceInstructionAtSelectedLine", TMessageType.Reply, seqid), cancellationToken); 
           await tmp1184.WriteAsync(oprot, cancellationToken);
         }
         catch (TTransportException)
@@ -4890,7 +4890,7 @@ namespace Yaskawa.Ext.API
           else
             Console.Error.WriteLine(tmp1186);
           var tmp1187 = new TApplicationException(TApplicationException.ExceptionType.InternalError," Internal error.");
-          await oprot.WriteMessageBeginAsync(new TMessage("modifyInstructionAtSelectedLine", TMessageType.Exception, seqid), cancellationToken);
+          await oprot.WriteMessageBeginAsync(new TMessage("replaceInstructionAtSelectedLine", TMessageType.Exception, seqid), cancellationToken);
           await tmp1187.WriteAsync(oprot, cancellationToken);
         }
         await oprot.WriteMessageEndAsync(cancellationToken);
@@ -24432,7 +24432,7 @@ namespace Yaskawa.Ext.API
       }
 
 
-      public partial class modifyInstructionAtSelectedLine_args : TBase
+      public partial class replaceInstructionAtSelectedLine_args : TBase
       {
         private long _p;
         private string _instruction;
@@ -24471,13 +24471,13 @@ namespace Yaskawa.Ext.API
           public bool instruction;
         }
 
-        public modifyInstructionAtSelectedLine_args()
+        public replaceInstructionAtSelectedLine_args()
         {
         }
 
-        public modifyInstructionAtSelectedLine_args DeepCopy()
+        public replaceInstructionAtSelectedLine_args DeepCopy()
         {
-          var tmp1767 = new modifyInstructionAtSelectedLine_args();
+          var tmp1767 = new replaceInstructionAtSelectedLine_args();
           if(__isset.p)
           {
             tmp1767.P = this.P;
@@ -24549,7 +24549,7 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1768 = new TStruct("modifyInstructionAtSelectedLine_args");
+            var tmp1768 = new TStruct("replaceInstructionAtSelectedLine_args");
             await oprot.WriteStructBeginAsync(tmp1768, cancellationToken);
             var tmp1769 = new TField();
             if(__isset.p)
@@ -24581,7 +24581,7 @@ namespace Yaskawa.Ext.API
 
         public override bool Equals(object that)
         {
-          if (!(that is modifyInstructionAtSelectedLine_args other)) return false;
+          if (!(that is replaceInstructionAtSelectedLine_args other)) return false;
           if (ReferenceEquals(this, other)) return true;
           return ((__isset.p == other.__isset.p) && ((!__isset.p) || (global::System.Object.Equals(P, other.P))))
             && ((__isset.instruction == other.__isset.instruction) && ((!__isset.instruction) || (global::System.Object.Equals(Instruction, other.Instruction))));
@@ -24604,7 +24604,7 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1770 = new StringBuilder("modifyInstructionAtSelectedLine_args(");
+          var tmp1770 = new StringBuilder("replaceInstructionAtSelectedLine_args(");
           int tmp1771 = 0;
           if(__isset.p)
           {
@@ -24624,7 +24624,7 @@ namespace Yaskawa.Ext.API
       }
 
 
-      public partial class modifyInstructionAtSelectedLine_result : TBase
+      public partial class replaceInstructionAtSelectedLine_result : TBase
       {
         private string _success;
 
@@ -24648,13 +24648,13 @@ namespace Yaskawa.Ext.API
           public bool success;
         }
 
-        public modifyInstructionAtSelectedLine_result()
+        public replaceInstructionAtSelectedLine_result()
         {
         }
 
-        public modifyInstructionAtSelectedLine_result DeepCopy()
+        public replaceInstructionAtSelectedLine_result DeepCopy()
         {
-          var tmp1772 = new modifyInstructionAtSelectedLine_result();
+          var tmp1772 = new replaceInstructionAtSelectedLine_result();
           if((Success != null) && __isset.success)
           {
             tmp1772.Success = this.Success;
@@ -24711,7 +24711,7 @@ namespace Yaskawa.Ext.API
           oprot.IncrementRecursionDepth();
           try
           {
-            var tmp1773 = new TStruct("modifyInstructionAtSelectedLine_result");
+            var tmp1773 = new TStruct("replaceInstructionAtSelectedLine_result");
             await oprot.WriteStructBeginAsync(tmp1773, cancellationToken);
             var tmp1774 = new TField();
 
@@ -24738,7 +24738,7 @@ namespace Yaskawa.Ext.API
 
         public override bool Equals(object that)
         {
-          if (!(that is modifyInstructionAtSelectedLine_result other)) return false;
+          if (!(that is replaceInstructionAtSelectedLine_result other)) return false;
           if (ReferenceEquals(this, other)) return true;
           return ((__isset.success == other.__isset.success) && ((!__isset.success) || (global::System.Object.Equals(Success, other.Success))));
         }
@@ -24756,7 +24756,7 @@ namespace Yaskawa.Ext.API
 
         public override string ToString()
         {
-          var tmp1775 = new StringBuilder("modifyInstructionAtSelectedLine_result(");
+          var tmp1775 = new StringBuilder("replaceInstructionAtSelectedLine_result(");
           int tmp1776 = 0;
           if((Success != null) && __isset.success)
           {
