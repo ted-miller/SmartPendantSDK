@@ -467,10 +467,17 @@ namespace Yaskawa.Ext
             lock (extension.SyncRoot)
                 client.setOutputAddress(id, address, value).Wait();
         }
+
         public void setNetworkInputAddress(int address, bool value)
         {
             lock (extension.SyncRoot)
                 client.setNetworkInputAddress(id, address, value).Wait();
+        }
+
+        public void setInterfacePanelAddress(int address, bool value)
+        {
+            lock (extension.SyncRoot)
+                client.setInterfacePanelAddress(id, address, value).Wait();
         }
 
         public ushort mRegisterValue(int index)
